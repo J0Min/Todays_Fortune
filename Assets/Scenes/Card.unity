@@ -183,7 +183,11 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   selectedCardPivot: {fileID: 1274637246}
-  selectionDuration: 0.35
+  selectionDuration: 0.5
+  selectedCardScale: {x: 5, y: 5, z: 1}
+  enableHover: 1
+  hoverSpreadDistance: 0.4
+  hoverDuration: 0.15
   sortingOrder: 0
   sortingLayerName: Default
 --- !u!4 &103688807

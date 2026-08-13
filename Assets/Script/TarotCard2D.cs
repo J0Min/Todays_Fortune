@@ -17,4 +17,16 @@ public class TarotCard2D : MonoBehaviour
         if (cardFan != null)
             cardFan.SelectCard(transform);
     }
+
+    private void OnMouseEnter()
+    {
+        if (cardFan != null)
+            cardFan.HoverCard(transform);
+    }
+
+    private void OnMouseExit()
+    {
+        if (cardFan != null)
+            cardFan.ClearHoverCard(transform);
+    }
 }
