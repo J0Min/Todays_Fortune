@@ -150,8 +150,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TarotCardFan
   cardBackSprite: {fileID: -1932786364905023747, guid: c3d4a79aac42907428df18410783de15, type: 3}
   cardCount: 12
-  width: 5
-  fanAngle: 100
+  width: 12
+  fanAngle: 55
   arcHeight: 1.2
   centerOffset: {x: 0, y: 0}
   placementDuration: 0.12
@@ -184,9 +184,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   selectedCardPivot: {fileID: 1274637246}
   selectionDuration: 0.5
-  selectedCardScale: {x: 5, y: 5, z: 1}
+  selectedCardScale: {x: 2, y: 2, z: 1}
   enableHover: 1
-  hoverSpreadDistance: 0.4
+  hoverSpreadDistance: 1
   hoverDuration: 0.15
   sortingOrder: 0
   sortingLayerName: Default
@@ -199,7 +199,7 @@ Transform:
   m_GameObject: {fileID: 103688805}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.10526, y: 0.84889, z: 0}
+  m_LocalPosition: {x: -0.45, y: 0.84889, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -231,7 +231,7 @@ Transform:
   m_GameObject: {fileID: 1274637245}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.94, y: 0, z: 0}
+  m_LocalPosition: {x: 0.39, y: -0.54, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
