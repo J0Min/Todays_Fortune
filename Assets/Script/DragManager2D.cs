@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Video;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -22,7 +21,6 @@ public class DragManager2D : MonoBehaviour
     private LayerMask selectionZoneLayers;
     [SerializeField, Tooltip("Prevents dragging another rope after one has been confirmed.")]
     private bool lockAfterSelection = true;
-    [SerializeField] private VideoPlayer selectionVideoPlayer;
     [SerializeField] private DragAnchorConfirmedEvent onAnchorConfirmed;
 
     private DragAnchor2D activeAnchor;
@@ -76,8 +74,6 @@ public class DragManager2D : MonoBehaviour
 
         confirmedAnchor = anchor;
         Debug.Log($"Rope selected: {anchor.name}", anchor);
-        if (selectionVideoPlayer != null)
-            selectionVideoPlayer.Play();
         onAnchorConfirmed?.Invoke(anchor);
     }
 
