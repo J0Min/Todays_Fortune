@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1f04f6f7cd8dff4384ffc5789faaf62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TarotCardFan
-  cardBackSprite: {fileID: -452105543, guid: ca1b93ee1e9822646bf4dec1955f866f, type: 3}
+  cardBackSprite: {fileID: -1932786364905023747, guid: c3d4a79aac42907428df18410783de15, type: 3}
   cardCount: 12
   width: 5
   fanAngle: 100
