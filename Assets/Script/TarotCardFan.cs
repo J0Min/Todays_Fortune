@@ -9,9 +9,9 @@ using UnityEngine;
 /// </summary>
 public class TarotCardFan : MonoBehaviour
 {
-    [Header("Cards")]
-    [Tooltip("Leave empty to use every direct child as a card.")]
-    [SerializeField] private Transform[] cards;
+    [Header("Card Spawn")]
+    [SerializeField] private Sprite cardBackSprite;
+    [SerializeField, Min(1)] private int cardCount = 5;
 
     [Header("Fan Shape")]
     [SerializeField, Min(0f)] private float width = 10f;
@@ -23,13 +23,36 @@ public class TarotCardFan : MonoBehaviour
     [SerializeField, Min(0f), Tooltip("Travel time per card position. The stack moves continuously through the whole fan.")]
     private float placementDuration = 0.12f;
     [SerializeField] private bool unfoldOnStart = true;
+    [SerializeField, Tooltip("Starts the stacked cards at the first card's fan position and angle instead of their current pose.")]
+    private bool startAtFirstCardFanAngle = true;
+    [SerializeField, Min(0f), Tooltip("Time to wait after the initial stacked-card pose is shown, before unfolding begins.")]
+    private float unfoldStartDelay = 0f;
     [SerializeField] private AnimationCurve unfoldEase = null;
+
+    [Header("Card Selection")]
+    [SerializeField, Tooltip("A child Transform that defines where the selected card moves after selection.")]
+    private Transform selectedCardPivot;
+    [SerializeField, Min(0f)] private float selectionDuration = 0.35f;
+    [SerializeField, Tooltip("Local scale applied to the selected card at the selection pivot.")]
+    private Vector3 selectedCardScale = Vector3.one;
+
+    [Header("Card Hover")]
+    [SerializeField] private bool enableHover = true;
+    [SerializeField, Min(0f), Tooltip("How far the left and right card groups separate from the hovered card along the fan curve.")]
+    private float hoverSpreadDistance = 0.4f;
+    [SerializeField, Min(0f)] private float hoverDuration = 0.15f;
 
     [Header("2D Draw Order")]
     [SerializeField] private int sortingOrder = 0;
     [SerializeField] private string sortingLayerName = "Default";
 
     private Coroutine unfoldRoutine;
+    private Coroutine selectionRoutine;
+    private Coroutine hoverRoutine;
+    private readonly List<Transform> spawnedCards = new List<Transform>();
+    private bool isUnfolding;
+    private bool cardSelected;
+    private Transform hoveredCard;
 
     private void Reset()
     {
@@ -38,10 +61,42 @@ public class TarotCardFan : MonoBehaviour
 
     private void Start()
     {
+        SpawnCards();
+
         if (unfoldOnStart)
             Unfold();
         else
             SnapToFan();
+    }
+
+    [ContextMenu("Spawn Cards")]
+    public void SpawnCards()
+    {
+        ClearSpawnedCards();
+        cardSelected = false;
+
+        if (cardBackSprite == null)
+        {
+            Debug.LogWarning("TarotCardFan needs a Card Back Sprite before it can spawn cards.", this);
+            return;
+        }
+
+        int count = Mathf.Max(1, cardCount);
+        for (int i = 0; i < count; i++)
+        {
+            GameObject cardObject = new GameObject($"Card {i + 1:00}");
+            cardObject.transform.SetParent(transform, false);
+
+            SpriteRenderer spriteRenderer = cardObject.AddComponent<SpriteRenderer>();
+            spriteRenderer.sprite = cardBackSprite;
+
+            BoxCollider2D cardCollider = cardObject.AddComponent<BoxCollider2D>();
+            cardCollider.size = cardBackSprite.bounds.size;
+
+            TarotCard2D card = cardObject.AddComponent<TarotCard2D>();
+            card.Initialize(this);
+            spawnedCards.Add(cardObject.transform);
+        }
     }
 
     [ContextMenu("Unfold")]
@@ -63,6 +118,143 @@ public class TarotCardFan : MonoBehaviour
         }
     }
 
+    public void FocusCard(Transform selectedCard)
+    {
+        if (selectedCard == null || selectedCardPivot == null) return;
+
+        if (selectionRoutine != null)
+            StopCoroutine(selectionRoutine);
+
+        selectionRoutine = StartCoroutine(FocusCardRoutine(selectedCard));
+    }
+
+    public void SelectCard(Transform selectedCard)
+    {
+        if (isUnfolding || cardSelected || !spawnedCards.Contains(selectedCard)) return;
+
+        cardSelected = true;
+        hoveredCard = null;
+        if (hoverRoutine != null)
+            StopCoroutine(hoverRoutine);
+        FocusCard(selectedCard);
+    }
+
+    public void HoverCard(Transform card)
+    {
+        if (!enableHover || isUnfolding || cardSelected || card == hoveredCard || !spawnedCards.Contains(card)) return;
+
+        hoveredCard = card;
+        StartHoverLayoutAnimation();
+    }
+
+    public void ClearHoverCard(Transform card)
+    {
+        if (card != hoveredCard || cardSelected) return;
+
+        hoveredCard = null;
+        StartHoverLayoutAnimation();
+    }
+
+    private IEnumerator FocusCardRoutine(Transform selectedCard)
+    {
+        List<Transform> activeCards = GetCards();
+        Vector3 selectedStartPosition = selectedCard.localPosition;
+        Quaternion selectedStartRotation = selectedCard.localRotation;
+        Vector3 selectedStartScale = selectedCard.localScale;
+        Color[] otherStartColors = new Color[activeCards.Count];
+
+        for (int i = 0; i < activeCards.Count; i++)
+        {
+            if (activeCards[i] == selectedCard) continue;
+
+            SpriteRenderer spriteRenderer = activeCards[i].GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+                otherStartColors[i] = spriteRenderer.color;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < selectionDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = selectionDuration <= 0f ? 1f : Mathf.Clamp01(elapsed / selectionDuration);
+            selectedCard.localPosition = Vector3.Lerp(selectedStartPosition, selectedCardPivot.localPosition, t);
+            selectedCard.localRotation = Quaternion.Slerp(selectedStartRotation, selectedCardPivot.localRotation, t);
+            selectedCard.localScale = Vector3.Lerp(selectedStartScale, selectedCardScale, t);
+
+            for (int i = 0; i < activeCards.Count; i++)
+            {
+                if (activeCards[i] == selectedCard) continue;
+
+                SpriteRenderer spriteRenderer = activeCards[i].GetComponent<SpriteRenderer>();
+                if (spriteRenderer == null) continue;
+
+                Color color = otherStartColors[i];
+                color.a *= 1f - t;
+                spriteRenderer.color = color;
+            }
+            yield return null;
+        }
+
+        selectedCard.localPosition = selectedCardPivot.localPosition;
+        selectedCard.localRotation = selectedCardPivot.localRotation;
+        selectedCard.localScale = selectedCardScale;
+        selectionRoutine = null;
+    }
+
+    private void StartHoverLayoutAnimation()
+    {
+        if (hoverRoutine != null)
+            StopCoroutine(hoverRoutine);
+
+        hoverRoutine = StartCoroutine(AnimateHoverLayout());
+    }
+
+    private IEnumerator AnimateHoverLayout()
+    {
+        List<Transform> activeCards = GetCards();
+        Vector3[] startPositions = new Vector3[activeCards.Count];
+        Vector3[] targetPositions = new Vector3[activeCards.Count];
+        Quaternion[] startRotations = new Quaternion[activeCards.Count];
+        Quaternion[] targetRotations = new Quaternion[activeCards.Count];
+        int hoveredIndex = hoveredCard == null ? -1 : activeCards.IndexOf(hoveredCard);
+        float normalizedSpread = width > 0.0001f ? hoverSpreadDistance / width : 0f;
+
+        for (int i = 0; i < activeCards.Count; i++)
+        {
+            startPositions[i] = activeCards[i].localPosition;
+            startRotations[i] = activeCards[i].localRotation;
+            float t = activeCards.Count <= 1 ? 0.5f : (float)i / (activeCards.Count - 1);
+
+            if (hoveredIndex >= 0 && i != hoveredIndex)
+                t += Mathf.Sign(i - hoveredIndex) * normalizedSpread;
+
+            GetTargetAtNormalizedPosition(t, out targetPositions[i], out targetRotations[i]);
+
+            if (hoveredIndex >= 0 && i != hoveredIndex && width <= 0.0001f)
+                targetPositions[i].x += Mathf.Sign(i - hoveredIndex) * hoverSpreadDistance;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < hoverDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = hoverDuration <= 0f ? 1f : Mathf.Clamp01(elapsed / hoverDuration);
+            for (int i = 0; i < activeCards.Count; i++)
+            {
+                activeCards[i].localPosition = Vector3.Lerp(startPositions[i], targetPositions[i], t);
+                activeCards[i].localRotation = Quaternion.Slerp(startRotations[i], targetRotations[i], t);
+            }
+            yield return null;
+        }
+
+        for (int i = 0; i < activeCards.Count; i++)
+        {
+            activeCards[i].localPosition = targetPositions[i];
+            activeCards[i].localRotation = targetRotations[i];
+        }
+        hoverRoutine = null;
+    }
+
     private IEnumerator UnfoldCards()
     {
         List<Transform> activeCards = GetCards();
@@ -75,18 +267,33 @@ public class TarotCardFan : MonoBehaviour
             yield break;
         }
 
+        isUnfolding = true;
+
         // All cards begin as one stack. It travels through every target in one
         // continuous spline motion; a card stays behind when its target is passed.
         Vector3 stackPosition = activeCards[0].localPosition;
         Quaternion stackRotation = activeCards[0].localRotation;
         for (int i = 0; i < activeCards.Count; i++)
         {
+            GetTarget(i, activeCards.Count, out targetPositions[i], out targetRotations[i]);
+        }
+
+        if (startAtFirstCardFanAngle)
+        {
+            stackPosition = targetPositions[0];
+            stackRotation = targetRotations[0];
+        }
+
+        for (int i = 0; i < activeCards.Count; i++)
+        {
             Transform card = activeCards[i];
             card.localPosition = stackPosition;
             card.localRotation = stackRotation;
-            GetTarget(i, activeCards.Count, out targetPositions[i], out targetRotations[i]);
             SetDrawOrder(card, i);
         }
+
+        if (unfoldStartDelay > 0f)
+            yield return new WaitForSeconds(unfoldStartDelay);
 
         float totalDuration = placementDuration * activeCards.Count;
         float elapsed = 0f;
@@ -127,6 +334,7 @@ public class TarotCardFan : MonoBehaviour
             activeCards[i].localPosition = targetPositions[i];
             activeCards[i].localRotation = targetRotations[i];
         }
+        isUnfolding = false;
         unfoldRoutine = null;
     }
 
@@ -161,20 +369,30 @@ public class TarotCardFan : MonoBehaviour
     private List<Transform> GetCards()
     {
         var result = new List<Transform>();
-        if (cards != null && cards.Length > 0)
+        for (int i = spawnedCards.Count - 1; i >= 0; i--)
         {
-            foreach (Transform card in cards)
-                if (card != null && card.gameObject.activeSelf) result.Add(card);
-        }
-        else
-        {
-            for (int i = 0; i < transform.childCount; i++)
+            Transform card = spawnedCards[i];
+            if (card == null)
             {
-                Transform card = transform.GetChild(i);
-                if (card.gameObject.activeSelf) result.Add(card);
+                spawnedCards.RemoveAt(i);
+                continue;
             }
+
+            if (card.gameObject.activeSelf)
+                result.Add(card);
         }
+        result.Reverse();
         return result;
+    }
+
+    private void ClearSpawnedCards()
+    {
+        for (int i = 0; i < spawnedCards.Count; i++)
+        {
+            if (spawnedCards[i] != null)
+                Destroy(spawnedCards[i].gameObject);
+        }
+        spawnedCards.Clear();
     }
 
     private void ApplyTarget(Transform card, int index, int count)
@@ -188,10 +406,15 @@ public class TarotCardFan : MonoBehaviour
     private void GetTarget(int index, int count, out Vector3 position, out Quaternion rotation)
     {
         float t = count <= 1 ? 0.5f : (float)index / (count - 1);
-        float x = Mathf.Lerp(-width * 0.5f, width * 0.5f, t);
+        GetTargetAtNormalizedPosition(t, out position, out rotation);
+    }
+
+    private void GetTargetAtNormalizedPosition(float t, out Vector3 position, out Quaternion rotation)
+    {
+        float x = Mathf.LerpUnclamped(-width * 0.5f, width * 0.5f, t);
         // The middle cards sit highest, giving the row a gentle upward arc.
         float y = arcHeight * (1f - 4f * Mathf.Pow(t - 0.5f, 2f));
-        float zAngle = Mathf.Lerp(fanAngle * 0.5f, -fanAngle * 0.5f, t);
+        float zAngle = Mathf.LerpUnclamped(fanAngle * 0.5f, -fanAngle * 0.5f, t);
 
         position = new Vector3(x + centerOffset.x, y + centerOffset.y, 0f);
         rotation = Quaternion.Euler(0f, 0f, zAngle);
