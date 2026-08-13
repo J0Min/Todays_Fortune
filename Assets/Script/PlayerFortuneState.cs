@@ -4,9 +4,23 @@ public sealed class PlayerFortuneState : MonoBehaviour
 {
     [SerializeField] private bool runResetTestOnStart = true;
 
+    public static PlayerFortuneState Instance { get; private set; }
+
     public int RopeId { get; private set; }
     public int CardId { get; private set; }
     public FortuneDataReader.FortuneData FortuneResult { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
 
     public void SaveSelection(int ropeId, int cardId)
     {
