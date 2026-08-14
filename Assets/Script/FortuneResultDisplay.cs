@@ -1,14 +1,9 @@
-using TMPro;
 using UnityEngine;
 
 public sealed class FortuneResultDisplay : MonoBehaviour
 {
     [Header("Data Source")]
     [SerializeField] private FortuneDataReader fortuneDataReader;
-
-    [Header("Result Text")]
-    [SerializeField] private TextMeshProUGUI titleText;
-    [SerializeField] private TextMeshProUGUI descriptionText;
 
     private void Start()
     {
@@ -17,14 +12,6 @@ public sealed class FortuneResultDisplay : MonoBehaviour
 
     public void RefreshDisplay()
     {
-        if (titleText == null || descriptionText == null)
-        {
-            Debug.LogError(
-                "[FortuneResultDisplay] Title Text and Description Text must both be assigned in the Inspector.",
-                this);
-            return;
-        }
-
         PlayerFortuneState state = PlayerFortuneState.Instance;
         if (state == null)
         {
@@ -74,13 +61,5 @@ public sealed class FortuneResultDisplay : MonoBehaviour
             state.SetFortuneResult(fortune);
         }
 
-        if (fortune == null)
-        {
-            Debug.LogError("[FortuneResultDisplay] Fortune result is missing.", this);
-            return;
-        }
-
-        titleText.text = fortune.Title ?? string.Empty;
-        descriptionText.text = fortune.Description ?? string.Empty;
     }
 }
