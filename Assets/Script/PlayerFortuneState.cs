@@ -28,14 +28,17 @@ public sealed class PlayerFortuneState : MonoBehaviour
     public void SelectRandomRope()
     {
         RopeId = Random.Range(1, ropeIdCount + 1);
-        CardId = 0;
-        FortuneResult = null;
     }
 
     public void SelectRandomCard()
     {
         CardId = Random.Range(1, cardIdCount + 1);
-        FortuneResult = null;
+    }
+
+    public void SelectRopeCard(int cardId, int ropeId)
+    {
+        CardId=cardId;
+        RopeId=ropeId;
     }
 
     public void SetFortuneResult(FortuneDataReader.FortuneData fortuneResult)
