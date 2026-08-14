@@ -7,7 +7,7 @@ using UnityEngine;
 /// Add card GameObjects as children (each with a SpriteRenderer), then attach
 /// this component to their common parent.
 /// </summary>
-public class TarotCardFan : MonoBehaviour
+public class CardFan : MonoBehaviour
 {
     [Header("Card Spawn")]
     [SerializeField] private Sprite cardBackSprite;
@@ -77,7 +77,7 @@ public class TarotCardFan : MonoBehaviour
 
         if (cardBackSprite == null)
         {
-            Debug.LogWarning("TarotCardFan needs a Card Back Sprite before it can spawn cards.", this);
+            Debug.LogWarning("CardFan needs a Card Back Sprite before it can spawn cards.", this);
             return;
         }
 
@@ -93,7 +93,7 @@ public class TarotCardFan : MonoBehaviour
             BoxCollider2D cardCollider = cardObject.AddComponent<BoxCollider2D>();
             cardCollider.size = cardBackSprite.bounds.size;
 
-            TarotCard2D card = cardObject.AddComponent<TarotCard2D>();
+            Card2D card = cardObject.AddComponent<Card2D>();
             card.Initialize(this);
             spawnedCards.Add(cardObject.transform);
         }

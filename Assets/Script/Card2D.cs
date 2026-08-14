@@ -1,13 +1,13 @@
 using UnityEngine;
 
 /// <summary>
-/// Added automatically to cards spawned by TarotCardFan.
+/// Added automatically to cards spawned by CardFan.
 /// </summary>
-public class TarotCard2D : MonoBehaviour
+public class Card2D : MonoBehaviour
 {
-    private TarotCardFan cardFan;
+    private CardFan cardFan;
 
-    public void Initialize(TarotCardFan owner)
+    public void Initialize(CardFan owner)
     {
         cardFan = owner;
     }
