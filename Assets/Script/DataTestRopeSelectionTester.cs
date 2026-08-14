@@ -31,7 +31,7 @@ public sealed class DataTestRopeSelectionTester : MonoBehaviour
             return;
         }
 
-        state.SaveSelection(testRopeId, testCardId);
+        state.SelectRopeCard(testRopeId, testCardId);
 
         Debug.Log(
             $"[DataTestRopeSelectionTester] Test selection saved: " +
