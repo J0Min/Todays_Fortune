@@ -391,6 +391,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFortuneState
   runResetTestOnStart: 0
+  ropeIdCount: 5
+  cardIdCount: 12
 --- !u!4 &907350452
 Transform:
   m_ObjectHideFlags: 0
@@ -452,6 +454,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StartScreenController
   waitingVideo: {fileID: 32900000, guid: f99c835a82b24bd6a43018645055349e, type: 3}
   transitionVideo: {fileID: 32900000, guid: 01b0ab327fd84278a215f4b8a7338459, type: 3}
+  sceneNameToOpen: Rope
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

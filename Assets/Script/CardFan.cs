@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// Places this object's child cards in a wide, tarot-style fan.
@@ -35,6 +36,7 @@ public class CardFan : MonoBehaviour
     [SerializeField, Min(0f)] private float selectionDuration = 0.35f;
     [SerializeField, Tooltip("Local scale applied to the selected card at the selection pivot.")]
     private Vector3 selectedCardScale = Vector3.one;
+    [SerializeField] private UnityEvent onCardSelectionFinished;
 
     [Header("Card Hover")]
     [SerializeField] private bool enableHover = true;
@@ -199,6 +201,7 @@ public class CardFan : MonoBehaviour
         selectedCard.localRotation = selectedCardPivot.localRotation;
         selectedCard.localScale = selectedCardScale;
         selectionRoutine = null;
+        onCardSelectionFinished?.Invoke();
     }
 
     private void StartHoverLayoutAnimation()

@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 103688807}
   - component: {fileID: 103688806}
   m_Layer: 0
-  m_Name: TarotCardFan
+  m_Name: CardFan
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -147,7 +147,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d1f04f6f7cd8dff4384ffc5789faaf62, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TarotCardFan
+  m_EditorClassIdentifier: Assembly-CSharp::CardFan
   cardBackSprite: {fileID: -1932786364905023747, guid: c3d4a79aac42907428df18410783de15, type: 3}
   cardCount: 12
   width: 12
@@ -185,6 +185,21 @@ MonoBehaviour:
   selectedCardPivot: {fileID: 1274637246}
   selectionDuration: 0.5
   selectedCardScale: {x: 2, y: 2, z: 1}
+  onCardSelectionFinished:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1289456844}
+        m_TargetAssemblyTypeName: SelectionFlow, Assembly-CSharp
+        m_MethodName: HandleCardSelected
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   enableHover: 1
   hoverSpreadDistance: 1
   hoverDuration: 0.15
@@ -206,68 +221,6 @@ Transform:
   - {fileID: 1274637246}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &841772279
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 841772281}
-  - component: {fileID: 841772280}
-  m_Layer: 0
-  m_Name: SceneVideoController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &841772280
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 841772279}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 843ac19c4f0c74d4da0ecaeaccc45de5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SceneVideoController
-  videoPlayer: {fileID: 1906870089}
-  restartFromBeginning: 1
-  onVideoFinished:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 841772280}
-        m_TargetAssemblyTypeName: SceneVideoController, Assembly-CSharp
-        m_MethodName: OpenScene
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  sceneNameToOpen: Card
---- !u!4 &841772281
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 841772279}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.80342, y: -1.65576, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1274637245
 GameObject:
   m_ObjectHideFlags: 0
@@ -278,7 +231,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1274637246}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Pivot
   m_TagString: Untagged
   m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -299,6 +252,147 @@ Transform:
   m_Children: []
   m_Father: {fileID: 103688807}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1289456844 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1959748751628483510, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+  m_PrefabInstance: {fileID: 1763643455}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d75b3b9b436d64049b8d3711589307e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectionFlow
+--- !u!1001 &1302513901
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 901456600749022509, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: m_Name
+      value: SceneVideoController
+      objectReference: {fileID: 0}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: videoPlayer
+      value: 
+      objectReference: {fileID: 1906870089}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: sceneNameToOpen
+      value: DataTest
+      objectReference: {fileID: 0}
+    - target: {fileID: 8314411368178266015, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.90254
+      objectReference: {fileID: 0}
+    - target: {fileID: 8314411368178266015, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.72857
+      objectReference: {fileID: 0}
+    - target: {fileID: 8314411368178266015, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8314411368178266015, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8314411368178266015, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8314411368178266015, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8314411368178266015, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8314411368178266015, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8314411368178266015, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8314411368178266015, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+--- !u!1001 &1763643455
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1959748751628483510, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+      propertyPath: selectionStage
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1959748751628483510, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+      propertyPath: sceneVideoController
+      value: 
+      objectReference: {fileID: 2118569155}
+    - target: {fileID: 5289642070379263310, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+      propertyPath: m_Name
+      value: SelectionFlow
+      objectReference: {fileID: 0}
+    - target: {fileID: 8590422268733833558, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.90254
+      objectReference: {fileID: 0}
+    - target: {fileID: 8590422268733833558, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.72857
+      objectReference: {fileID: 0}
+    - target: {fileID: 8590422268733833558, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8590422268733833558, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8590422268733833558, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8590422268733833558, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8590422268733833558, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8590422268733833558, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8590422268733833558, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8590422268733833558, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f0f5099719334324f99d427be7e987cc, type: 3}
 --- !u!1 &1847975870
 GameObject:
   m_ObjectHideFlags: 0
@@ -464,7 +558,7 @@ VideoPlayer:
   m_VideoClip: {fileID: 32900000, guid: 61548a2968b6ce145ab28482decb7ae8, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
-  m_TargetCamera: {fileID: 0}
+  m_TargetCamera: {fileID: 1847975872}
   m_TargetTexture: {fileID: 0}
   m_TimeReference: 0
   m_TargetMaterialRenderer: {fileID: 0}
@@ -502,6 +596,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2118569155 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+  m_PrefabInstance: {fileID: 1302513901}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 843ac19c4f0c74d4da0ecaeaccc45de5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneVideoController
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -509,4 +614,5 @@ SceneRoots:
   - {fileID: 1847975873}
   - {fileID: 103688807}
   - {fileID: 1906870090}
-  - {fileID: 841772281}
+  - {fileID: 1302513901}
+  - {fileID: 1763643455}
