@@ -3,6 +3,9 @@ using UnityEngine;
 public sealed class PlayerFortuneState : MonoBehaviour
 {
     [SerializeField] private bool runResetTestOnStart = true;
+    [Header("Random Selection")]
+    [SerializeField, Min(1)] private int ropeIdCount = 5;
+    [SerializeField, Min(1)] private int cardIdCount = 12;
 
     public static PlayerFortuneState Instance { get; private set; }
 
@@ -22,10 +25,17 @@ public sealed class PlayerFortuneState : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public void SaveSelection(int ropeId, int cardId)
+    public void SelectRandomRope()
     {
-        RopeId = ropeId;
-        CardId = cardId;
+        RopeId = Random.Range(1, ropeIdCount + 1);
+        CardId = 0;
+        FortuneResult = null;
+    }
+
+    public void SelectRandomCard()
+    {
+        CardId = Random.Range(1, cardIdCount + 1);
+        FortuneResult = null;
     }
 
     public void SetFortuneResult(FortuneDataReader.FortuneData fortuneResult)
@@ -50,7 +60,8 @@ public sealed class PlayerFortuneState : MonoBehaviour
 
     private void RunResetTest()
     {
-        SaveSelection(1, 3);
+        SelectRandomRope();
+        SelectRandomCard();
         SetFortuneResult(new FortuneDataReader.FortuneData(
             1,
             "테스트 동아줄",

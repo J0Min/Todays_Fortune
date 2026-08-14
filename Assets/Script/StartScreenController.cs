@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Video;
 
@@ -12,6 +13,8 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
 
     [SerializeField] private VideoClip waitingVideo;
     [SerializeField] private VideoClip transitionVideo;
+    [Header("Scene Transition")]
+    [SerializeField] private string sceneNameToOpen;
 
     private VideoPlayer backgroundVideoPlayer;
     private VideoPlayer transitionVideoPlayer;
@@ -179,6 +182,14 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
 
         transitionFinished = true;
         Debug.Log(TransitionFinishedMessage);
+
+        if (string.IsNullOrWhiteSpace(sceneNameToOpen))
+        {
+            Debug.LogError("StartScreenController needs a scene name to open.", this);
+            return;
+        }
+
+        SceneManager.LoadScene(sceneNameToOpen);
     }
 
     private static void EnsureEventSystem()
