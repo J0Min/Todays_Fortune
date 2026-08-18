@@ -16,6 +16,7 @@ public sealed class PlayerFortuneState : MonoBehaviour
     public int RopeId { get; private set; }
     public int CardId { get; private set; }
     public FortuneDataReader.FortuneData FortuneResult { get; private set; }
+    public int RopeIdCount => ropeIdCount;
 
     private InactivityTimer inactivityTimer;
 

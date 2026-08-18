@@ -6,6 +6,10 @@ using UnityEngine;
 /// </summary>
 public class DragAnchor2D : MonoBehaviour
 {
+    [Header("Drag")]
+    [SerializeField, Tooltip("Keeps the distance between the click position and this anchor while dragging. Disable to snap the anchor to the click position.")]
+    private bool preserveClickOffset = true;
+
     private bool isDragging;
     private Vector3 dragOffset;
     private Rigidbody2D attachedBody;
@@ -25,7 +29,9 @@ public class DragAnchor2D : MonoBehaviour
             attachedBody = GetComponent<Rigidbody2D>();
 
         isDragging = true;
-        dragOffset = transform.position - mouseWorldPosition;
+        dragOffset = preserveClickOffset
+            ? transform.position - mouseWorldPosition
+            : Vector3.zero;
         dragTargetPosition = transform.position;
 
         if (attachedBody != null)
