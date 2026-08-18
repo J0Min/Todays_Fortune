@@ -1196,6 +1196,7 @@ GameObject:
   - component: {fileID: 725888002}
   - component: {fileID: 725888001}
   - component: {fileID: 725888003}
+  - component: {fileID: 725888004}
   m_Layer: 0
   m_Name: PlayerFortuneStateTester
   m_TagString: Untagged
@@ -1215,6 +1216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4954590550bf5f647865b4fd9ead9321, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFortuneState
+  startSceneName: StartScene
   runResetTestOnStart: 0
   ropeIdCount: 5
   cardIdCount: 12
@@ -1247,6 +1249,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DataTestRopeSelectionTester
   testRopeId: 1
   testCardId: 1
+--- !u!114 &725888004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 725888000}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63ad6ccdb37dccf4095a2ec36e97f6dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InactivityTimer
+  inactivityTimeout: 30
+  inactiveSceneNames:
+  - StartScene
 --- !u!1 &1000427335
 GameObject:
   m_ObjectHideFlags: 0
@@ -2356,51 +2373,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!1 &1339143544
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1339143546}
-  - component: {fileID: 1339143545}
-  m_Layer: 0
-  m_Name: InactivityTimerTester
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1339143545
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1339143544}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63ad6ccdb37dccf4095a2ec36e97f6dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InactivityTimer
-  inactivityTimeout: 30
---- !u!4 &1339143546
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1339143544}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1449499169
 GameObject:
   m_ObjectHideFlags: 0
@@ -3996,7 +3968,6 @@ SceneRoots:
   - {fileID: 260494896}
   - {fileID: 602893247}
   - {fileID: 725888002}
-  - {fileID: 1339143546}
   - {fileID: 1287924497}
   - {fileID: 2018394390}
   - {fileID: 1852974553}

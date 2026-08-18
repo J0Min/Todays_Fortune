@@ -14,6 +14,8 @@ public sealed class SceneVideoController : MonoBehaviour
     [Header("Scene Transition")]
     [SerializeField] private string sceneNameToOpen;
 
+    private InactivityTimer inactivityTimer;
+
     private void Awake()
     {
         if (videoPlayer == null)
@@ -22,6 +24,8 @@ public sealed class SceneVideoController : MonoBehaviour
 
     private void OnEnable()
     {
+        inactivityTimer = FindAnyObjectByType<InactivityTimer>();
+
         if (videoPlayer != null)
             videoPlayer.loopPointReached += HandleVideoFinished;
     }
@@ -30,6 +34,8 @@ public sealed class SceneVideoController : MonoBehaviour
     {
         if (videoPlayer != null)
             videoPlayer.loopPointReached -= HandleVideoFinished;
+
+        inactivityTimer?.Resume(this);
     }
 
     public void VideoPlay()
@@ -43,6 +49,7 @@ public sealed class SceneVideoController : MonoBehaviour
         if (restartFromBeginning)
             videoPlayer.time = 0d;
 
+        inactivityTimer?.Pause(this);
         videoPlayer.Play();
     }
 
@@ -62,6 +69,7 @@ public sealed class SceneVideoController : MonoBehaviour
         if (finishedVideoPlayer != videoPlayer || finishedVideoPlayer.isLooping)
             return;
 
+        inactivityTimer?.Resume(this);
         onVideoFinished?.Invoke();
     }
 }
