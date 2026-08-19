@@ -10,10 +10,16 @@ public class DragAnchor2D : MonoBehaviour
     [SerializeField, Tooltip("Keeps the distance between the click position and this anchor while dragging. Disable to snap the anchor to the click position.")]
     private bool preserveClickOffset = true;
 
+    [Header("Movement Bounds")]
+    [SerializeField] private bool useMovementBounds;
+    [SerializeField] private Vector2 movementBoundsMinOffset = new Vector2(-10f, -10f);
+    [SerializeField] private Vector2 movementBoundsMaxOffset = new Vector2(10f, 10f);
+
     private bool isDragging;
     private Vector3 dragOffset;
     private Rigidbody2D attachedBody;
     private Vector3 dragTargetPosition;
+    private Vector3 movementBoundsOrigin;
     private float savedGravityScale;
 
     public bool IsDragging => isDragging;
@@ -21,6 +27,7 @@ public class DragAnchor2D : MonoBehaviour
     private void Awake()
     {
         attachedBody = GetComponent<Rigidbody2D>();
+        movementBoundsOrigin = transform.position;
     }
 
     public void BeginDrag(Vector3 mouseWorldPosition)
@@ -45,7 +52,23 @@ public class DragAnchor2D : MonoBehaviour
     public void DragTo(Vector3 mouseWorldPosition)
     {
         if (isDragging)
-            dragTargetPosition = mouseWorldPosition + dragOffset;
+        {
+            Vector3 targetPosition = mouseWorldPosition + dragOffset;
+
+            if (useMovementBounds)
+            {
+                targetPosition.x = Mathf.Clamp(
+                    targetPosition.x,
+                    movementBoundsOrigin.x + movementBoundsMinOffset.x,
+                    movementBoundsOrigin.x + movementBoundsMaxOffset.x);
+                targetPosition.y = Mathf.Clamp(
+                    targetPosition.y,
+                    movementBoundsOrigin.y + movementBoundsMinOffset.y,
+                    movementBoundsOrigin.y + movementBoundsMaxOffset.y);
+            }
+
+            dragTargetPosition = targetPosition;
+        }
     }
 
     public void EndDrag()
