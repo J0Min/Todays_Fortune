@@ -7,46 +7,50 @@ using UnityEngine;
 /// </summary>
 public class VerletRope2D : MonoBehaviour
 {
-    private const float BendCorrectionRatio = 0.25f;
-
     [Header("Anchors")]
-    [SerializeField] private Transform startAnchor;
-    [SerializeField] private Transform endAnchor;
-    [SerializeField] private Vector2 startPosition = new Vector2(-3f, 1f);
-    [SerializeField] private Vector2 endPosition = new Vector2(3f, 1f);
+    [SerializeField, Tooltip("로프의 시작점을 고정할 오브젝트입니다. 비워 두면 Start Position을 사용합니다.")] private Transform startAnchor;
+    [SerializeField, Tooltip("로프의 끝점을 연결하거나 드래그할 오브젝트입니다. 비워 두면 End Position을 사용합니다.")] private Transform endAnchor;
+    [SerializeField, Tooltip("Start Anchor가 없을 때 사용할 시작 위치입니다. 로프 오브젝트 기준 로컬 좌표입니다.")] private Vector2 startPosition = new Vector2(-3f, 1f);
+    [SerializeField, Tooltip("End Anchor가 없을 때 사용할 끝 위치입니다. 로프 오브젝트 기준 로컬 좌표입니다.")] private Vector2 endPosition = new Vector2(3f, 1f);
 
     [Header("Rope Shape")]
-    [SerializeField, Min(2)] private int segmentCount = 16;
-    [SerializeField, Min(0.01f)] private float ropeLength = 6f;
-    [SerializeField, Tooltip("Keeps the End Anchor within Rope Length of the Start Anchor so the rope cannot visually stretch.")]
+    [SerializeField, Min(2), Tooltip("로프를 나눌 구간 수입니다. 높을수록 더 부드럽게 휘지만 연산량이 늘어납니다.")] private int segmentCount = 16;
+    [SerializeField, Min(0.01f), Tooltip("로프의 전체 물리 길이입니다.")] private float ropeLength = 6f;
+    [SerializeField, Tooltip("끝 앵커가 로프 길이를 벗어나지 않도록 제한합니다. 켜면 로프가 과하게 늘어나 보이지 않습니다.")]
     private bool clampEndAnchorToRopeLength = true;
-    [SerializeField, Range(0f, 1f), Tooltip("Extra reach allowed as a fraction of Rope Length. 0.25 allows the rope to stretch 25% farther.")]
+    [SerializeField, Range(0f, 1f), Tooltip("Rope Length보다 추가로 허용할 최대 거리 비율입니다. 0.25면 최대 25% 더 멀리 이동할 수 있습니다.")]
     private float maxStretchRatio = 0f;
-    [SerializeField, Tooltip("When the End Anchor has DragAnchor2D, release it into rope physics after the mouse button is released.")]
+    [SerializeField, Range(0f, 1f), Tooltip("시작점과 끝점 사이에 유지할 최소 거리 비율입니다. 높을수록 로프의 늘어짐이 줄어듭니다.")]
+    private float minEndDistanceRatio = 0.9f;
+    [SerializeField, Tooltip("End Anchor에 DragAnchor2D가 있을 때, 마우스를 놓으면 끝점을 고정 해제하고 로프 물리에 맡깁니다.")]
     private bool releaseEndAnchorOnMouseUp = true;
-    [SerializeField, Range(1, 30)] private int constraintIterations = 10;
-    [SerializeField] private Vector2 gravity = new Vector2(0f, -12f);
-    [SerializeField, Range(0f, 0.5f)] private float damping = 0.02f;
+    [SerializeField, Range(1, 30), Tooltip("한 물리 프레임에서 줄 길이 제약을 계산하는 횟수입니다. 높을수록 탄탄해지지만 연산량이 증가합니다.")] private int constraintIterations = 10;
+    [SerializeField, Tooltip("로프 각 점에 적용할 중력 방향과 세기입니다.")] private Vector2 gravity = new Vector2(0f, -12f);
+    [SerializeField, Range(0f, 0.5f), Tooltip("점의 이동 속도를 줄이는 정도입니다. 높을수록 흔들림이 빨리 멈춥니다.")] private float damping = 0.02f;
 
     [Header("Bend Limit")]
-    [SerializeField, Range(0f, 180f), Tooltip("Maximum direction change allowed between adjacent rope segments. 0 keeps segments straight; 180 applies no practical limit.")]
+    [SerializeField, Range(0f, 180f), Tooltip("서로 이웃한 줄 구간이 꺾일 수 있는 최대 각도입니다. 0이면 직선으로 유지되고, 180이면 각도 제한이 사실상 없습니다.")]
     private float maxBendAngle = 180f;
+    [SerializeField, Range(1, 8), Tooltip("각도 제한 시 함께 이동시킬 점의 개수입니다. 값이 클수록 꺾임이 넓게 분산되어 더 부드러운 곡선이 됩니다.")]
+    private int bendInfluencePoints = 3;
 
     [Header("Visual")]
-    [Tooltip("The image used repeatedly for each rope section.")]
+    [Tooltip("로프의 각 구간에 반복해서 표시할 스프라이트 이미지입니다.")]
     [SerializeField] private Sprite ropeSprite;
-    [Tooltip("Enable when the rope image is drawn bottom-to-top instead of left-to-right.")]
+    [Tooltip("스프라이트가 좌우가 아니라 아래에서 위 방향으로 그려져 있으면 켭니다.")]
     [SerializeField] private bool spriteIsVertical = true;
-    [SerializeField, Min(0.01f), Tooltip("Visual width multiplier. Lower this when the rope looks too thick.")]
+    [SerializeField, Min(0.01f), Tooltip("로프 스프라이트의 두께 배율입니다. 로프가 두꺼워 보이면 낮추세요.")]
     private float thickness = 0.35f;
-    [SerializeField, Range(1f, 2f), Tooltip("Overlaps neighbouring rope images to hide visible seams at bends.")]
+    [SerializeField, Range(1f, 2f), Tooltip("이웃한 스프라이트를 겹치는 정도입니다. 꺾이는 부분의 틈을 가리는 데 사용합니다.")]
     private float segmentOverlap = 1.25f;
-    [SerializeField] private string sortingLayerName = "Default";
-    [SerializeField] private int sortingOrder = 5;
-    [SerializeField] private Color ropeColor = Color.white;
+    [SerializeField, Tooltip("로프 스프라이트를 그릴 Sorting Layer입니다.")] private string sortingLayerName = "Default";
+    [SerializeField, Tooltip("같은 Sorting Layer 안에서의 표시 순서입니다. 값이 클수록 앞에 그려집니다.")] private int sortingOrder = 5;
+    [SerializeField, Tooltip("로프 스프라이트에 적용할 색상입니다.")] private Color ropeColor = Color.white;
 
     private readonly List<RopePoint> points = new List<RopePoint>();
     private readonly List<SpriteRenderer> renderers = new List<SpriteRenderer>();
+    private readonly List<Vector2> overlapSourcePoints = new List<Vector2>();
+    private readonly List<float> overlapSourceDistances = new List<float>();
     private float segmentLength;
     private bool initialized;
 
@@ -78,6 +82,18 @@ public class VerletRope2D : MonoBehaviour
     {
         if (!initialized) BuildRope();
         if (!initialized) return;
+
+        Vector2 requestedEndPosition = GetEndPosition();
+        if (endAnchor != null)
+        {
+            DragAnchor2D dragAnchor = endAnchor.GetComponent<DragAnchor2D>();
+            if (dragAnchor != null && dragAnchor.IsDragging)
+                requestedEndPosition = dragAnchor.CurrentMouseWorldPosition;
+        }
+
+        SetPinnedPoint(0, GetStartPosition());
+        if (TrySolveSegmentOverlap(requestedEndPosition))
+            return;
 
         PinAnchors();
         Simulate(Time.fixedDeltaTime);
@@ -156,12 +172,20 @@ public class VerletRope2D : MonoBehaviour
 
     private void SolveConstraints()
     {
-        for (int iteration = 0; iteration < constraintIterations; iteration++)
+        int iterations = Mathf.Max(1, constraintIterations);
+        float bendCorrectionStrength = Mathf.Clamp01(4f / iterations);
+
+        for (int iteration = 0; iteration < iterations; iteration++)
         {
             PinAnchors();
             SolveLengthConstraints();
-            SolveBendConstraints();
+            PinAnchors();
+            SolveBendConstraints(bendCorrectionStrength);
         }
+
+        PinAnchors();
+        SolveLengthConstraints();
+        PinAnchors();
     }
 
     private void SolveLengthConstraints()
@@ -189,7 +213,7 @@ public class VerletRope2D : MonoBehaviour
         }
     }
 
-    private void SolveBendConstraints()
+    private void SolveBendConstraints(float correctionStrength)
     {
         for (int i = 1; i < points.Count - 1; i++)
         {
@@ -214,17 +238,149 @@ public class VerletRope2D : MonoBehaviour
             {
                 Vector2 limitedOutgoing = Rotate(incoming / incomingLength, limitedTurnAngle) * outgoingLength;
                 Vector2 targetPosition = current.position + limitedOutgoing;
-                next.position = Vector2.Lerp(next.position, targetPosition, BendCorrectionRatio);
-                points[i + 1] = next;
+                ApplyDistributedBendCorrection(
+                    i + 1,
+                    1,
+                    (targetPosition - next.position) * correctionStrength);
             }
             else if (!previous.pinned)
             {
                 Vector2 limitedIncoming = Rotate(outgoing / outgoingLength, -limitedTurnAngle) * incomingLength;
                 Vector2 targetPosition = current.position - limitedIncoming;
-                previous.position = Vector2.Lerp(previous.position, targetPosition, BendCorrectionRatio);
-                points[i - 1] = previous;
+                ApplyDistributedBendCorrection(
+                    i - 1,
+                    -1,
+                    (targetPosition - previous.position) * correctionStrength);
             }
         }
+    }
+
+    private void ApplyDistributedBendCorrection(int firstIndex, int direction, Vector2 correction)
+    {
+        int count = Mathf.Max(1, bendInfluencePoints);
+        float totalWeight = count * (count + 1) * 0.5f;
+
+        for (int offset = 0; offset < count; offset++)
+        {
+            int pointIndex = firstIndex + direction * offset;
+            if (pointIndex < 0 || pointIndex >= points.Count)
+                break;
+
+            RopePoint point = points[pointIndex];
+            if (point.pinned)
+                break;
+
+            float weight = (count - offset) / totalWeight;
+            Vector2 weightedCorrection = correction * weight;
+            point.position += weightedCorrection;
+            point.previousPosition += weightedCorrection;
+            points[pointIndex] = point;
+        }
+    }
+
+    private bool TrySolveSegmentOverlap(Vector2 requestedEndPosition)
+    {
+        if (!ShouldPinEndAnchor() || points.Count < 2)
+            return false;
+
+        DragAnchor2D dragAnchor = endAnchor != null
+            ? endAnchor.GetComponent<DragAnchor2D>()
+            : null;
+        if (dragAnchor != null && !dragAnchor.HasMovedSinceBeginDrag)
+            return false;
+
+        CaptureOverlapSourcePath();
+
+        float snapDistance = Mathf.Max(segmentLength * 0.35f, 0.02f);
+        float bestDistanceSquared = snapDistance * snapDistance;
+        float overlapDistance = 0f;
+        Vector2 snappedEnd = requestedEndPosition;
+        bool foundOverlap = false;
+        int lastSnapSegment = Mathf.Max(0, points.Count - 3);
+
+        for (int i = 0; i < lastSnapSegment; i++)
+        {
+            Vector2 from = overlapSourcePoints[i];
+            Vector2 to = overlapSourcePoints[i + 1];
+            Vector2 segment = to - from;
+            float lengthSquared = segment.sqrMagnitude;
+            if (lengthSquared < 0.0001f)
+                continue;
+
+            float t = Mathf.Clamp01(Vector2.Dot(requestedEndPosition - from, segment) / lengthSquared);
+            Vector2 closestPoint = from + segment * t;
+            float distanceSquared = (requestedEndPosition - closestPoint).sqrMagnitude;
+            if (distanceSquared >= bestDistanceSquared)
+                continue;
+
+            bestDistanceSquared = distanceSquared;
+            snappedEnd = closestPoint;
+            overlapDistance = overlapSourceDistances[i] + Mathf.Sqrt(lengthSquared) * t;
+            foundOverlap = true;
+        }
+
+        if (!foundOverlap)
+            return false;
+
+        float totalLength = overlapSourceDistances[overlapSourceDistances.Count - 1];
+        if (totalLength < 0.0001f || totalLength - overlapDistance < segmentLength)
+            return false;
+
+        float foldDistance = (totalLength + overlapDistance) * 0.5f;
+
+        for (int i = 0; i < points.Count; i++)
+        {
+            float distanceAlongRope = totalLength * i / (points.Count - 1);
+            float sourceDistance = distanceAlongRope <= foldDistance
+                ? distanceAlongRope
+                : foldDistance - (distanceAlongRope - foldDistance);
+            Vector2 position = SampleOverlapSourcePath(sourceDistance);
+
+            RopePoint point = points[i];
+            point.position = position;
+            point.previousPosition = position;
+            points[i] = point;
+        }
+
+        SetPinnedPoint(0, GetStartPosition());
+        SetPinnedPoint(points.Count - 1, snappedEnd);
+        endAnchor.position = new Vector3(snappedEnd.x, snappedEnd.y, endAnchor.position.z);
+        return true;
+    }
+
+    private void CaptureOverlapSourcePath()
+    {
+        overlapSourcePoints.Clear();
+        overlapSourceDistances.Clear();
+
+        float distance = 0f;
+        for (int i = 0; i < points.Count; i++)
+        {
+            if (i > 0)
+                distance += Vector2.Distance(points[i - 1].position, points[i].position);
+
+            overlapSourcePoints.Add(points[i].position);
+            overlapSourceDistances.Add(distance);
+        }
+    }
+
+    private Vector2 SampleOverlapSourcePath(float distance)
+    {
+        distance = Mathf.Clamp(distance, 0f, overlapSourceDistances[overlapSourceDistances.Count - 1]);
+
+        for (int i = 0; i < overlapSourceDistances.Count - 1; i++)
+        {
+            float fromDistance = overlapSourceDistances[i];
+            float toDistance = overlapSourceDistances[i + 1];
+            if (distance > toDistance)
+                continue;
+
+            float length = toDistance - fromDistance;
+            float t = length > 0.0001f ? (distance - fromDistance) / length : 0f;
+            return Vector2.Lerp(overlapSourcePoints[i], overlapSourcePoints[i + 1], t);
+        }
+
+        return overlapSourcePoints[overlapSourcePoints.Count - 1];
     }
 
     private static Vector2 Rotate(Vector2 vector, float angleDegrees)
@@ -297,12 +453,31 @@ public class VerletRope2D : MonoBehaviour
         if (!clampEndAnchorToRopeLength) return end;
 
         Vector2 offset = end - start;
+        float minimumReach = ropeLength * Mathf.Min(minEndDistanceRatio, 1f + maxStretchRatio);
         float maximumReach = ropeLength * (1f + maxStretchRatio);
-        if (offset.sqrMagnitude <= maximumReach * maximumReach) return end;
+        float distanceSquared = offset.sqrMagnitude;
+
+        if (distanceSquared < minimumReach * minimumReach)
+        {
+            Vector2 direction = distanceSquared > 0.0001f
+                ? offset.normalized
+                : GetFallbackEndDirection(start);
+            Vector2 minimumClampedEnd = start + direction * minimumReach;
+            endAnchor.position = new Vector3(minimumClampedEnd.x, minimumClampedEnd.y, endAnchor.position.z);
+            return minimumClampedEnd;
+        }
+
+        if (distanceSquared <= maximumReach * maximumReach) return end;
 
         Vector2 clampedEnd = start + offset.normalized * maximumReach;
         endAnchor.position = new Vector3(clampedEnd.x, clampedEnd.y, endAnchor.position.z);
         return clampedEnd;
+    }
+
+    private Vector2 GetFallbackEndDirection(Vector2 start)
+    {
+        Vector2 initialOffset = (Vector2)transform.TransformPoint(endPosition) - start;
+        return initialOffset.sqrMagnitude > 0.0001f ? initialOffset.normalized : Vector2.down;
     }
 
     private void SetPinnedPoint(int index, Vector2 position)

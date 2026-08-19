@@ -180,7 +180,7 @@ Transform:
   m_GameObject: {fileID: 4032674730601933885}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.03, y: 3.72, z: 0}
+  m_LocalPosition: {x: 4.408929, y: 3.68032, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -204,14 +204,17 @@ MonoBehaviour:
   endAnchor: {fileID: 7605713319476992558}
   startPosition: {x: -3, y: 1}
   endPosition: {x: 3, y: 1}
-  segmentCount: 16
+  segmentCount: 30
   ropeLength: 6
   clampEndAnchorToRopeLength: 1
-  maxStretchRatio: 0.2
+  maxStretchRatio: 0.3
+  minEndDistanceRatio: 0.9
   releaseEndAnchorOnMouseUp: 1
   constraintIterations: 15
-  gravity: {x: 0, y: -12}
-  damping: 0.02
+  gravity: {x: 0, y: -90}
+  damping: 0.25
+  maxBendAngle: 60
+  bendInfluencePoints: 3
   ropeSprite: {fileID: 910186999510889282, guid: a4200162aa2a48a47ac61c35ac5a60b3, type: 3}
   spriteIsVertical: 1
   thickness: 0.15

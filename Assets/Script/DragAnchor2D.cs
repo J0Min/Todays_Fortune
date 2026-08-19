@@ -6,6 +6,8 @@ using UnityEngine;
 /// </summary>
 public class DragAnchor2D : MonoBehaviour
 {
+    private const float MinimumDragDistance = 0.05f;
+
     [Header("Drag")]
     [SerializeField, Tooltip("Keeps the distance between the click position and this anchor while dragging. Disable to snap the anchor to the click position.")]
     private bool preserveClickOffset = true;
@@ -19,15 +21,20 @@ public class DragAnchor2D : MonoBehaviour
     private Vector3 dragOffset;
     private Rigidbody2D attachedBody;
     private Vector3 dragTargetPosition;
-    private Vector3 movementBoundsOrigin;
+    private Vector3 dragStartMousePosition;
+    private Vector3 currentMouseWorldPosition;
+    private Vector3 movementBoundsOriginLocal;
     private float savedGravityScale;
+    private bool hasMovedSinceBeginDrag;
 
     public bool IsDragging => isDragging;
+    public bool HasMovedSinceBeginDrag => hasMovedSinceBeginDrag;
+    public Vector3 CurrentMouseWorldPosition => currentMouseWorldPosition;
 
     private void Awake()
     {
         attachedBody = GetComponent<Rigidbody2D>();
-        movementBoundsOrigin = transform.position;
+        movementBoundsOriginLocal = transform.localPosition;
     }
 
     public void BeginDrag(Vector3 mouseWorldPosition)
@@ -36,6 +43,9 @@ public class DragAnchor2D : MonoBehaviour
             attachedBody = GetComponent<Rigidbody2D>();
 
         isDragging = true;
+        hasMovedSinceBeginDrag = false;
+        dragStartMousePosition = mouseWorldPosition;
+        currentMouseWorldPosition = mouseWorldPosition;
         dragOffset = preserveClickOffset
             ? transform.position - mouseWorldPosition
             : Vector3.zero;
@@ -53,18 +63,33 @@ public class DragAnchor2D : MonoBehaviour
     {
         if (isDragging)
         {
+            currentMouseWorldPosition = mouseWorldPosition;
+
+            if ((mouseWorldPosition - dragStartMousePosition).sqrMagnitude >=
+                MinimumDragDistance * MinimumDragDistance)
+                hasMovedSinceBeginDrag = true;
+
             Vector3 targetPosition = mouseWorldPosition + dragOffset;
 
             if (useMovementBounds)
             {
-                targetPosition.x = Mathf.Clamp(
-                    targetPosition.x,
-                    movementBoundsOrigin.x + movementBoundsMinOffset.x,
-                    movementBoundsOrigin.x + movementBoundsMaxOffset.x);
-                targetPosition.y = Mathf.Clamp(
-                    targetPosition.y,
-                    movementBoundsOrigin.y + movementBoundsMinOffset.y,
-                    movementBoundsOrigin.y + movementBoundsMaxOffset.y);
+                Transform parent = transform.parent;
+                Vector3 targetLocalPosition = parent != null
+                    ? parent.InverseTransformPoint(targetPosition)
+                    : targetPosition;
+
+                targetLocalPosition.x = Mathf.Clamp(
+                    targetLocalPosition.x,
+                    movementBoundsOriginLocal.x + movementBoundsMinOffset.x,
+                    movementBoundsOriginLocal.x + movementBoundsMaxOffset.x);
+                targetLocalPosition.y = Mathf.Clamp(
+                    targetLocalPosition.y,
+                    movementBoundsOriginLocal.y + movementBoundsMinOffset.y,
+                    movementBoundsOriginLocal.y + movementBoundsMaxOffset.y);
+
+                targetPosition = parent != null
+                    ? parent.TransformPoint(targetLocalPosition)
+                    : targetLocalPosition;
             }
 
             dragTargetPosition = targetPosition;
@@ -74,6 +99,7 @@ public class DragAnchor2D : MonoBehaviour
     public void EndDrag()
     {
         isDragging = false;
+        hasMovedSinceBeginDrag = false;
         if (attachedBody != null)
             attachedBody.gravityScale = savedGravityScale;
     }
