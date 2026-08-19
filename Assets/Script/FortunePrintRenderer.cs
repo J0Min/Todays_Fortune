@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public sealed class FortunePrintRenderer : MonoBehaviour
 {
+    private const string DefaultPngFileNameFormat = "fortune_{0:yyyyMMdd_HHmmss}.png";
+
     [Header("Print Layout")]
     [SerializeField] private Camera printCamera;
     [SerializeField] private Canvas printCanvas;
@@ -11,7 +13,10 @@ public sealed class FortunePrintRenderer : MonoBehaviour
 
     [Header("Output")]
     [SerializeField, Min(1)] private int outputWidth = 576;
-    [SerializeField] private string pngFileName = "fortune-print.png";
+    [SerializeField, Tooltip("Use {0:...} to insert the current date and time. Example: fortune_{0:yyyyMMdd_HHmmss}.png")]
+    private string pngFileNameFormat = DefaultPngFileNameFormat;
+    [SerializeField, Tooltip("Full folder path for saved PNGs. Leave blank to use Application.persistentDataPath.")]
+    private string outputDirectoryPath;
 
     public string LastSavedPath { get; private set; }
 
@@ -93,10 +98,10 @@ public sealed class FortunePrintRenderer : MonoBehaviour
             return;
         }
 
-        string safeFileName = Path.GetFileName(pngFileName);
+        string safeFileName = Path.GetFileName(GetFormattedFileName());
         if (string.IsNullOrWhiteSpace(safeFileName))
         {
-            safeFileName = "fortune-print.png";
+            safeFileName = string.Format(DefaultPngFileNameFormat, System.DateTime.Now);
         }
 
         if (!safeFileName.EndsWith(".png", System.StringComparison.OrdinalIgnoreCase))
@@ -104,11 +109,47 @@ public sealed class FortunePrintRenderer : MonoBehaviour
             safeFileName += ".png";
         }
 
-        LastSavedPath = Path.Combine(Application.persistentDataPath, safeFileName);
-        File.WriteAllBytes(LastSavedPath, texture.EncodeToPNG());
+        string outputDirectory = string.IsNullOrWhiteSpace(outputDirectoryPath)
+            ? Application.persistentDataPath
+            : outputDirectoryPath.Trim();
+
+        try
+        {
+            Directory.CreateDirectory(outputDirectory);
+            LastSavedPath = Path.Combine(outputDirectory, safeFileName);
+            File.WriteAllBytes(LastSavedPath, texture.EncodeToPNG());
+        }
+        catch (System.Exception exception) when (
+            exception is System.ArgumentException ||
+            exception is System.IO.IOException ||
+            exception is System.UnauthorizedAccessException)
+        {
+            Debug.LogError(
+                $"[FortunePrintRenderer] PNG 저장에 실패했습니다: {exception.Message}",
+                this);
+            Destroy(texture);
+            return;
+        }
+
         Destroy(texture);
 
         Debug.Log($"[FortunePrintRenderer] PNG saved: {LastSavedPath}", this);
+    }
+
+    private string GetFormattedFileName()
+    {
+        try
+        {
+            return string.Format(pngFileNameFormat, System.DateTime.Now);
+        }
+        catch (System.FormatException)
+        {
+            Debug.LogWarning(
+                "[FortunePrintRenderer] Invalid PNG File Name Format. " +
+                "Using the default filename format instead.",
+                this);
+            return string.Format(DefaultPngFileNameFormat, System.DateTime.Now);
+        }
     }
 
     private bool ValidateReferences()

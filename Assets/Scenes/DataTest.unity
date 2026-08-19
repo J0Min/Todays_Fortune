@@ -1220,6 +1220,7 @@ MonoBehaviour:
   runResetTestOnStart: 0
   ropeIdCount: 5
   cardIdCount: 12
+  testSceneName: 
 --- !u!4 &725888002
 Transform:
   m_ObjectHideFlags: 0
@@ -1264,6 +1265,7 @@ MonoBehaviour:
   inactivityTimeout: 30
   inactiveSceneNames:
   - StartScene
+  ElapsedTime: 0
 --- !u!1 &1000427335
 GameObject:
   m_ObjectHideFlags: 0
@@ -1332,7 +1334,8 @@ MonoBehaviour:
   printCanvas: {fileID: 1990311900}
   printLayout: {fileID: 1449499170}
   outputWidth: 576
-  pngFileName: fortune-print.png
+  pngFileNameFormat: fortune_{0:yyyyMMdd_HHmmss}.png
+  outputDirectoryPath: C:\Users\indigo\Desktop\T
 --- !u!1 &1029706629
 GameObject:
   m_ObjectHideFlags: 0
