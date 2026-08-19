@@ -64,23 +64,20 @@ public sealed class SelectionFlow : MonoBehaviour
             return;
         }
 
+        int selectedId;
         if (selectionStage == SelectionStage.Rope)
         {
             state.SelectRandomRope();
+            selectedId = state.RopeId;
         }
         else
         {
-            if (state.RopeId < 1)
-            {
-                Debug.LogError("A rope must be selected before selecting a card.", this);
-                return;
-            }
-
             state.SelectRandomCard();
+            selectedId = state.CardId;
         }
 
         hasHandledSelection = true;
-        sceneVideoController.VideoPlay();
+        sceneVideoController.VideoPlay(selectedId);
     }
 
 }

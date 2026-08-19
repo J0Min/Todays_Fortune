@@ -2702,7 +2702,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: -2
-      type: {class: , ns: , asm: }
+      type: {class: '', ns: '', asm: ''}
     - rid: 9031566933652668496
       type: {class: Light2DProviderSources, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.2D.Runtime}
       data:
@@ -2712,7 +2712,8 @@ MonoBehaviour:
         m_Provider2DCache:
           rid: 9031566933652668497
     - rid: 9031566933652668497
-      type: {class: 'Provider2DCache`1[[UnityEngine.Rendering.Universal.Light2DProvider, Unity.RenderPipelines.Universal.2D.Runtime]]', ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.2D.Runtime}
+      type: {class: 'Provider2DCache`1[[UnityEngine.Rendering.Universal.Light2DProvider,
+          Unity.RenderPipelines.Universal.2D.Runtime]]', ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.2D.Runtime}
       data:
         m_Cache: []
 --- !u!4 &619394802
@@ -3906,6 +3907,7 @@ GameObject:
   m_Component:
   - component: {fileID: 907350452}
   - component: {fileID: 907350451}
+  - component: {fileID: 907350453}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -3925,9 +3927,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4954590550bf5f647865b4fd9ead9321, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFortuneState
+  startSceneName: StartScene
   runResetTestOnStart: 0
   ropeIdCount: 5
   cardIdCount: 12
+  testSceneName: 
 --- !u!4 &907350452
 Transform:
   m_ObjectHideFlags: 0
@@ -3943,6 +3947,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &907350453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 907350450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63ad6ccdb37dccf4095a2ec36e97f6dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InactivityTimer
+  inactivityTimeout: 20
+  inactiveSceneNames:
+  - StartScene
+  ElapsedTime: 0
 --- !u!1 &907476137
 GameObject:
   m_ObjectHideFlags: 0

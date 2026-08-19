@@ -7,6 +7,8 @@ using UnityEngine;
 /// </summary>
 public class VerletRope2D : MonoBehaviour
 {
+    private const float BendCorrectionRatio = 0.25f;
+
     [Header("Anchors")]
     [SerializeField] private Transform startAnchor;
     [SerializeField] private Transform endAnchor;
@@ -24,7 +26,11 @@ public class VerletRope2D : MonoBehaviour
     private bool releaseEndAnchorOnMouseUp = true;
     [SerializeField, Range(1, 30)] private int constraintIterations = 10;
     [SerializeField] private Vector2 gravity = new Vector2(0f, -12f);
-    [SerializeField, Range(0f, 0.2f)] private float damping = 0.02f;
+    [SerializeField, Range(0f, 0.5f)] private float damping = 0.02f;
+
+    [Header("Bend Limit")]
+    [SerializeField, Range(0f, 180f), Tooltip("Maximum direction change allowed between adjacent rope segments. 0 keeps segments straight; 180 applies no practical limit.")]
+    private float maxBendAngle = 180f;
 
     [Header("Visual")]
     [Tooltip("The image used repeatedly for each rope section.")]
@@ -76,6 +82,14 @@ public class VerletRope2D : MonoBehaviour
         PinAnchors();
         Simulate(Time.fixedDeltaTime);
         SolveConstraints();
+
+        if (!ArePointPositionsFinite())
+        {
+            Debug.LogWarning("[VerletRope2D] Invalid rope position detected. Rebuilding rope.", this);
+            BuildRope();
+            return;
+        }
+
         SyncReleasedEndAnchor();
     }
 
@@ -145,28 +159,99 @@ public class VerletRope2D : MonoBehaviour
         for (int iteration = 0; iteration < constraintIterations; iteration++)
         {
             PinAnchors();
-            for (int i = 0; i < points.Count - 1; i++)
-            {
-                RopePoint first = points[i];
-                RopePoint second = points[i + 1];
-                Vector2 delta = second.position - first.position;
-                float distance = delta.magnitude;
-                if (distance < 0.0001f) continue;
+            SolveLengthConstraints();
+            SolveBendConstraints();
+        }
+    }
 
-                Vector2 correction = delta * ((distance - segmentLength) / distance);
-                if (first.pinned)
-                    second.position -= correction;
-                else if (second.pinned)
-                    first.position += correction;
-                else
-                {
-                    first.position += correction * 0.5f;
-                    second.position -= correction * 0.5f;
-                }
-                points[i] = first;
-                points[i + 1] = second;
+    private void SolveLengthConstraints()
+    {
+        for (int i = 0; i < points.Count - 1; i++)
+        {
+            RopePoint first = points[i];
+            RopePoint second = points[i + 1];
+            Vector2 delta = second.position - first.position;
+            float distance = delta.magnitude;
+            if (distance < 0.0001f) continue;
+
+            Vector2 correction = delta * ((distance - segmentLength) / distance);
+            if (first.pinned)
+                second.position -= correction;
+            else if (second.pinned)
+                first.position += correction;
+            else
+            {
+                first.position += correction * 0.5f;
+                second.position -= correction * 0.5f;
+            }
+            points[i] = first;
+            points[i + 1] = second;
+        }
+    }
+
+    private void SolveBendConstraints()
+    {
+        for (int i = 1; i < points.Count - 1; i++)
+        {
+            RopePoint previous = points[i - 1];
+            RopePoint current = points[i];
+            RopePoint next = points[i + 1];
+            Vector2 incoming = current.position - previous.position;
+            Vector2 outgoing = next.position - current.position;
+            float incomingLength = incoming.magnitude;
+            float outgoingLength = outgoing.magnitude;
+
+            if (!IsFinite(incoming) || !IsFinite(outgoing) ||
+                incomingLength < 0.0001f || outgoingLength < 0.0001f)
+                continue;
+
+            float turnAngle = Vector2.SignedAngle(incoming, outgoing);
+            if (Mathf.Abs(turnAngle) <= maxBendAngle)
+                continue;
+
+            float limitedTurnAngle = Mathf.Clamp(turnAngle, -maxBendAngle, maxBendAngle);
+            if (!next.pinned)
+            {
+                Vector2 limitedOutgoing = Rotate(incoming / incomingLength, limitedTurnAngle) * outgoingLength;
+                Vector2 targetPosition = current.position + limitedOutgoing;
+                next.position = Vector2.Lerp(next.position, targetPosition, BendCorrectionRatio);
+                points[i + 1] = next;
+            }
+            else if (!previous.pinned)
+            {
+                Vector2 limitedIncoming = Rotate(outgoing / outgoingLength, -limitedTurnAngle) * incomingLength;
+                Vector2 targetPosition = current.position - limitedIncoming;
+                previous.position = Vector2.Lerp(previous.position, targetPosition, BendCorrectionRatio);
+                points[i - 1] = previous;
             }
         }
+    }
+
+    private static Vector2 Rotate(Vector2 vector, float angleDegrees)
+    {
+        float angleRadians = angleDegrees * Mathf.Deg2Rad;
+        float cosine = Mathf.Cos(angleRadians);
+        float sine = Mathf.Sin(angleRadians);
+        return new Vector2(
+            vector.x * cosine - vector.y * sine,
+            vector.x * sine + vector.y * cosine);
+    }
+
+    private bool ArePointPositionsFinite()
+    {
+        foreach (RopePoint point in points)
+        {
+            if (!IsFinite(point.position) || !IsFinite(point.previousPosition))
+                return false;
+        }
+
+        return true;
+    }
+
+    private static bool IsFinite(Vector2 value)
+    {
+        return !float.IsNaN(value.x) && !float.IsInfinity(value.x) &&
+               !float.IsNaN(value.y) && !float.IsInfinity(value.y);
     }
 
     private void PinAnchors()
@@ -208,7 +293,7 @@ public class VerletRope2D : MonoBehaviour
 
     private Vector2 GetClampedEndAnchorPosition(Vector2 start)
     {
-        Vector2 end = endAnchor.position;
+        Vector2 end = GetEndPosition();
         if (!clampEndAnchorToRopeLength) return end;
 
         Vector2 offset = end - start;
@@ -241,7 +326,7 @@ public class VerletRope2D : MonoBehaviour
             spriteRenderer.transform.position = (from + to) * 0.5f;
             float directionAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             spriteRenderer.transform.rotation = Quaternion.Euler(0f, 0f,
-                spriteIsVertical ? directionAngle - 90f : directionAngle);
+                spriteIsVertical ? directionAngle + 90f : directionAngle);
 
             float spriteLength = spriteIsVertical ? ropeSprite.bounds.size.y : ropeSprite.bounds.size.x;
             float lengthScale = spriteLength > 0.0001f
@@ -253,8 +338,22 @@ public class VerletRope2D : MonoBehaviour
         }
     }
 
-    private Vector2 GetStartPosition() => startAnchor != null ? startAnchor.position : (Vector2)transform.TransformPoint(startPosition);
-    private Vector2 GetEndPosition() => endAnchor != null ? endAnchor.position : (Vector2)transform.TransformPoint(endPosition);
+    private Vector2 GetStartPosition() => GetValidAnchorPosition(startAnchor, startPosition);
+    private Vector2 GetEndPosition() => GetValidAnchorPosition(endAnchor, endPosition);
+
+    private Vector2 GetValidAnchorPosition(Transform anchor, Vector2 fallbackLocalPosition)
+    {
+        Vector2 fallbackPosition = transform.TransformPoint(fallbackLocalPosition);
+        if (anchor == null || !IsFinite(anchor.position))
+        {
+            if (anchor != null)
+                anchor.position = new Vector3(fallbackPosition.x, fallbackPosition.y, transform.position.z);
+
+            return fallbackPosition;
+        }
+
+        return anchor.position;
+    }
 
     private void ClearVisuals()
     {
