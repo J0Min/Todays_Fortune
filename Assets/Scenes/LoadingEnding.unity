@@ -54,5 +54,6 @@ MonoBehaviour:
   - {fileID: 2800000, guid: e6f995320e057c543ae93bcb650159ec, type: 3}
   endingFadeDuration: 0.5
   endingHoldDuration: 0.5
-  finalHoldDuration: 2
-  nextSceneName: DataTest
+  inputEnableDelay: 2
+  autoReturnDelay: 20
+  startSceneName: StartScene

@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Video;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 public sealed class LoadingEndingController : MonoBehaviour
 {
@@ -17,11 +20,13 @@ public sealed class LoadingEndingController : MonoBehaviour
     [SerializeField] private float endingFadeDuration = 0.5f;
     [Min(0f)]
     [SerializeField] private float endingHoldDuration = 0.5f;
-    [Min(0f)]
-    [SerializeField] private float finalHoldDuration = 2f;
 
-    [Header("Next Scene (Temporary)")]
-    [SerializeField] private string nextSceneName = "DataTest";
+    [Header("Return To Start")]
+    [Min(0f)]
+    [SerializeField] private float inputEnableDelay = 2f;
+    [Min(0f)]
+    [SerializeField] private float autoReturnDelay = 20f;
+    [SerializeField] private string startSceneName = "StartScene";
 
     private VideoPlayer loadingVideoPlayer;
     private RawImage loadingVideoImage;
@@ -29,7 +34,9 @@ public sealed class LoadingEndingController : MonoBehaviour
     private InactivityTimer inactivityTimer;
     private bool hasStartedEnding;
     private bool hasFinishedLoadingVideo;
-    private bool isTransitioning;
+    private bool isInputEnabled;
+    private bool isReturning;
+    private Coroutine autoReturnCoroutine;
 
     private void Awake()
     {
@@ -68,6 +75,20 @@ public sealed class LoadingEndingController : MonoBehaviour
         loadingVideoPlayer.frameReady -= HandleVideoFrameReady;
         loadingVideoPlayer.loopPointReached -= HandleVideoFinished;
         loadingVideoPlayer.errorReceived -= HandleVideoError;
+    }
+
+    private void Update()
+    {
+        if (!isInputEnabled || isReturning)
+        {
+            return;
+        }
+
+        if (WasReturnInputPressedThisFrame())
+        {
+            Debug.Log("[LoadingEnding] User input detected", this);
+            BeginReturnToWaitingScreen("user input", true);
+        }
     }
 
     private void HandleVideoPrepared(VideoPlayer player)
@@ -149,17 +170,17 @@ public sealed class LoadingEndingController : MonoBehaviour
             }
         }
 
-        if (finalHoldDuration > 0f)
+        Debug.Log("[LoadingEnding] Ending completed", this);
+        Debug.Log("[LoadingEnding] Input enable delay started.", this);
+        if (inputEnableDelay > 0f)
         {
-            Debug.Log("[LoadingEnding] Final hold started.", this);
-            yield return new WaitForSecondsRealtime(finalHoldDuration);
-        }
-        else
-        {
-            Debug.Log("[LoadingEnding] Final hold started (duration: 0).", this);
+            yield return new WaitForSecondsRealtime(inputEnableDelay);
         }
 
-        TransitionToNextSceneOnce();
+        isInputEnabled = true;
+        Debug.Log("[LoadingEnding] Input enabled", this);
+        Debug.Log($"[LoadingEnding] Auto return timer started: {autoReturnDelay:0.##}s", this);
+        autoReturnCoroutine = StartCoroutine(AutoReturnAfterDelay());
     }
 
     private bool HasCompleteEndingSetup()
@@ -196,22 +217,71 @@ public sealed class LoadingEndingController : MonoBehaviour
         return true;
     }
 
-    private void TransitionToNextSceneOnce()
+    private IEnumerator AutoReturnAfterDelay()
     {
-        if (isTransitioning)
+        if (autoReturnDelay > 0f)
+        {
+            yield return new WaitForSecondsRealtime(autoReturnDelay);
+        }
+
+        if (isReturning)
+        {
+            yield break;
+        }
+
+        Debug.Log("[LoadingEnding] Auto return timeout", this);
+        autoReturnCoroutine = null;
+        BeginReturnToWaitingScreen("auto timeout", false);
+    }
+
+    private void BeginReturnToWaitingScreen(string reason, bool waitForInputRelease)
+    {
+        if (isReturning)
         {
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(nextSceneName))
+        if (string.IsNullOrWhiteSpace(startSceneName))
         {
-            Debug.LogError("LoadingEndingController needs a Next Scene name.", this);
+            Debug.LogError("LoadingEndingController needs a Start Scene name.", this);
             return;
         }
 
-        isTransitioning = true;
-        Debug.Log($"[LoadingEnding] Loading scene '{nextSceneName}'.", this);
-        SceneManager.LoadScene(nextSceneName);
+        if (!Application.CanStreamedLevelBeLoaded(startSceneName))
+        {
+            Debug.LogError(
+                $"[LoadingEnding] Scene '{startSceneName}' is not available in Build Settings.",
+                this);
+            return;
+        }
+
+        isReturning = true;
+        isInputEnabled = false;
+        if (autoReturnCoroutine != null)
+        {
+            StopCoroutine(autoReturnCoroutine);
+            autoReturnCoroutine = null;
+        }
+
+        Debug.Log(
+            $"[LoadingEnding] Returning to waiting screen: {startSceneName} ({reason})",
+            this);
+        PlayerFortuneState.Instance?.ResetData();
+        StartScreenController.PrepareForEndingReturn(waitForInputRelease);
+        SceneManager.LoadScene(startSceneName);
+    }
+
+    private static bool WasReturnInputPressedThisFrame()
+    {
+#if ENABLE_INPUT_SYSTEM
+        bool mousePressed = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+        bool touchPressed = Touchscreen.current != null &&
+            Touchscreen.current.primaryTouch.press.wasPressedThisFrame;
+        return mousePressed || touchPressed;
+#else
+        return Input.GetMouseButtonDown(0) ||
+            (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began);
+#endif
     }
 
     private IEnumerator FadeIn(CanvasGroup layer)
