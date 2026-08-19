@@ -19,7 +19,7 @@ public class DragAnchor2D : MonoBehaviour
     private Vector3 dragOffset;
     private Rigidbody2D attachedBody;
     private Vector3 dragTargetPosition;
-    private Vector3 movementBoundsOrigin;
+    private Vector3 movementBoundsOriginLocal;
     private float savedGravityScale;
 
     public bool IsDragging => isDragging;
@@ -27,7 +27,7 @@ public class DragAnchor2D : MonoBehaviour
     private void Awake()
     {
         attachedBody = GetComponent<Rigidbody2D>();
-        movementBoundsOrigin = transform.position;
+        movementBoundsOriginLocal = transform.localPosition;
     }
 
     public void BeginDrag(Vector3 mouseWorldPosition)
@@ -57,14 +57,23 @@ public class DragAnchor2D : MonoBehaviour
 
             if (useMovementBounds)
             {
-                targetPosition.x = Mathf.Clamp(
-                    targetPosition.x,
-                    movementBoundsOrigin.x + movementBoundsMinOffset.x,
-                    movementBoundsOrigin.x + movementBoundsMaxOffset.x);
-                targetPosition.y = Mathf.Clamp(
-                    targetPosition.y,
-                    movementBoundsOrigin.y + movementBoundsMinOffset.y,
-                    movementBoundsOrigin.y + movementBoundsMaxOffset.y);
+                Transform parent = transform.parent;
+                Vector3 targetLocalPosition = parent != null
+                    ? parent.InverseTransformPoint(targetPosition)
+                    : targetPosition;
+
+                targetLocalPosition.x = Mathf.Clamp(
+                    targetLocalPosition.x,
+                    movementBoundsOriginLocal.x + movementBoundsMinOffset.x,
+                    movementBoundsOriginLocal.x + movementBoundsMaxOffset.x);
+                targetLocalPosition.y = Mathf.Clamp(
+                    targetLocalPosition.y,
+                    movementBoundsOriginLocal.y + movementBoundsMinOffset.y,
+                    movementBoundsOriginLocal.y + movementBoundsMaxOffset.y);
+
+                targetPosition = parent != null
+                    ? parent.TransformPoint(targetLocalPosition)
+                    : targetLocalPosition;
             }
 
             dragTargetPosition = targetPosition;
