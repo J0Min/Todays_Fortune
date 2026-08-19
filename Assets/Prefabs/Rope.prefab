@@ -213,10 +213,10 @@ MonoBehaviour:
   gravity: {x: 0, y: -60}
   damping: 0.25
   maxBendAngle: 60
-  ropeSprite: {fileID: 910186999510889282, guid: a4200162aa2a48a47ac61c35ac5a60b3, type: 3}
+  ropeSprite: {fileID: -500009913405275181, guid: f0c9f7ae38336d74d84ddb96c4706273, type: 3}
   spriteIsVertical: 1
-  thickness: 0.15
-  segmentOverlap: 1.25
+  thickness: 1
+  segmentOverlap: 1.1
   sortingLayerName: Default
   sortingOrder: 5
   ropeColor: {r: 1, g: 1, b: 1, a: 1}

@@ -326,7 +326,7 @@ public class VerletRope2D : MonoBehaviour
             spriteRenderer.transform.position = (from + to) * 0.5f;
             float directionAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             spriteRenderer.transform.rotation = Quaternion.Euler(0f, 0f,
-                spriteIsVertical ? directionAngle - 90f : directionAngle);
+                spriteIsVertical ? directionAngle + 90f : directionAngle);
 
             float spriteLength = spriteIsVertical ? ropeSprite.bounds.size.y : ropeSprite.bounds.size.x;
             float lengthScale = spriteLength > 0.0001f
