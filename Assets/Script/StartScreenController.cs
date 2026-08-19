@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 #if ENABLE_INPUT_SYSTEM
@@ -12,21 +13,54 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
 {
     private const string TouchMessage = "Start Screen Touched";
     private const string TransitionFinishedMessage = "Start Transition Finished";
+#if UNITY_EDITOR
+    private const string IntroShortVideoAssetPath = "Assets/Video/intro2.mp4";
+#endif
 
-    [Header("Intro Video")]
-    [SerializeField] private VideoClip transitionVideo;
+    [Header("Title Exit")]
+    [SerializeField] private TitleExitAnimation titleExitAnimation;
+
+    [Header("Intro Short Video")]
+    [SerializeField] private VideoClip introShortVideo;
+    [Min(0.01f)]
+    [SerializeField] private float introCrossfadeDuration = 0.25f;
 
     [Header("Scene Transition")]
     [SerializeField] private string sceneNameToOpen;
 
-    private VideoPlayer transitionVideoPlayer;
-    private RawImage transitionImage;
     private bool hasStartedTransition;
+    private bool hasReportedMissingIntroShortVideo;
+    private VideoPlayer introVideoPlayer;
+    private RawImage introVideoImage;
 
     private void Awake()
     {
+#if UNITY_EDITOR
+        ResolveIntroShortVideoReference();
+#endif
         EnsureEventSystem();
     }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        ResolveIntroShortVideoReference();
+    }
+
+    private void ResolveIntroShortVideoReference()
+    {
+        if (introShortVideo != null)
+        {
+            return;
+        }
+
+        introShortVideo = UnityEditor.AssetDatabase.LoadAssetAtPath<VideoClip>(IntroShortVideoAssetPath);
+        if (introShortVideo != null)
+        {
+            UnityEditor.EditorUtility.SetDirty(this);
+        }
+    }
+#endif
 
     private void Update()
     {
@@ -36,21 +70,22 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
         }
     }
 
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        BeginTransition();
+    }
+
     private void OnDestroy()
     {
-        if (transitionVideoPlayer == null)
+        if (introVideoPlayer == null)
         {
             return;
         }
 
-        transitionVideoPlayer.prepareCompleted -= OnTransitionPrepared;
-        transitionVideoPlayer.frameReady -= OnTransitionFrameReady;
-        transitionVideoPlayer.loopPointReached -= OnTransitionFinished;
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        BeginTransition();
+        introVideoPlayer.prepareCompleted -= OnIntroVideoPrepared;
+        introVideoPlayer.frameReady -= OnIntroVideoFrameReady;
+        introVideoPlayer.loopPointReached -= OnIntroVideoFinished;
+        introVideoPlayer.errorReceived -= OnIntroVideoError;
     }
 
     private void BeginTransition()
@@ -60,9 +95,9 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
             return;
         }
 
-        if (transitionVideo == null)
+        if (titleExitAnimation == null)
         {
-            Debug.LogError("StartScreenController needs a transition video.", this);
+            Debug.LogError("StartScreenController needs a title exit animation.", this);
             return;
         }
 
@@ -72,6 +107,23 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
             return;
         }
 
+        if (introShortVideo == null)
+        {
+            if (!hasReportedMissingIntroShortVideo)
+            {
+                hasReportedMissingIntroShortVideo = true;
+                Debug.LogError("StartScreenController needs an intro short video.", this);
+            }
+            return;
+        }
+
+        hasStartedTransition = true;
+        Debug.Log(TouchMessage);
+        titleExitAnimation.Play(OnTitleExitFinished);
+    }
+
+    private void OnTitleExitFinished()
+    {
         Canvas canvas = GetComponentInChildren<Canvas>();
         if (canvas == null)
         {
@@ -79,73 +131,89 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
             return;
         }
 
-        hasStartedTransition = true;
-        Debug.Log(TouchMessage);
-        CreateTransitionPlayer(canvas.transform);
-        transitionVideoPlayer.Prepare();
+        CreateIntroVideoPlayer(canvas.transform);
+        introVideoPlayer.Prepare();
     }
 
-    private void CreateTransitionPlayer(Transform canvasTransform)
+    private void CreateIntroVideoPlayer(Transform canvasTransform)
     {
-        GameObject transitionObject = new GameObject(
-            "Transition Video",
+        GameObject videoObject = new GameObject(
+            "Intro Short Video",
             typeof(RectTransform),
             typeof(CanvasRenderer),
             typeof(RawImage),
             typeof(AspectRatioFitter),
             typeof(VideoPlayer));
-        transitionObject.transform.SetParent(canvasTransform, false);
-        transitionObject.transform.SetAsLastSibling();
+        videoObject.transform.SetParent(canvasTransform, false);
+        videoObject.transform.SetAsLastSibling();
 
-        RectTransform transitionRect = transitionObject.GetComponent<RectTransform>();
-        transitionRect.anchorMin = new Vector2(0.5f, 0.5f);
-        transitionRect.anchorMax = new Vector2(0.5f, 0.5f);
-        transitionRect.pivot = new Vector2(0.5f, 0.5f);
-        transitionRect.anchoredPosition = Vector2.zero;
+        RectTransform rect = videoObject.GetComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = Vector2.zero;
 
-        AspectRatioFitter aspectRatioFitter = transitionObject.GetComponent<AspectRatioFitter>();
-        aspectRatioFitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
-        aspectRatioFitter.aspectRatio = transitionVideo.height > 0
-            ? (float)transitionVideo.width / transitionVideo.height
+        AspectRatioFitter fitter = videoObject.GetComponent<AspectRatioFitter>();
+        fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+        fitter.aspectRatio = introShortVideo.height > 0
+            ? (float)introShortVideo.width / introShortVideo.height
             : 16f / 9f;
 
-        transitionImage = transitionObject.GetComponent<RawImage>();
-        transitionImage.color = Color.white;
-        transitionImage.raycastTarget = true;
-        transitionImage.enabled = false;
+        introVideoImage = videoObject.GetComponent<RawImage>();
+        introVideoImage.color = new Color(1f, 1f, 1f, 0f);
+        introVideoImage.raycastTarget = true;
+        introVideoImage.enabled = false;
 
-        transitionVideoPlayer = transitionObject.GetComponent<VideoPlayer>();
-        transitionVideoPlayer.playOnAwake = false;
-        transitionVideoPlayer.isLooping = false;
-        transitionVideoPlayer.renderMode = VideoRenderMode.APIOnly;
-        transitionVideoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
-        transitionVideoPlayer.source = VideoSource.VideoClip;
-        transitionVideoPlayer.clip = transitionVideo;
-        transitionVideoPlayer.sendFrameReadyEvents = true;
-        transitionVideoPlayer.prepareCompleted += OnTransitionPrepared;
-        transitionVideoPlayer.frameReady += OnTransitionFrameReady;
-        transitionVideoPlayer.loopPointReached += OnTransitionFinished;
+        introVideoPlayer = videoObject.GetComponent<VideoPlayer>();
+        introVideoPlayer.playOnAwake = false;
+        introVideoPlayer.isLooping = false;
+        introVideoPlayer.renderMode = VideoRenderMode.APIOnly;
+        introVideoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
+        introVideoPlayer.source = VideoSource.VideoClip;
+        introVideoPlayer.clip = introShortVideo;
+        introVideoPlayer.sendFrameReadyEvents = true;
+        introVideoPlayer.prepareCompleted += OnIntroVideoPrepared;
+        introVideoPlayer.frameReady += OnIntroVideoFrameReady;
+        introVideoPlayer.loopPointReached += OnIntroVideoFinished;
+        introVideoPlayer.errorReceived += OnIntroVideoError;
     }
 
-    private void OnTransitionPrepared(VideoPlayer preparedPlayer)
+    private void OnIntroVideoPrepared(VideoPlayer player)
     {
-        preparedPlayer.Play();
+        player.Play();
     }
 
-    private void OnTransitionFrameReady(VideoPlayer videoPlayer, long frameIndex)
+    private void OnIntroVideoFrameReady(VideoPlayer player, long frameIndex)
     {
-        if (transitionImage.enabled || videoPlayer.texture == null)
+        if (introVideoImage.enabled || player.texture == null)
         {
             return;
         }
 
-        transitionImage.texture = videoPlayer.texture;
-        transitionImage.enabled = true;
+        introVideoImage.texture = player.texture;
+        introVideoImage.enabled = true;
+        StartCoroutine(FadeInIntroVideo());
     }
 
-    private void OnTransitionFinished(VideoPlayer videoPlayer)
+    private IEnumerator FadeInIntroVideo()
     {
-        if (videoPlayer != transitionVideoPlayer)
+        float startedAt = Time.unscaledTime;
+        float elapsed = 0f;
+        while (elapsed < introCrossfadeDuration)
+        {
+            elapsed = Time.unscaledTime - startedAt;
+            float normalizedTime = Mathf.Clamp01(elapsed / introCrossfadeDuration);
+            float alpha = Mathf.SmoothStep(0f, 1f, normalizedTime);
+            introVideoImage.color = new Color(1f, 1f, 1f, alpha);
+            yield return null;
+        }
+
+        introVideoImage.color = Color.white;
+    }
+
+    private void OnIntroVideoFinished(VideoPlayer player)
+    {
+        if (player != introVideoPlayer)
         {
             return;
         }
@@ -154,13 +222,18 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
         SceneManager.LoadScene(sceneNameToOpen);
     }
 
+    private void OnIntroVideoError(VideoPlayer player, string message)
+    {
+        Debug.LogError("Intro short video failed: " + message, this);
+    }
+
     private static bool WasPrimaryInputPressedThisFrame()
     {
 #if ENABLE_INPUT_SYSTEM
-        bool mousePressed = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+        bool pointerPressed = Pointer.current != null && Pointer.current.press.wasPressedThisFrame;
         bool touchPressed = Touchscreen.current != null &&
             Touchscreen.current.primaryTouch.press.wasPressedThisFrame;
-        return mousePressed || touchPressed;
+        return pointerPressed || touchPressed;
 #else
         return Input.GetMouseButtonDown(0) ||
             (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began);
