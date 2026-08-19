@@ -64,17 +64,20 @@ public sealed class SelectionFlow : MonoBehaviour
             return;
         }
 
+        int selectedId;
         if (selectionStage == SelectionStage.Rope)
         {
             state.SelectRandomRope();
+            selectedId = state.RopeId;
         }
         else
         {
             state.SelectRandomCard();
+            selectedId = state.CardId;
         }
 
         hasHandledSelection = true;
-        sceneVideoController.VideoPlay();
+        sceneVideoController.VideoPlay(selectedId);
     }
 
 }

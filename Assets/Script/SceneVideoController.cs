@@ -52,13 +52,20 @@ public sealed class SceneVideoController : MonoBehaviour
 
     public void VideoPlay()
     {
+        PlayerFortuneState state = PlayerFortuneState.Instance;
+        int selectedId = state != null && state.CardId > 0 ? state.CardId : state?.RopeId ?? 0;
+        VideoPlay(selectedId);
+    }
+
+    public void VideoPlay(int selectedId)
+    {
         if (videoPlayer == null)
         {
             Debug.LogError("SceneVideoController needs a VideoPlayer.", this);
             return;
         }
 
-        if (!TrySetSelectedVideo())
+        if (!TrySetSelectedVideo(selectedId))
         {
             return;
         }
@@ -106,7 +113,7 @@ public sealed class SceneVideoController : MonoBehaviour
         onVideoFinished?.Invoke();
     }
 
-    private bool TrySetSelectedVideo()
+    private bool TrySetSelectedVideo(int selectedId)
     {
         // An empty list preserves the existing setup where the clip is assigned directly
         // to the VideoPlayer in the Inspector.
@@ -115,18 +122,11 @@ public sealed class SceneVideoController : MonoBehaviour
             return true;
         }
 
-        PlayerFortuneState state = PlayerFortuneState.Instance;
-        if (state == null)
-        {
-            Debug.LogError("Selected video playback needs an active PlayerFortuneState.", this);
-            return false;
-        }
-
-        int videoIndex = state.CardId - 1;
+        int videoIndex = selectedId - 1;
         if (videoIndex < 0 || videoIndex >= videoClips.Length || videoClips[videoIndex] == null)
         {
             Debug.LogError(
-                $"No video is registered for selected ID={state.CardId}. " +
+                $"No video is registered for selected ID={selectedId}. " +
                 "Set the matching Video Clips array element in the Inspector.",
                 this);
             return false;

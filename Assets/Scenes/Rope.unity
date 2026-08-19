@@ -1126,6 +1126,30 @@ PrefabInstance:
       propertyPath: videoPlayer
       value: 
       objectReference: {fileID: 2110451364}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: videoClips.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: 'videoClips.Array.data[0]'
+      value: 
+      objectReference: {fileID: 32900000, guid: 58fcfae9aa0141e45b94a632eebe82d8, type: 3}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: 'videoClips.Array.data[1]'
+      value: 
+      objectReference: {fileID: 32900000, guid: 579276d15219f4049a8021a23ef3ceda, type: 3}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: 'videoClips.Array.data[2]'
+      value: 
+      objectReference: {fileID: 32900000, guid: 9f758df1430fa9f42949a7aec6eba7f3, type: 3}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: 'videoClips.Array.data[3]'
+      value: 
+      objectReference: {fileID: 32900000, guid: 3685fb9aaf212894bbc412fd61f1600c, type: 3}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: 'videoClips.Array.data[4]'
+      value: 
+      objectReference: {fileID: 32900000, guid: 2761810c9edd67c409599747f799c917, type: 3}
     - target: {fileID: 8314411368178266015, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.80342
