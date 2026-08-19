@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &100000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 100001}
+  - component: {fileID: 100002}
+  m_Layer: 0
+  m_Name: Loading Ending Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &100001
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &100002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94fc58b014c64b47ba07487a291e885f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LoadingEndingController
+  loadingVideo: {fileID: 32900000, guid: ad9fe396089232e42ad4634b7e51e34c, type: 3}
+  endingTextures:
+  - {fileID: 2800000, guid: 1772b1c15b812254ba87263a4571152b, type: 3}
+  - {fileID: 2800000, guid: c8f020444dd2a24408a0a0d2192638ce, type: 3}
+  - {fileID: 2800000, guid: 7a84b0649479ab84eb46c1e129fc217c, type: 3}
+  - {fileID: 2800000, guid: 0ac1163d89d02934a96418a4d0334d95, type: 3}
+  - {fileID: 2800000, guid: f8aee2ff0665bb84ab5e586f62f3db2f, type: 3}
+  - {fileID: 2800000, guid: e6f995320e057c543ae93bcb650159ec, type: 3}
+  endingFadeDuration: 0.5
+  endingHoldDuration: 0.5
+  finalHoldDuration: 2
+  nextSceneName: DataTest

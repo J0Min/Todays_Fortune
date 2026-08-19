@@ -18,6 +18,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Card.unity
     guid: a8da26a730c11b94589c42e1677d6e33
   - enabled: 1
+    path: Assets/Scenes/LoadingEnding.unity
+    guid: e31df62efb3b464fbdf13bf10854c578
+  - enabled: 1
     path: Assets/Scenes/DataTest.unity
     guid: 166dc90cee49829408e997fbd8603aab
   m_configObjects:
