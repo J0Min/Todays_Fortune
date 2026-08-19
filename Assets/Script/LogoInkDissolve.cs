@@ -22,6 +22,8 @@ public sealed class LogoInkDissolve : MonoBehaviour
     private static readonly int DissolveAmountId = Shader.PropertyToID("_DissolveAmount");
     private static readonly int NoiseScaleId = Shader.PropertyToID("_NoiseScale");
     private static readonly int FeatherId = Shader.PropertyToID("_Feather");
+    private const float MaximumNoiseValue = 1f;
+    private const float IntroTransitionThreshold = 0.65f;
 
     private Graphic[] logoGraphics;
     private Material runtimeMaterial;
@@ -54,7 +56,7 @@ public sealed class LogoInkDissolve : MonoBehaviour
         }
     }
 
-    public void Play(Action onCompleted = null)
+    public void Play(Action onTransitionReady = null)
     {
         if (isPlaying)
         {
@@ -63,18 +65,19 @@ public sealed class LogoInkDissolve : MonoBehaviour
 
         if (runtimeMaterial == null)
         {
-            onCompleted?.Invoke();
+            onTransitionReady?.Invoke();
             return;
         }
 
         isPlaying = true;
-        StartCoroutine(PlayDissolve(onCompleted));
+        StartCoroutine(PlayDissolve(onTransitionReady));
     }
 
-    private IEnumerator PlayDissolve(Action onCompleted)
+    private IEnumerator PlayDissolve(Action onTransitionReady)
     {
         float startedAt = Time.unscaledTime;
         float elapsed = 0f;
+        bool hasStartedIntroTransition = false;
         while (elapsed < dissolveDuration)
         {
             elapsed = Time.unscaledTime - startedAt;
@@ -82,12 +85,27 @@ public sealed class LogoInkDissolve : MonoBehaviour
             float progress = dissolveProgress.Evaluate(normalizedTime);
             float threshold = Mathf.LerpUnclamped(thresholdRange.x, thresholdRange.y, progress);
             ApplyMaterialValues(threshold);
+
+            if (!hasStartedIntroTransition && threshold >= IntroTransitionThreshold)
+            {
+                hasStartedIntroTransition = true;
+                onTransitionReady?.Invoke();
+            }
+
+            if (threshold >= MaximumNoiseValue + edgeFeather)
+            {
+                break;
+            }
+
             yield return null;
         }
 
-        ApplyMaterialValues(thresholdRange.y);
+        ApplyMaterialValues(MaximumNoiseValue + edgeFeather);
         isPlaying = false;
-        onCompleted?.Invoke();
+        if (!hasStartedIntroTransition)
+        {
+            onTransitionReady?.Invoke();
+        }
     }
 
     private void ApplyMaterialValues(float threshold)

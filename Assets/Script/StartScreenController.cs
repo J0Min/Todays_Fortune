@@ -14,7 +14,7 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
     private const string TouchMessage = "Start Screen Touched";
     private const string TransitionFinishedMessage = "Start Transition Finished";
 #if UNITY_EDITOR
-    private const string IntroShortVideoAssetPath = "Assets/Video/intro2.mp4";
+    private const string IntroShortVideoAssetPath = "Assets/Video/intro3.mp4";
 #endif
 
     [Header("Title Exit")]
@@ -32,6 +32,8 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
     private bool hasReportedMissingIntroShortVideo;
     private VideoPlayer introVideoPlayer;
     private RawImage introVideoImage;
+    private bool isTitleExitFinished;
+    private bool isIntroVideoPrepared;
 
     private void Awake()
     {
@@ -119,20 +121,24 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
 
         hasStartedTransition = true;
         Debug.Log(TouchMessage);
-        titleExitAnimation.Play(OnTitleExitFinished);
-    }
 
-    private void OnTitleExitFinished()
-    {
         Canvas canvas = GetComponentInChildren<Canvas>();
         if (canvas == null)
         {
             Debug.LogError("StartScreenController needs a child Canvas.", this);
+            hasStartedTransition = false;
             return;
         }
 
         CreateIntroVideoPlayer(canvas.transform);
         introVideoPlayer.Prepare();
+        titleExitAnimation.Play(OnTitleExitFinished);
+    }
+
+    private void OnTitleExitFinished()
+    {
+        isTitleExitFinished = true;
+        PlayIntroVideoWhenReady();
     }
 
     private void CreateIntroVideoPlayer(Transform canvasTransform)
@@ -180,7 +186,16 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
 
     private void OnIntroVideoPrepared(VideoPlayer player)
     {
-        player.Play();
+        isIntroVideoPrepared = true;
+        PlayIntroVideoWhenReady();
+    }
+
+    private void PlayIntroVideoWhenReady()
+    {
+        if (isTitleExitFinished && isIntroVideoPrepared)
+        {
+            introVideoPlayer.Play();
+        }
     }
 
     private void OnIntroVideoFrameReady(VideoPlayer player, long frameIndex)
