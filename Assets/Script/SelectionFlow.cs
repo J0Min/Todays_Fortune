@@ -70,12 +70,6 @@ public sealed class SelectionFlow : MonoBehaviour
         }
         else
         {
-            if (state.RopeId < 1)
-            {
-                Debug.LogError("A rope must be selected before selecting a card.", this);
-                return;
-            }
-
             state.SelectRandomCard();
         }
 

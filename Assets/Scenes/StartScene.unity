@@ -395,6 +395,7 @@ MonoBehaviour:
   runResetTestOnStart: 0
   ropeIdCount: 5
   cardIdCount: 12
+  testSceneName: 
 --- !u!4 &907350452
 Transform:
   m_ObjectHideFlags: 0

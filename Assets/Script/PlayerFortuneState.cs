@@ -11,6 +11,9 @@ public sealed class PlayerFortuneState : MonoBehaviour
     [SerializeField, Min(1)] private int ropeIdCount = 5;
     [SerializeField, Min(1)] private int cardIdCount = 12;
 
+    [HideInInspector]
+    [SerializeField] private string testSceneName;
+
     public static PlayerFortuneState Instance { get; private set; }
 
     public int RopeId { get; private set; }
@@ -36,12 +39,15 @@ public sealed class PlayerFortuneState : MonoBehaviour
 
     private void OnEnable()
     {
-        if (Instance != this || inactivityTimer == null)
+        if (Instance != this)
         {
             return;
         }
 
-        inactivityTimer.TimedOut += ReturnToStartAfterInactivity;
+        if (inactivityTimer != null)
+        {
+            inactivityTimer.TimedOut += ReturnToStartAfterInactivity;
+        }
     }
 
     private void OnDisable()
@@ -78,6 +84,23 @@ public sealed class PlayerFortuneState : MonoBehaviour
         RopeId = 0;
         CardId = 0;
         FortuneResult = null;
+    }
+
+    public void OpenTestScene()
+    {
+        if (!Application.isPlaying)
+        {
+            Debug.LogWarning("OpenTestScene can only be used in Play Mode.", this);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(testSceneName) || !Application.CanStreamedLevelBeLoaded(testSceneName))
+        {
+            Debug.LogWarning("Select a scene registered in Build Settings first.", this);
+            return;
+        }
+
+        SceneManager.LoadScene(testSceneName);
     }
 
     private void ReturnToStartAfterInactivity()
@@ -126,3 +149,77 @@ public sealed class PlayerFortuneState : MonoBehaviour
             this);
     }
 }
+
+#if UNITY_EDITOR
+[UnityEditor.CustomEditor(typeof(PlayerFortuneState))]
+public sealed class PlayerFortuneStateEditor : UnityEditor.Editor
+{
+    public override void OnInspectorGUI()
+    {
+        serializedObject.Update();
+        DrawPropertiesExcluding(serializedObject, "testSceneName");
+
+        PlayerFortuneState state = (PlayerFortuneState)target;
+        UnityEditor.SerializedProperty testSceneName = serializedObject.FindProperty("testSceneName");
+        System.Collections.Generic.List<string> sceneNames = GetBuildSceneNames();
+        int selectedIndex = Mathf.Max(0, sceneNames.IndexOf(testSceneName.stringValue));
+
+        UnityEditor.EditorGUILayout.Space();
+        UnityEditor.EditorGUILayout.LabelField("Test", UnityEditor.EditorStyles.boldLabel);
+
+        UnityEditor.EditorGUI.BeginChangeCheck();
+        selectedIndex = UnityEditor.EditorGUILayout.Popup(
+            "Test Scene",
+            selectedIndex,
+            sceneNames.ToArray());
+
+        if (UnityEditor.EditorGUI.EndChangeCheck())
+        {
+            testSceneName.stringValue = selectedIndex > 0 ? sceneNames[selectedIndex] : string.Empty;
+        }
+
+        serializedObject.ApplyModifiedProperties();
+
+        using (new UnityEditor.EditorGUI.DisabledScope(!Application.isPlaying || selectedIndex == 0))
+        {
+            if (GUILayout.Button("Open Test Scene"))
+            {
+                state.OpenTestScene();
+            }
+        }
+
+        SceneVideoController sceneVideoController = FindAnyObjectByType<SceneVideoController>();
+        using (new UnityEditor.EditorGUI.DisabledScope(!Application.isPlaying || sceneVideoController == null))
+        {
+            if (GUILayout.Button("Skip Current Video"))
+            {
+                sceneVideoController.SkipVideo();
+            }
+        }
+
+        if (!Application.isPlaying)
+        {
+            UnityEditor.EditorGUILayout.HelpBox(
+                "This button is available in Play Mode only.",
+                UnityEditor.MessageType.Info);
+        }
+    }
+
+    private static System.Collections.Generic.List<string> GetBuildSceneNames()
+    {
+        var sceneNames = new System.Collections.Generic.List<string> { "Select Scene" };
+
+        foreach (UnityEditor.EditorBuildSettingsScene scene in UnityEditor.EditorBuildSettings.scenes)
+        {
+            if (!scene.enabled)
+            {
+                continue;
+            }
+
+            sceneNames.Add(System.IO.Path.GetFileNameWithoutExtension(scene.path));
+        }
+
+        return sceneNames;
+    }
+}
+#endif
