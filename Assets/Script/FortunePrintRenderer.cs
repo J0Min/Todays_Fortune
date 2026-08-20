@@ -1,3 +1,4 @@
+using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,8 +18,20 @@ public sealed class FortunePrintRenderer : MonoBehaviour
     private string pngFileNameFormat = DefaultPngFileNameFormat;
     [SerializeField, Tooltip("Full folder path for saved PNGs. Leave blank to use Application.persistentDataPath.")]
     private string outputDirectoryPath;
+    [SerializeField] private bool autoSaveOnStart;
 
     public string LastSavedPath { get; private set; }
+
+    private IEnumerator Start()
+    {
+        if (!autoSaveOnStart)
+        {
+            yield break;
+        }
+
+        yield return null;
+        SavePng();
+    }
 
     public Texture2D RenderToTexture()
     {

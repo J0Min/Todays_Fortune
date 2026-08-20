@@ -314,8 +314,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 249013677}
-  - component: {fileID: 249013676}
+  - component: {fileID: 249013678}
   - component: {fileID: 249013675}
+  - component: {fileID: 249013679}
+  - component: {fileID: 249013676}
   m_Layer: 0
   m_Name: Print
   m_TagString: Untagged
@@ -335,7 +337,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7bd38f045786ae439fff0574a4a7088, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FortuneResultController
-  fortuneDataReader: {fileID: 1963065389}
+  fortuneDataReader: {fileID: 249013678}
   ropeText: {fileID: 1435950150}
   cardText: {fileID: 706946640}
   titleText: {fileID: 814387878}
@@ -358,6 +360,7 @@ MonoBehaviour:
   outputWidth: 576
   pngFileNameFormat: fortune_{0:yyyyMMdd_HHmmss}.png
   outputDirectoryPath: C:\Users\indigo\Desktop\T
+  autoSaveOnStart: 1
 --- !u!4 &249013677
 Transform:
   m_ObjectHideFlags: 0
@@ -375,6 +378,52 @@ Transform:
   - {fileID: 63151495}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &249013678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249013674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9023c938ee920d04cb38f98237717d73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FortuneDataReader
+  fortuneTsv: {fileID: 8478306746935243750, guid: c5c0ae4d36b64724b8141dd8dfed9452, type: 3}
+--- !u!114 &249013679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249013674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d26b862470b4bd5937fb92329c954c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectedFortuneImageDisplay
+  ropeDisplayImage: {fileID: 777902263}
+  cardDisplayImage: {fileID: 1252414666}
+  ropeSprites:
+  - {fileID: -8401938252916901482, guid: 367e0cae724519641a386da738d48dcc, type: 3}
+  - {fileID: -3623995843059238831, guid: 9bb7e449a9d89e64b89336935f7de63c, type: 3}
+  - {fileID: 4077577078042118330, guid: 4b6fbef052a10d44e8091002a75fc8bb, type: 3}
+  - {fileID: -8107568306115097492, guid: f4df2cff8a91a4d4dbf4ea41dd50516b, type: 3}
+  - {fileID: -8397764329073281751, guid: 0f7b772d5a3f868498f067bd1503033e, type: 3}
+  cardSprites:
+  - {fileID: 9076628614930282163, guid: fc7fd248e8bb6b94a9aa5c4382b9c661, type: 3}
+  - {fileID: -5389402044013689998, guid: f2edc643eb31a454cabb2200a9ba8f46, type: 3}
+  - {fileID: 7601115183742932854, guid: 896942f6f007f02489f333fec85f33fb, type: 3}
+  - {fileID: 1302094626286971163, guid: 0367cfc502b2d154b94df5d9d410a909, type: 3}
+  - {fileID: -3094865916263203818, guid: baa190b87fd64f94d80474065b30c0b7, type: 3}
+  - {fileID: 3113471139962205135, guid: 253f626a4bd5aa543aa89b76569d7c85, type: 3}
+  - {fileID: -4683971045844663902, guid: e2f5d2fd2c4691e40b78c6105a31da65, type: 3}
+  - {fileID: 1548625764075229096, guid: b526ba2b04498b54788ac1baec9507ee, type: 3}
+  - {fileID: 1238658789631275073, guid: 9793c41b44c8cae40a2cba313067dfb6, type: 3}
+  - {fileID: -5640297085573600746, guid: e247abbdadd89e8458baf0d39a0b37d2, type: 3}
+  - {fileID: -779471905111198307, guid: 3c8b6173eaac8864cb7192278caee591, type: 3}
+  - {fileID: -1187966464889483631, guid: ae61a9764caf78b4e8f111540fe71716, type: 3}
 --- !u!1 &503284349
 GameObject:
   m_ObjectHideFlags: 0
@@ -483,15 +532,15 @@ RectTransform:
   m_GameObject: {fileID: 706946637}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 108, y: 108, z: 108}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 503284350}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -105, y: 175}
-  m_SizeDelta: {x: 2, y: 1}
+  m_AnchoredPosition: {x: 40, y: 100}
+  m_SizeDelta: {x: 500, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &706946639
 CanvasRenderer:
@@ -550,8 +599,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
-  m_fontSizeBase: 0.2
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -697,15 +746,15 @@ RectTransform:
   m_GameObject: {fileID: 814387875}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 108, y: 108, z: 108}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 503284350}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -103, y: 61}
-  m_SizeDelta: {x: 2, y: 1}
+  m_AnchoredPosition: {x: 40, y: 0}
+  m_SizeDelta: {x: 500, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &814387877
 CanvasRenderer:
@@ -764,8 +813,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
-  m_fontSizeBase: 0.2
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -911,15 +960,15 @@ RectTransform:
   m_GameObject: {fileID: 1435950147}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 108, y: 108, z: 108}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 503284350}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -101, y: 224}
-  m_SizeDelta: {x: 2, y: 1}
+  m_AnchoredPosition: {x: 40, y: 200}
+  m_SizeDelta: {x: 500, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1435950149
 CanvasRenderer:
@@ -978,8 +1027,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
-  m_fontSizeBase: 0.2
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1023,51 +1072,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!1 &1963065388
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1963065390}
-  - component: {fileID: 1963065389}
-  m_Layer: 0
-  m_Name: FortuneDataTester
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1963065389
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1963065388}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9023c938ee920d04cb38f98237717d73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FortuneDataReader
-  fortuneTsv: {fileID: 8478306746935243750, guid: c5c0ae4d36b64724b8141dd8dfed9452, type: 3}
---- !u!4 &1963065390
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1963065388}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1965120879
 GameObject:
   m_ObjectHideFlags: 0
@@ -1238,8 +1242,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 0.2
-  m_fontSizeBase: 0.2
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1300,100 +1304,19 @@ RectTransform:
   m_GameObject: {fileID: 2042388974}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 108, y: 108, z: 108}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 503284350}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -104, y: -131}
-  m_SizeDelta: {x: 2, y: 1}
+  m_AnchoredPosition: {x: 40, y: -200}
+  m_SizeDelta: {x: 500, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &2129142085
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2129142088}
-  - component: {fileID: 2129142087}
-  - component: {fileID: 2129142086}
-  m_Layer: 0
-  m_Name: SelectedFortuneImageDisplay
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2129142086
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2129142085}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93d16c6895414a41bf139a77733ccf47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FortuneResultDisplay
-  fortuneDataReader: {fileID: 1963065389}
---- !u!114 &2129142087
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2129142085}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d26b862470b4bd5937fb92329c954c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SelectedFortuneImageDisplay
-  ropeDisplayImage: {fileID: 0}
-  cardDisplayImage: {fileID: 0}
-  ropeSprites:
-  - {fileID: -8401938252916901482, guid: 367e0cae724519641a386da738d48dcc, type: 3}
-  - {fileID: -3623995843059238831, guid: 9bb7e449a9d89e64b89336935f7de63c, type: 3}
-  - {fileID: 4077577078042118330, guid: 4b6fbef052a10d44e8091002a75fc8bb, type: 3}
-  - {fileID: -8107568306115097492, guid: f4df2cff8a91a4d4dbf4ea41dd50516b, type: 3}
-  - {fileID: -8397764329073281751, guid: 0f7b772d5a3f868498f067bd1503033e, type: 3}
-  cardSprites:
-  - {fileID: 9076628614930282163, guid: fc7fd248e8bb6b94a9aa5c4382b9c661, type: 3}
-  - {fileID: -5389402044013689998, guid: f2edc643eb31a454cabb2200a9ba8f46, type: 3}
-  - {fileID: 7601115183742932854, guid: 896942f6f007f02489f333fec85f33fb, type: 3}
-  - {fileID: 1302094626286971163, guid: 0367cfc502b2d154b94df5d9d410a909, type: 3}
-  - {fileID: -3094865916263203818, guid: baa190b87fd64f94d80474065b30c0b7, type: 3}
-  - {fileID: 3113471139962205135, guid: 253f626a4bd5aa543aa89b76569d7c85, type: 3}
-  - {fileID: -4683971045844663902, guid: e2f5d2fd2c4691e40b78c6105a31da65, type: 3}
-  - {fileID: 1548625764075229096, guid: b526ba2b04498b54788ac1baec9507ee, type: 3}
-  - {fileID: 1238658789631275073, guid: 9793c41b44c8cae40a2cba313067dfb6, type: 3}
-  - {fileID: -5640297085573600746, guid: e247abbdadd89e8458baf0d39a0b37d2, type: 3}
-  - {fileID: -779471905111198307, guid: 3c8b6173eaac8864cb7192278caee591, type: 3}
-  - {fileID: -1187966464889483631, guid: ae61a9764caf78b4e8f111540fe71716, type: 3}
---- !u!4 &2129142088
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2129142085}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 100001}
-  - {fileID: 2129142088}
   - {fileID: 249013677}
-  - {fileID: 1963065390}
