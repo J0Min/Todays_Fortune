@@ -20,6 +20,7 @@ public sealed class PlayerFortuneState : MonoBehaviour
     public int CardId { get; private set; }
     public FortuneDataReader.FortuneData FortuneResult { get; private set; }
     public int RopeIdCount => ropeIdCount;
+    public int CardIdCount => cardIdCount;
 
     private InactivityTimer inactivityTimer;
 
@@ -165,6 +166,32 @@ public sealed class PlayerFortuneStateEditor : UnityEditor.Editor
         int selectedIndex = Mathf.Max(0, sceneNames.IndexOf(testSceneName.stringValue));
 
         UnityEditor.EditorGUILayout.Space();
+        UnityEditor.EditorGUILayout.LabelField("Current Selection", UnityEditor.EditorStyles.boldLabel);
+
+        using (new UnityEditor.EditorGUI.DisabledScope(!Application.isPlaying))
+        {
+            UnityEditor.EditorGUI.BeginChangeCheck();
+            int ropeId = Mathf.Clamp(
+                UnityEditor.EditorGUILayout.IntField("Current Rope ID", state.RopeId),
+                0,
+                state.RopeIdCount);
+            int cardId = Mathf.Clamp(
+                UnityEditor.EditorGUILayout.IntField("Current Card ID", state.CardId),
+                0,
+                state.CardIdCount);
+
+            if (UnityEditor.EditorGUI.EndChangeCheck())
+            {
+                state.SelectRopeCard(cardId, ropeId);
+                UnityEditor.EditorUtility.SetDirty(state);
+            }
+        }
+
+        UnityEditor.EditorGUILayout.HelpBox(
+            "0 means no result has been selected yet. Values can be changed in Play Mode.",
+            UnityEditor.MessageType.None);
+
+        UnityEditor.EditorGUILayout.Space();
         UnityEditor.EditorGUILayout.LabelField("Test", UnityEditor.EditorStyles.boldLabel);
 
         UnityEditor.EditorGUI.BeginChangeCheck();
@@ -203,6 +230,11 @@ public sealed class PlayerFortuneStateEditor : UnityEditor.Editor
                 "This button is available in Play Mode only.",
                 UnityEditor.MessageType.Info);
         }
+    }
+
+    public override bool RequiresConstantRepaint()
+    {
+        return Application.isPlaying;
     }
 
     private static System.Collections.Generic.List<string> GetBuildSceneNames()
