@@ -13,6 +13,8 @@ public sealed class LoadingEndingController : MonoBehaviour
 
     [Header("Loading Video")]
     [SerializeField] private VideoClip loadingVideo;
+    [Min(0f)]
+    [SerializeField] private float loadingFadeFromBlackDuration = 1.2f;
 
     [Header("Temporary Ending Textures (01 - 06)")]
     [SerializeField] private Texture2D[] endingTextures;
@@ -30,6 +32,7 @@ public sealed class LoadingEndingController : MonoBehaviour
 
     private VideoPlayer loadingVideoPlayer;
     private RawImage loadingVideoImage;
+    private RawImage loadingFadeOverlay;
     private CanvasGroup[] endingLayers;
     private InactivityTimer inactivityTimer;
     private bool hasStartedEnding;
@@ -37,6 +40,7 @@ public sealed class LoadingEndingController : MonoBehaviour
     private bool isInputEnabled;
     private bool isReturning;
     private Coroutine autoReturnCoroutine;
+    private Coroutine loadingFadeCoroutine;
 
     private void Awake()
     {
@@ -112,6 +116,11 @@ public sealed class LoadingEndingController : MonoBehaviour
 
         loadingVideoImage.texture = player.texture;
         loadingVideoImage.enabled = true;
+
+        if (loadingFadeCoroutine == null)
+        {
+            loadingFadeCoroutine = StartCoroutine(FadeLoadingFromBlack());
+        }
     }
 
     private void HandleVideoFinished(VideoPlayer player)
@@ -144,6 +153,12 @@ public sealed class LoadingEndingController : MonoBehaviour
         {
             loadingVideoImage.enabled = false;
             loadingVideoImage.gameObject.SetActive(false);
+        }
+
+        if (loadingFadeOverlay != null)
+        {
+            loadingFadeOverlay.enabled = false;
+            loadingFadeOverlay.gameObject.SetActive(false);
         }
 
         ResetEndingLayersForPlayback();
@@ -305,6 +320,35 @@ public sealed class LoadingEndingController : MonoBehaviour
         layer.alpha = 1f;
     }
 
+    private IEnumerator FadeLoadingFromBlack()
+    {
+        if (loadingFadeOverlay == null)
+        {
+            yield break;
+        }
+
+        if (loadingFadeFromBlackDuration <= 0f)
+        {
+            loadingFadeOverlay.enabled = false;
+            loadingFadeOverlay.gameObject.SetActive(false);
+            yield break;
+        }
+
+        float startedAt = Time.unscaledTime;
+        float elapsed = 0f;
+        while (elapsed < loadingFadeFromBlackDuration)
+        {
+            elapsed = Time.unscaledTime - startedAt;
+            float progress = Mathf.Clamp01(elapsed / loadingFadeFromBlackDuration);
+            float alpha = 1f - Mathf.SmoothStep(0f, 1f, progress);
+            loadingFadeOverlay.color = new Color(0f, 0f, 0f, alpha);
+            yield return null;
+        }
+
+        loadingFadeOverlay.enabled = false;
+        loadingFadeOverlay.gameObject.SetActive(false);
+    }
+
     private void SetEndingLayersHidden()
     {
         if (endingLayers == null)
@@ -407,6 +451,9 @@ public sealed class LoadingEndingController : MonoBehaviour
         loadingVideoPlayer.source = VideoSource.VideoClip;
         loadingVideoPlayer.clip = loadingVideo;
         loadingVideoPlayer.sendFrameReadyEvents = true;
+
+        loadingFadeOverlay = CreateFullscreenImage("Loading Fade From Black", canvasObject.transform);
+        loadingFadeOverlay.color = Color.black;
     }
 
     private static void CreateCamera()

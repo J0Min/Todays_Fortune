@@ -18,6 +18,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Card.unity
     guid: a8da26a730c11b94589c42e1677d6e33
   - enabled: 1
+    path: Assets/Scenes/SelectionCombination.unity
+    guid: 22ea115c8bfd4f779e591856a18e54d2
+  - enabled: 1
     path: Assets/Scenes/LoadingEnding.unity
     guid: e31df62efb3b464fbdf13bf10854c578
   - enabled: 1
