@@ -4858,7 +4858,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LogoInkDissolve
   dissolveMaterial: {fileID: 2100000, guid: d9243d1807b49de43b3b03b21e777486, type: 2}
-  dissolveDuration: 3
+  dissolveDuration: 3.9
   noiseScale: 10
   edgeFeather: 0.075
   thresholdRange: {x: -0.15, y: 1.15}
@@ -5616,7 +5616,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StartScreenController
   titleExitAnimation: {fileID: 2000000006}
-  introShortVideo: {fileID: 32900000, guid: 46f07e8a9c1c3ea4da4621cd7d145548, type: 3}
+  introShortVideo: {fileID: 32900000, guid: d457a7b27ee09604d8586e931cb6d5ff, type: 3}
   introCrossfadeDuration: 0.25
   sceneNameToOpen: Rope
 --- !u!1 &1335341351

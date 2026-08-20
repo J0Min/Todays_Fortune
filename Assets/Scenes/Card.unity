@@ -706,7 +706,7 @@ PrefabInstance:
       objectReference: {fileID: 1906870089}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: sceneNameToOpen
-      value: DataTest
+      value: LoadingEnding
       objectReference: {fileID: 0}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: videoClips.Array.size

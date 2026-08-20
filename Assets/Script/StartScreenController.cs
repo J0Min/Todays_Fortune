@@ -13,8 +13,10 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
 {
     private const string TouchMessage = "Start Screen Touched";
     private const string TransitionFinishedMessage = "Start Transition Finished";
+    private static bool hasPendingEndingReturn;
+    private static bool pendingReturnNeedsInputRelease;
 #if UNITY_EDITOR
-    private const string IntroShortVideoAssetPath = "Assets/Video/intro2.mp4";
+    private const string IntroShortVideoAssetPath = "Assets/Video/intro3.mp4";
 #endif
 
     [Header("Title Exit")]
@@ -32,9 +34,15 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
     private bool hasReportedMissingIntroShortVideo;
     private VideoPlayer introVideoPlayer;
     private RawImage introVideoImage;
+    private bool isTitleExitFinished;
+    private bool isIntroVideoPrepared;
+    private bool isReturnInputGuardActive;
+    private bool hasLoggedWaitingForRelease;
+    private bool hasObservedReturnInputRelease;
 
     private void Awake()
     {
+        ApplyPendingEndingReturnGuard();
 #if UNITY_EDITOR
         ResolveIntroShortVideoReference();
 #endif
@@ -64,15 +72,80 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
 
     private void Update()
     {
+        if (isReturnInputGuardActive)
+        {
+            UpdateReturnInputGuard();
+            return;
+        }
+
         if (WasPrimaryInputPressedThisFrame())
         {
+            Debug.Log("[StartScreen] New start input detected", this);
             BeginTransition();
         }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (isReturnInputGuardActive)
+        {
+            return;
+        }
+
+        Debug.Log("[StartScreen] New start input detected", this);
         BeginTransition();
+    }
+
+    public static void PrepareForEndingReturn(bool waitForInputRelease)
+    {
+        hasPendingEndingReturn = true;
+        pendingReturnNeedsInputRelease = waitForInputRelease;
+    }
+
+    private void ApplyPendingEndingReturnGuard()
+    {
+        if (!hasPendingEndingReturn)
+        {
+            return;
+        }
+
+        hasPendingEndingReturn = false;
+        isReturnInputGuardActive = pendingReturnNeedsInputRelease;
+        pendingReturnNeedsInputRelease = false;
+
+        if (isReturnInputGuardActive)
+        {
+            Debug.Log("[StartScreen] Return input guard enabled", this);
+            Debug.Log("[StartScreen] Waiting for previous input release", this);
+            hasLoggedWaitingForRelease = true;
+        }
+        else
+        {
+            Debug.Log("[StartScreen] Entered from auto return - no held input", this);
+        }
+    }
+
+    private void UpdateReturnInputGuard()
+    {
+        if (!hasObservedReturnInputRelease)
+        {
+            if (IsPrimaryInputHeld())
+            {
+                if (!hasLoggedWaitingForRelease)
+                {
+                    Debug.Log("[StartScreen] Waiting for previous input release", this);
+                    hasLoggedWaitingForRelease = true;
+                }
+                return;
+            }
+
+            hasObservedReturnInputRelease = true;
+            Debug.Log("[StartScreen] Previous input released", this);
+            return;
+        }
+
+        isReturnInputGuardActive = false;
+        Debug.Log("[StartScreen] Start input enabled", this);
     }
 
     private void OnDestroy()
@@ -119,20 +192,24 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
 
         hasStartedTransition = true;
         Debug.Log(TouchMessage);
-        titleExitAnimation.Play(OnTitleExitFinished);
-    }
 
-    private void OnTitleExitFinished()
-    {
         Canvas canvas = GetComponentInChildren<Canvas>();
         if (canvas == null)
         {
             Debug.LogError("StartScreenController needs a child Canvas.", this);
+            hasStartedTransition = false;
             return;
         }
 
         CreateIntroVideoPlayer(canvas.transform);
         introVideoPlayer.Prepare();
+        titleExitAnimation.Play(OnTitleExitFinished);
+    }
+
+    private void OnTitleExitFinished()
+    {
+        isTitleExitFinished = true;
+        PlayIntroVideoWhenReady();
     }
 
     private void CreateIntroVideoPlayer(Transform canvasTransform)
@@ -180,7 +257,16 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
 
     private void OnIntroVideoPrepared(VideoPlayer player)
     {
-        player.Play();
+        isIntroVideoPrepared = true;
+        PlayIntroVideoWhenReady();
+    }
+
+    private void PlayIntroVideoWhenReady()
+    {
+        if (isTitleExitFinished && isIntroVideoPrepared)
+        {
+            introVideoPlayer.Play();
+        }
     }
 
     private void OnIntroVideoFrameReady(VideoPlayer player, long frameIndex)
@@ -237,6 +323,21 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
 #else
         return Input.GetMouseButtonDown(0) ||
             (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began);
+#endif
+    }
+
+    private static bool IsPrimaryInputHeld()
+    {
+#if ENABLE_INPUT_SYSTEM
+        bool mouseHeld = Mouse.current != null && Mouse.current.leftButton.isPressed;
+        bool touchHeld = Touchscreen.current != null &&
+            Touchscreen.current.primaryTouch.press.isPressed;
+        return mouseHeld || touchHeld;
+#else
+        bool touchHeld = Input.touchCount > 0 &&
+            Input.GetTouch(0).phase != TouchPhase.Ended &&
+            Input.GetTouch(0).phase != TouchPhase.Canceled;
+        return Input.GetMouseButton(0) || touchHeld;
 #endif
     }
 
