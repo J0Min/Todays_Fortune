@@ -30,18 +30,22 @@ public sealed class SelectionCombinationController : MonoBehaviour
     [SerializeField] private int previewCardId = 1;
 
     [Header("Layout (1920 x 1080 Reference)")]
-    [SerializeField] private Vector2 ropeStartPosition = new Vector2(-470f, -126f);
-    [SerializeField] private Vector2 ropeEndPosition = new Vector2(-115f, -126f);
+    [SerializeField] private Vector2 ropeStartPosition = new Vector2(390f, -96f);
+    [SerializeField] private Vector2 ropeEndPosition = new Vector2(95f, -96f);
     [SerializeField] private Vector2 ropeSize = new Vector2(600f, 678f);
-    [SerializeField] private Vector2 cardStartPosition = new Vector2(470f, -126f);
-    [SerializeField] private Vector2 cardEndPosition = new Vector2(115f, -126f);
+    [SerializeField] private Vector2 cardStartPosition = new Vector2(-390f, -96f);
+    [SerializeField] private Vector2 cardEndPosition = new Vector2(-95f, -96f);
     [SerializeField] private Vector2 cardSize = new Vector2(600f, 678f);
     [SerializeField] private Vector2 titlePosition = new Vector2(0f, 380f);
     [SerializeField] private Vector2 titleSize = new Vector2(765f, 185f);
 
     [Header("Animation")]
+    [Min(0.01f)]
+    [SerializeField] private float introFadeDuration = 1.25f;
+    [Min(0.01f)]
+    [SerializeField] private float secondImageFadeDuration = 1.25f;
     [Min(0f)]
-    [SerializeField] private float initialHoldDuration = 1.5f;
+    [SerializeField] private float initialHoldDuration = 3.5f;
     [Min(0f)]
     [SerializeField] private float idleFloatDistance = 8f;
     [Min(0.01f)]
@@ -54,12 +58,18 @@ public sealed class SelectionCombinationController : MonoBehaviour
     [SerializeField] private float fullyTransparentProgress = 0.95f;
     [Range(0.01f, 1f)]
     [SerializeField] private float finalScale = 0.5f;
+    [Range(0f, 1f)]
+    [SerializeField] private float finalBackgroundBrightness = 0.25f;
+    [Min(0f)]
+    [SerializeField] private float postFadeHoldDuration = 0.5f;
 
     [Header("Scene Transition")]
     [SerializeField] private string loadingSceneName = "LoadingEnding";
 
     private RectTransform ropeRectTransform;
     private RectTransform cardRectTransform;
+    private Image backgroundImage;
+    private Image titleImage;
     private Image ropeImage;
     private Image cardImage;
     private InactivityTimer inactivityTimer;
@@ -138,7 +148,31 @@ public sealed class SelectionCombinationController : MonoBehaviour
     {
         float elapsed = 0f;
         SetPresentationProgress(0f);
+        SetImageAlpha(cardImage, 0f);
+        SetImageAlpha(ropeImage, 0f);
 
+        while (elapsed < introFadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float cardAlpha = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / introFadeDuration));
+            SetImageAlpha(cardImage, cardAlpha);
+            yield return null;
+        }
+
+        SetImageAlpha(cardImage, 1f);
+
+        elapsed = 0f;
+        while (elapsed < secondImageFadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float ropeAlpha = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / secondImageFadeDuration));
+            SetImageAlpha(ropeImage, ropeAlpha);
+            yield return null;
+        }
+
+        SetImageAlpha(ropeImage, 1f);
+
+        elapsed = 0f;
         while (elapsed < initialHoldDuration)
         {
             elapsed += Time.deltaTime;
@@ -159,6 +193,12 @@ public sealed class SelectionCombinationController : MonoBehaviour
         }
 
         SetPresentationProgress(1f);
+
+        if (postFadeHoldDuration > 0f)
+        {
+            yield return new WaitForSeconds(postFadeHoldDuration);
+        }
+
         OpenLoadingScene();
     }
 
@@ -185,6 +225,11 @@ public sealed class SelectionCombinationController : MonoBehaviour
         float alpha = 1f - Mathf.InverseLerp(fadeStartProgress, safeTransparentProgress, progress);
         SetImageAlpha(ropeImage, alpha);
         SetImageAlpha(cardImage, alpha);
+        SetImageAlpha(titleImage, alpha);
+
+        float darknessProgress = 1f - alpha;
+        float brightness = Mathf.Lerp(1f, finalBackgroundBrightness, darknessProgress);
+        backgroundImage.color = new Color(brightness, brightness, brightness, 1f);
     }
 
     private void OpenLoadingScene()
@@ -223,7 +268,7 @@ public sealed class SelectionCombinationController : MonoBehaviour
         scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
         scaler.matchWidthOrHeight = 0.5f;
 
-        Image backgroundImage = CreateImage("Background", canvasObject.transform, backgroundSprite, false);
+        backgroundImage = CreateImage("Background", canvasObject.transform, backgroundSprite, false);
         RectTransform backgroundRect = backgroundImage.rectTransform;
         backgroundRect.anchorMin = Vector2.zero;
         backgroundRect.anchorMax = Vector2.one;
@@ -238,7 +283,7 @@ public sealed class SelectionCombinationController : MonoBehaviour
         cardRectTransform = cardImage.rectTransform;
         ConfigureDisplayRect(cardRectTransform, cardStartPosition, cardSize);
 
-        Image titleImage = CreateImage("Combination Title", canvasObject.transform, titleSprite, true);
+        titleImage = CreateImage("Combination Title", canvasObject.transform, titleSprite, true);
         ConfigureDisplayRect(titleImage.rectTransform, titlePosition, titleSize);
     }
 

@@ -68,21 +68,25 @@ MonoBehaviour:
   usePreviewIdsWhenSelectionMissing: 1
   previewRopeId: 1
   previewCardId: 1
-  ropeStartPosition: {x: -470, y: -126}
-  ropeEndPosition: {x: -115, y: -126}
+  ropeStartPosition: {x: 390, y: -96}
+  ropeEndPosition: {x: 95, y: -96}
   ropeSize: {x: 600, y: 678}
-  cardStartPosition: {x: 470, y: -126}
-  cardEndPosition: {x: 115, y: -126}
+  cardStartPosition: {x: -390, y: -96}
+  cardEndPosition: {x: -95, y: -96}
   cardSize: {x: 600, y: 678}
   titlePosition: {x: 0, y: 380}
   titleSize: {x: 765, y: 185}
-  initialHoldDuration: 1.5
+  introFadeDuration: 1.25
+  secondImageFadeDuration: 1.25
+  initialHoldDuration: 3.5
   idleFloatDistance: 8
   idleFloatSpeed: 2
   animationDuration: 2.5
   fadeStartProgress: 0.33
   fullyTransparentProgress: 0.95
   finalScale: 0.5
+  finalBackgroundBrightness: 0.25
+  postFadeHoldDuration: 0.5
   loadingSceneName: LoadingEnding
 --- !u!1 &200000
 GameObject:
