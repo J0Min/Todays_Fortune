@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b23dc31ce8f4a0c9239d767b53da0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelectionCombinationController
-  backgroundSprite: {fileID: 854038104297708352, guid: 92696ba754638574cb636286a8c580f7, type: 3}
+  backgroundSprite: {fileID: 6429504625928405481, guid: cbbeec6ded54ee242b7d8879c04e6c7c, type: 3}
   titleSprite: {fileID: 2476729870842785084, guid: 96a3816663dca464480723b19da821ff, type: 3}
   ropeSprites:
   - {fileID: -8401938252916901482, guid: 367e0cae724519641a386da738d48dcc, type: 3}
