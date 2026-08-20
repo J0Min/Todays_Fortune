@@ -14,6 +14,8 @@ public class Card2D : MonoBehaviour
 
     private void OnMouseUpAsButton()
     {
+        if (Buttons.IsWorldInputBlocked) return;
+
         if (cardFan != null)
             cardFan.SelectCard(transform);
     }
