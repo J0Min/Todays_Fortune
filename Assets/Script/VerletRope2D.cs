@@ -35,6 +35,10 @@ public class VerletRope2D : MonoBehaviour
     [Header("Visual")]
     [Tooltip("The image used repeatedly for each rope section.")]
     [SerializeField] private Sprite ropeSprite;
+    [Tooltip("Optional sprite used only for the segment connected to the End Anchor. Uses Rope Sprite when empty.")]
+    [SerializeField] private Sprite endSprite;
+    [Tooltip("Local X/Y scale multiplier applied only to the final rope segment.")]
+    [SerializeField] private Vector2 endScale = Vector2.one;
     [Tooltip("Enable when the rope image is drawn bottom-to-top instead of left-to-right.")]
     [SerializeField] private bool spriteIsVertical = true;
     [SerializeField, Min(0.01f), Tooltip("Visual width multiplier. Lower this when the rope looks too thick.")]
@@ -123,7 +127,9 @@ public class VerletRope2D : MonoBehaviour
                 var segment = new GameObject($"Rope Segment {i + 1}");
                 segment.transform.SetParent(transform, false);
                 var spriteRenderer = segment.AddComponent<SpriteRenderer>();
-                spriteRenderer.sprite = ropeSprite;
+                spriteRenderer.sprite = i == segmentCount - 1 && endSprite != null
+                    ? endSprite
+                    : ropeSprite;
                 spriteRenderer.color = ropeColor;
                 spriteRenderer.sortingLayerName = sortingLayerName;
                 spriteRenderer.sortingOrder = sortingOrder;
@@ -328,13 +334,24 @@ public class VerletRope2D : MonoBehaviour
             spriteRenderer.transform.rotation = Quaternion.Euler(0f, 0f,
                 spriteIsVertical ? directionAngle + 90f : directionAngle);
 
-            float spriteLength = spriteIsVertical ? ropeSprite.bounds.size.y : ropeSprite.bounds.size.x;
+            Sprite segmentSprite = spriteRenderer.sprite;
+            float spriteLength = spriteIsVertical
+                ? segmentSprite.bounds.size.y
+                : segmentSprite.bounds.size.x;
             float lengthScale = spriteLength > 0.0001f
                 ? (direction.magnitude / spriteLength) * segmentOverlap
                 : 1f;
-            spriteRenderer.transform.localScale = spriteIsVertical
+            Vector3 visualScale = spriteIsVertical
                 ? new Vector3(thickness, lengthScale, 1f)
                 : new Vector3(lengthScale, thickness, 1f);
+
+            if (i == renderers.Count - 1)
+            {
+                visualScale.x *= endScale.x;
+                visualScale.y *= endScale.y;
+            }
+
+            spriteRenderer.transform.localScale = visualScale;
         }
     }
 

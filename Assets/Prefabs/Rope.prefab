@@ -214,6 +214,8 @@ MonoBehaviour:
   damping: 0.25
   maxBendAngle: 60
   ropeSprite: {fileID: -500009913405275181, guid: f0c9f7ae38336d74d84ddb96c4706273, type: 3}
+  endSprite: {fileID: 21300000, guid: 716facebe95fc094083b94da1d887c8f, type: 3}
+  endScale: {x: 1, y: 2}
   spriteIsVertical: 1
   thickness: 1
   segmentOverlap: 1.1

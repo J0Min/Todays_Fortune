@@ -1,7 +1,7 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.Video;
 
 /// <summary>
@@ -17,17 +17,19 @@ public sealed class SceneVideoController : MonoBehaviour
 
     [SerializeField] private VideoPlayer videoPlayer;
     [SerializeField] private bool restartFromBeginning = true;
-    [SerializeField] private UnityEvent onVideoFinished;
+
+    [Header("Events")]
+    [SerializeField] private UnityEvent onIntroVideoFinished;
+    [FormerlySerializedAs("onVideoFinished")]
+    [SerializeField] private UnityEvent onOutroVideoFinished;
 
     [Header("Scene Start Playback")]
     [SerializeField] private bool playOnSceneStart;
     [SerializeField] private VideoClip sceneStartVideo;
 
     [Header("UI")]
-    [SerializeField] private Canvas uiCanvas;
+    [SerializeField] private Canvas[] uiCanvases;
     [SerializeField] private bool hideUiWhileVideoPlays = true;
-    [SerializeField, Min(0f)] private float uiFadeDelay;
-    [SerializeField, Min(0f)] private float uiFadeDuration = 0.25f;
 
     [Header("Video Clips")]
     [Tooltip("The selected result ID 1 maps to element 0, ID 2 maps to element 1, and so on.")]
@@ -38,17 +40,12 @@ public sealed class SceneVideoController : MonoBehaviour
 
     private InactivityTimer inactivityTimer;
     private bool isPreparing;
-    private Coroutine uiFadeRoutine;
-    private CanvasGroup uiCanvasGroup;
     private VideoPhase currentPhase;
 
     private void Awake()
     {
         if (videoPlayer == null)
             videoPlayer = GetComponent<VideoPlayer>();
-
-        if (uiCanvasGroup == null && uiCanvas != null)
-            uiCanvasGroup = uiCanvas.GetComponent<CanvasGroup>();
     }
 
     private void Start()
@@ -160,8 +157,10 @@ public sealed class SceneVideoController : MonoBehaviour
         inactivityTimer?.Resume(this);
         SetUiVisible(true);
 
-        if (currentPhase == VideoPhase.Outro)
-            onVideoFinished?.Invoke();
+        if (currentPhase == VideoPhase.Intro)
+            onIntroVideoFinished?.Invoke();
+        else
+            onOutroVideoFinished?.Invoke();
     }
 
     private void PlaySceneStartVideo()
@@ -194,55 +193,19 @@ public sealed class SceneVideoController : MonoBehaviour
 
     private void SetUiVisible(bool visible)
     {
-        if (!hideUiWhileVideoPlays || uiCanvas == null)
+        if (!hideUiWhileVideoPlays || uiCanvases == null || uiCanvases.Length == 0)
             return;
 
-        if (uiFadeRoutine != null)
+        for (int i = 0; i < uiCanvases.Length; i++)
         {
-            StopCoroutine(uiFadeRoutine);
-            uiFadeRoutine = null;
+            if (uiCanvases[i] != null)
+                uiCanvases[i].enabled = visible;
         }
-
-        if (uiCanvasGroup == null)
-            uiCanvasGroup = uiCanvas.GetComponent<CanvasGroup>();
-
-        if (uiCanvasGroup != null)
-            uiCanvasGroup.alpha = visible ? 1f : 0f;
     }
 
     private void HideUi()
     {
-        if (!hideUiWhileVideoPlays || uiCanvas == null)
-            return;
-
-        if (uiCanvasGroup == null)
-            uiCanvasGroup = uiCanvas.GetComponent<CanvasGroup>();
-
-        if (uiCanvasGroup == null)
-            return;
-
-        if (uiFadeRoutine != null)
-            StopCoroutine(uiFadeRoutine);
-
-        uiFadeRoutine = StartCoroutine(FadeOutUi());
-    }
-
-    private IEnumerator FadeOutUi()
-    {
-        if (uiFadeDelay > 0f)
-            yield return new WaitForSeconds(uiFadeDelay);
-
-        float startAlpha = uiCanvasGroup.alpha;
-        float elapsed = 0f;
-        while (elapsed < uiFadeDuration)
-        {
-            elapsed += Time.deltaTime;
-            uiCanvasGroup.alpha = Mathf.Lerp(startAlpha, 0f, elapsed / uiFadeDuration);
-            yield return null;
-        }
-
-        uiCanvasGroup.alpha = 0f;
-        uiFadeRoutine = null;
+        SetUiVisible(false);
     }
 
     private bool TrySetSelectedVideo(int selectedId)
