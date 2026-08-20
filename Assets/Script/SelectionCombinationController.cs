@@ -12,6 +12,7 @@ public sealed class SelectionCombinationController : MonoBehaviour
     private const int MaximumRopeId = 5;
     private const int MinimumCardId = 1;
     private const int MaximumCardId = 12;
+    private const float BackgroundOpacity = 0.5f;
 
     [Header("Presentation Assets")]
     [SerializeField] private Sprite backgroundSprite;
@@ -229,7 +230,7 @@ public sealed class SelectionCombinationController : MonoBehaviour
 
         float darknessProgress = 1f - alpha;
         float brightness = Mathf.Lerp(1f, finalBackgroundBrightness, darknessProgress);
-        backgroundImage.color = new Color(brightness, brightness, brightness, 1f);
+        backgroundImage.color = new Color(brightness, brightness, brightness, BackgroundOpacity);
     }
 
     private void OpenLoadingScene()
@@ -269,6 +270,7 @@ public sealed class SelectionCombinationController : MonoBehaviour
         scaler.matchWidthOrHeight = 0.5f;
 
         backgroundImage = CreateImage("Background", canvasObject.transform, backgroundSprite, false);
+        SetImageAlpha(backgroundImage, BackgroundOpacity);
         RectTransform backgroundRect = backgroundImage.rectTransform;
         backgroundRect.anchorMin = Vector2.zero;
         backgroundRect.anchorMax = Vector2.one;
