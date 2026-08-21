@@ -4,7 +4,7 @@ using UnityEngine;
 public sealed class RopeSpawner2D : MonoBehaviour
 {
     [SerializeField] private GameObject ropePrefab;
-    [SerializeField, Min(1)] private int ropeCount = 5;
+    [SerializeField, Min(1)] private int ropeCount = PlayerFortuneState.DefaultRopeIdCount;
     [SerializeField, Min(0f)] private float horizontalSpacing = 3.31f;
 
     private readonly List<GameObject> spawnedRopes = new();

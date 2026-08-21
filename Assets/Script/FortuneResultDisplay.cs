@@ -33,18 +33,20 @@ public sealed class FortuneResultDisplay : MonoBehaviour
                 return;
             }
 
-            if (state.RopeId < 1 || state.RopeId > 5)
+            if (!state.IsValidRopeId(state.RopeId))
             {
                 Debug.LogError(
-                    $"[FortuneResultDisplay] RopeId={state.RopeId} is outside the valid range (1-5).",
+                    $"[FortuneResultDisplay] RopeId={state.RopeId} is outside the valid range " +
+                    $"({PlayerFortuneState.MinimumSelectionId}-{state.RopeIdCount}).",
                     this);
                 return;
             }
 
-            if (state.CardId < 1 || state.CardId > 12)
+            if (!state.IsValidCardId(state.CardId))
             {
                 Debug.LogError(
-                    $"[FortuneResultDisplay] CardId={state.CardId} is outside the valid range (1-12).",
+                    $"[FortuneResultDisplay] CardId={state.CardId} is outside the valid range " +
+                    $"({PlayerFortuneState.MinimumSelectionId}-{state.CardIdCount}).",
                     this);
                 return;
             }

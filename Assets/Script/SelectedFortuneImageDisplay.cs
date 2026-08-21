@@ -3,21 +3,16 @@ using UnityEngine.UI;
 
 public sealed class SelectedFortuneImageDisplay : MonoBehaviour
 {
-    private const int RopeIdMinimum = 1;
-    private const int RopeIdMaximum = 5;
-    private const int CardIdMinimum = 1;
-    private const int CardIdMaximum = 12;
-
     [Header("Display Images")]
     [SerializeField] private Image ropeDisplayImage;
     [SerializeField] private Image cardDisplayImage;
 
     [Header("Selection Sprites (ID Order)")]
-    [Tooltip("Register 5 sprites in RopeId order: elements 0-4 correspond to IDs 1-5.")]
-    [SerializeField] private Sprite[] ropeSprites = new Sprite[5];
+    [Tooltip("Register sprites in RopeId order: element 0 corresponds to ID 1.")]
+    [SerializeField] private Sprite[] ropeSprites = new Sprite[PlayerFortuneState.DefaultRopeIdCount];
 
-    [Tooltip("Register 12 sprites in CardId order: elements 0-11 correspond to IDs 1-12.")]
-    [SerializeField] private Sprite[] cardSprites = new Sprite[12];
+    [Tooltip("Register sprites in CardId order: element 0 corresponds to ID 1.")]
+    [SerializeField] private Sprite[] cardSprites = new Sprite[PlayerFortuneState.DefaultCardIdCount];
 
     private void Start()
     {
@@ -38,16 +33,14 @@ public sealed class SelectedFortuneImageDisplay : MonoBehaviour
 
         SetSpriteForId(
             state.RopeId,
-            RopeIdMinimum,
-            RopeIdMaximum,
+            state.RopeIdCount,
             ropeSprites,
             ropeDisplayImage,
             "RopeId");
 
         SetSpriteForId(
             state.CardId,
-            CardIdMinimum,
-            CardIdMaximum,
+            state.CardIdCount,
             cardSprites,
             cardDisplayImage,
             "CardId");
@@ -55,8 +48,7 @@ public sealed class SelectedFortuneImageDisplay : MonoBehaviour
 
     private void SetSpriteForId(
         int id,
-        int minimumId,
-        int maximumId,
+        int expectedCount,
         Sprite[] sprites,
         Image displayImage,
         string idName)
@@ -69,16 +61,16 @@ public sealed class SelectedFortuneImageDisplay : MonoBehaviour
             return;
         }
 
-        if (id < minimumId || id > maximumId)
+        if (!PlayerFortuneState.IsValidSelectionId(id, expectedCount))
         {
             Debug.LogError(
                 $"[SelectedFortuneImageDisplay] {idName}={id} is outside the valid range " +
-                $"({minimumId}-{maximumId}).",
+                $"({PlayerFortuneState.MinimumSelectionId}-{expectedCount}).",
                 this);
             return;
         }
 
-        int spriteIndex = id - minimumId;
+        int spriteIndex = id - PlayerFortuneState.MinimumSelectionId;
         if (sprites == null || spriteIndex >= sprites.Length)
         {
             int registeredCount = sprites == null ? 0 : sprites.Length;

@@ -151,6 +151,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Canvas_Overlay
       objectReference: {fileID: 0}
+    - target: {fileID: 4808071967332943310, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6339290268488235687, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -339,6 +343,10 @@ PrefabInstance:
     - target: {fileID: 6251320743745396821, guid: e08e7442b2017104c9a861c95e23d11e, type: 3}
       propertyPath: m_Name
       value: Canvas_Camera
+      objectReference: {fileID: 0}
+    - target: {fileID: 6251320743745396821, guid: e08e7442b2017104c9a861c95e23d11e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1110,6 +1118,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SelectionFlow
       objectReference: {fileID: 0}
+    - target: {fileID: 5289642070379263310, guid: f0f5099719334324f99d427be7e987cc, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8590422268733833558, guid: f0f5099719334324f99d427be7e987cc, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.90254
@@ -1166,6 +1178,10 @@ PrefabInstance:
     - target: {fileID: 901456600749022509, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: m_Name
       value: SceneVideoController
+      objectReference: {fileID: 0}
+    - target: {fileID: 901456600749022509, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: uiCanvas

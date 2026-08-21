@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -17,6 +18,7 @@ public sealed class SceneVideoController : MonoBehaviour
 
     [SerializeField] private VideoPlayer videoPlayer;
     [SerializeField] private bool restartFromBeginning = true;
+    [SerializeField, Min(1f)] private float prepareTimeoutSeconds = 15f;
 
     [Header("Events")]
     [SerializeField] private UnityEvent onIntroVideoFinished;
@@ -39,7 +41,11 @@ public sealed class SceneVideoController : MonoBehaviour
     [SerializeField] private string sceneNameToOpen;
 
     private InactivityTimer inactivityTimer;
+    private AsyncOperation preloadOperation;
+    private string preloadedSceneName;
+    private Coroutine prepareTimeoutRoutine;
     private bool isPreparing;
+    private bool isFinishing;
     private VideoPhase currentPhase;
 
     private void Awake()
@@ -62,6 +68,7 @@ public sealed class SceneVideoController : MonoBehaviour
         {
             videoPlayer.prepareCompleted += HandleVideoPrepared;
             videoPlayer.loopPointReached += HandleVideoFinished;
+            videoPlayer.errorReceived += HandleVideoError;
         }
     }
 
@@ -71,8 +78,11 @@ public sealed class SceneVideoController : MonoBehaviour
         {
             videoPlayer.prepareCompleted -= HandleVideoPrepared;
             videoPlayer.loopPointReached -= HandleVideoFinished;
+            videoPlayer.errorReceived -= HandleVideoError;
         }
 
+        StopPrepareTimeout();
+        isPreparing = false;
         inactivityTimer?.Resume(this);
         HideVideoOutput();
         SetUiVisible(true);
@@ -98,6 +108,7 @@ public sealed class SceneVideoController : MonoBehaviour
             return;
         }
 
+        BeginScenePreload();
         PrepareVideo(VideoPhase.Outro);
     }
 
@@ -117,14 +128,20 @@ public sealed class SceneVideoController : MonoBehaviour
 
         videoPlayer.source = VideoSource.VideoClip;
         videoPlayer.clip = videoClip;
+        BeginScenePreload();
         PrepareVideo(VideoPhase.Outro);
     }
 
     public void OpenScene()
     {
-        if (string.IsNullOrWhiteSpace(sceneNameToOpen))
+        if (!CanOpenConfiguredScene())
         {
-            Debug.LogError("SceneVideoController needs a scene name to open.", this);
+            return;
+        }
+
+        if (preloadOperation != null && preloadedSceneName == sceneNameToOpen)
+        {
+            preloadOperation.allowSceneActivation = true;
             return;
         }
 
@@ -139,7 +156,6 @@ public sealed class SceneVideoController : MonoBehaviour
             return;
         }
 
-        isPreparing = false;
         FinishVideo();
     }
 
@@ -153,14 +169,27 @@ public sealed class SceneVideoController : MonoBehaviour
 
     private void FinishVideo()
     {
-        HideVideoOutput();
+        if (isFinishing)
+        {
+            return;
+        }
+
+        isFinishing = true;
+        isPreparing = false;
+        StopPrepareTimeout();
         inactivityTimer?.Resume(this);
-        SetUiVisible(true);
 
         if (currentPhase == VideoPhase.Intro)
+        {
+            HideVideoOutput();
+            SetUiVisible(true);
             onIntroVideoFinished?.Invoke();
+        }
         else
+        {
+            // Keep the final outro frame visible until the preloaded scene activates.
             onOutroVideoFinished?.Invoke();
+        }
     }
 
     private void PlaySceneStartVideo()
@@ -178,8 +207,74 @@ public sealed class SceneVideoController : MonoBehaviour
         inactivityTimer?.Pause(this);
         currentPhase = phase;
         isPreparing = true;
+        isFinishing = false;
         videoPlayer.targetCameraAlpha = 0f;
+        StopPrepareTimeout();
+        prepareTimeoutRoutine = StartCoroutine(WaitForVideoPrepare());
         videoPlayer.Prepare();
+    }
+
+    private IEnumerator WaitForVideoPrepare()
+    {
+        yield return new WaitForSecondsRealtime(prepareTimeoutSeconds);
+
+        if (isPreparing)
+        {
+            HandleVideoFailure("Video preparation timed out.");
+        }
+    }
+
+    private void StopPrepareTimeout()
+    {
+        if (prepareTimeoutRoutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(prepareTimeoutRoutine);
+        prepareTimeoutRoutine = null;
+    }
+
+    private void BeginScenePreload()
+    {
+        if (!CanOpenConfiguredScene())
+        {
+            return;
+        }
+
+        if (preloadOperation != null)
+        {
+            return;
+        }
+
+        preloadOperation = SceneManager.LoadSceneAsync(sceneNameToOpen);
+        if (preloadOperation == null)
+        {
+            Debug.LogError($"Failed to begin loading scene '{sceneNameToOpen}'.", this);
+            return;
+        }
+
+        preloadedSceneName = sceneNameToOpen;
+        preloadOperation.allowSceneActivation = false;
+    }
+
+    private bool CanOpenConfiguredScene()
+    {
+        if (string.IsNullOrWhiteSpace(sceneNameToOpen))
+        {
+            Debug.LogError("SceneVideoController needs a scene name to open.", this);
+            return false;
+        }
+
+        if (!Application.CanStreamedLevelBeLoaded(sceneNameToOpen))
+        {
+            Debug.LogError(
+                $"Scene '{sceneNameToOpen}' is not registered or enabled in Build Settings.",
+                this);
+            return false;
+        }
+
+        return true;
     }
 
     private void HideVideoOutput()
@@ -240,6 +335,7 @@ public sealed class SceneVideoController : MonoBehaviour
         }
 
         isPreparing = false;
+        StopPrepareTimeout();
 
         if (restartFromBeginning)
         {
@@ -249,5 +345,27 @@ public sealed class SceneVideoController : MonoBehaviour
         HideUi();
         videoPlayer.targetCameraAlpha = 1f;
         videoPlayer.Play();
+    }
+
+    private void HandleVideoError(VideoPlayer failedVideoPlayer, string message)
+    {
+        if (failedVideoPlayer != videoPlayer)
+        {
+            return;
+        }
+
+        HandleVideoFailure($"Video playback failed: {message}");
+    }
+
+    private void HandleVideoFailure(string message)
+    {
+        Debug.LogError(message, this);
+        VideoPhase failedPhase = currentPhase;
+        FinishVideo();
+
+        if (failedPhase == VideoPhase.Outro)
+        {
+            OpenScene();
+        }
     }
 }

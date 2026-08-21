@@ -22,6 +22,13 @@ public sealed class Buttons : MonoBehaviour
         resumedFrame = Time.frameCount;
     }
 
+    public static void ResetPauseState()
+    {
+        Time.timeScale = 1f;
+        gamePaused = false;
+        resumedFrame = -1;
+    }
+
     public void LoadScene(string sceneName)
     {
         if (string.IsNullOrWhiteSpace(sceneName))
@@ -38,9 +45,7 @@ public sealed class Buttons : MonoBehaviour
             return;
         }
 
-        Time.timeScale = 1f;
-        gamePaused = false;
-        resumedFrame = -1;
+        ResetPauseState();
         SceneManager.LoadScene(sceneName);
     }
 }

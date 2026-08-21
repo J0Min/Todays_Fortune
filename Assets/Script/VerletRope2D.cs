@@ -51,6 +51,7 @@ public class VerletRope2D : MonoBehaviour
 
     private readonly List<RopePoint> points = new List<RopePoint>();
     private readonly List<SpriteRenderer> renderers = new List<SpriteRenderer>();
+    private DragAnchor2D endDragAnchor;
     private float segmentLength;
     private bool initialized;
 
@@ -108,6 +109,7 @@ public class VerletRope2D : MonoBehaviour
     {
         ClearVisuals();
         points.Clear();
+        CacheEndDragAnchor();
 
         segmentCount = Mathf.Max(2, segmentCount);
         segmentLength = ropeLength / segmentCount;
@@ -277,8 +279,14 @@ public class VerletRope2D : MonoBehaviour
         if (endAnchor == null) return false;
         if (!releaseEndAnchorOnMouseUp) return true;
 
-        DragAnchor2D dragAnchor = endAnchor.GetComponent<DragAnchor2D>();
-        return dragAnchor == null || dragAnchor.IsDragging;
+        return endDragAnchor == null || endDragAnchor.IsDragging;
+    }
+
+    private void CacheEndDragAnchor()
+    {
+        endDragAnchor = endAnchor != null
+            ? endAnchor.GetComponent<DragAnchor2D>()
+            : null;
     }
 
     private void SetEndPointPinned(bool pinned)

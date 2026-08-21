@@ -29,6 +29,7 @@ public sealed class ReturnToStartButton : MonoBehaviour
         }
 
         PlayerFortuneState.Instance.ResetData();
+        Buttons.ResetPauseState();
         SceneManager.LoadScene(startSceneName);
     }
 }

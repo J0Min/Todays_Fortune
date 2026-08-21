@@ -8,26 +8,22 @@ using UnityEngine.UI;
 /// </summary>
 public sealed class SelectionCombinationController : MonoBehaviour
 {
-    private const int MinimumRopeId = 1;
-    private const int MaximumRopeId = 5;
-    private const int MinimumCardId = 1;
-    private const int MaximumCardId = 12;
     private const float BackgroundOpacity = 0.5f;
 
     [Header("Presentation Assets")]
     [SerializeField] private Sprite backgroundSprite;
     [SerializeField] private Sprite titleSprite;
-    [Tooltip("Elements 0-4 map to Rope IDs 1-5.")]
-    [SerializeField] private Sprite[] ropeSprites = new Sprite[5];
-    [Tooltip("Elements 0-11 map to Card IDs 1-12.")]
-    [SerializeField] private Sprite[] cardSprites = new Sprite[12];
+    [Tooltip("Element 0 maps to Rope ID 1.")]
+    [SerializeField] private Sprite[] ropeSprites = new Sprite[PlayerFortuneState.DefaultRopeIdCount];
+    [Tooltip("Element 0 maps to Card ID 1.")]
+    [SerializeField] private Sprite[] cardSprites = new Sprite[PlayerFortuneState.DefaultCardIdCount];
 
     [Header("Direct Scene Preview")]
     [Tooltip("Uses the IDs below only when this scene is played without a completed selection.")]
     [SerializeField] private bool usePreviewIdsWhenSelectionMissing = true;
-    [Range(MinimumRopeId, MaximumRopeId)]
+    [Min(PlayerFortuneState.MinimumSelectionId)]
     [SerializeField] private int previewRopeId = 1;
-    [Range(MinimumCardId, MaximumCardId)]
+    [Min(PlayerFortuneState.MinimumSelectionId)]
     [SerializeField] private int previewCardId = 1;
 
     [Header("Layout (1920 x 1080 Reference)")]
@@ -107,10 +103,12 @@ public sealed class SelectionCombinationController : MonoBehaviour
         PlayerFortuneState state = PlayerFortuneState.Instance;
         int ropeId = state != null ? state.RopeId : 0;
         int cardId = state != null ? state.CardId : 0;
+        int ropeIdCount = state != null ? state.RopeIdCount : PlayerFortuneState.DefaultRopeIdCount;
+        int cardIdCount = state != null ? state.CardIdCount : PlayerFortuneState.DefaultCardIdCount;
 
         if (usePreviewIdsWhenSelectionMissing &&
-            (ropeId < MinimumRopeId || ropeId > MaximumRopeId ||
-             cardId < MinimumCardId || cardId > MaximumCardId))
+            (!PlayerFortuneState.IsValidSelectionId(ropeId, ropeIdCount) ||
+             !PlayerFortuneState.IsValidSelectionId(cardId, cardIdCount)))
         {
             ropeId = previewRopeId;
             cardId = previewCardId;
@@ -119,20 +117,26 @@ public sealed class SelectionCombinationController : MonoBehaviour
                 this);
         }
 
-        if (ropeId < MinimumRopeId || ropeId > MaximumRopeId)
+        if (!PlayerFortuneState.IsValidSelectionId(ropeId, ropeIdCount))
         {
-            Debug.LogError($"[SelectionCombination] RopeId={ropeId} is outside the valid range (1-5).", this);
+            Debug.LogError(
+                $"[SelectionCombination] RopeId={ropeId} is outside the valid range " +
+                $"({PlayerFortuneState.MinimumSelectionId}-{ropeIdCount}).",
+                this);
             return false;
         }
 
-        if (cardId < MinimumCardId || cardId > MaximumCardId)
+        if (!PlayerFortuneState.IsValidSelectionId(cardId, cardIdCount))
         {
-            Debug.LogError($"[SelectionCombination] CardId={cardId} is outside the valid range (1-12).", this);
+            Debug.LogError(
+                $"[SelectionCombination] CardId={cardId} is outside the valid range " +
+                $"({PlayerFortuneState.MinimumSelectionId}-{cardIdCount}).",
+                this);
             return false;
         }
 
-        int ropeIndex = ropeId - MinimumRopeId;
-        int cardIndex = cardId - MinimumCardId;
+        int ropeIndex = ropeId - PlayerFortuneState.MinimumSelectionId;
+        int cardIndex = cardId - PlayerFortuneState.MinimumSelectionId;
         if (ropeSprites == null || ropeIndex >= ropeSprites.Length || ropeSprites[ropeIndex] == null ||
             cardSprites == null || cardIndex >= cardSprites.Length || cardSprites[cardIndex] == null)
         {

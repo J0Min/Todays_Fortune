@@ -26,6 +26,7 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
     [SerializeField] private VideoClip introShortVideo;
     [Min(0.01f)]
     [SerializeField] private float introCrossfadeDuration = 0.25f;
+    [SerializeField, Min(1f)] private float introPrepareTimeoutSeconds = 15f;
 
     [Header("Scene Transition")]
     [SerializeField] private string sceneNameToOpen;
@@ -39,9 +40,11 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
     private bool isReturnInputGuardActive;
     private bool hasLoggedWaitingForRelease;
     private bool hasObservedReturnInputRelease;
+    private Coroutine introPrepareTimeoutRoutine;
 
     private void Awake()
     {
+        Buttons.ResetPauseState();
         ApplyPendingEndingReturnGuard();
 #if UNITY_EDITOR
         ResolveIntroShortVideoReference();
@@ -150,6 +153,8 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
 
     private void OnDestroy()
     {
+        StopIntroPrepareTimeout();
+
         if (introVideoPlayer == null)
         {
             return;
@@ -174,9 +179,10 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(sceneNameToOpen))
+        if (string.IsNullOrWhiteSpace(sceneNameToOpen) ||
+            !Application.CanStreamedLevelBeLoaded(sceneNameToOpen))
         {
-            Debug.LogError("StartScreenController needs a scene name to open.", this);
+            Debug.LogError("StartScreenController needs a scene registered in Build Settings.", this);
             return;
         }
 
@@ -202,6 +208,7 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
         }
 
         CreateIntroVideoPlayer(canvas.transform);
+        introPrepareTimeoutRoutine = StartCoroutine(WaitForIntroVideoPrepare());
         introVideoPlayer.Prepare();
         titleExitAnimation.Play(OnTitleExitFinished);
     }
@@ -257,6 +264,12 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
 
     private void OnIntroVideoPrepared(VideoPlayer player)
     {
+        if (player != introVideoPlayer)
+        {
+            return;
+        }
+
+        StopIntroPrepareTimeout();
         isIntroVideoPrepared = true;
         PlayIntroVideoWhenReady();
     }
@@ -305,12 +318,54 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
         }
 
         Debug.Log(TransitionFinishedMessage);
-        SceneManager.LoadScene(sceneNameToOpen);
+        OpenTargetScene();
     }
 
     private void OnIntroVideoError(VideoPlayer player, string message)
     {
+        if (player != introVideoPlayer)
+        {
+            return;
+        }
+
         Debug.LogError("Intro short video failed: " + message, this);
+        OpenTargetScene();
+    }
+
+    private IEnumerator WaitForIntroVideoPrepare()
+    {
+        yield return new WaitForSecondsRealtime(introPrepareTimeoutSeconds);
+
+        if (!isIntroVideoPrepared)
+        {
+            Debug.LogError("Intro short video preparation timed out.", this);
+            OpenTargetScene();
+        }
+    }
+
+    private void StopIntroPrepareTimeout()
+    {
+        if (introPrepareTimeoutRoutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(introPrepareTimeoutRoutine);
+        introPrepareTimeoutRoutine = null;
+    }
+
+    private void OpenTargetScene()
+    {
+        StopIntroPrepareTimeout();
+
+        if (!Application.CanStreamedLevelBeLoaded(sceneNameToOpen))
+        {
+            hasStartedTransition = false;
+            Debug.LogError("StartScreenController target scene is not registered in Build Settings.", this);
+            return;
+        }
+
+        SceneManager.LoadScene(sceneNameToOpen);
     }
 
     private static bool WasPrimaryInputPressedThisFrame()

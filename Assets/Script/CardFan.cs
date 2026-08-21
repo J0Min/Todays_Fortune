@@ -12,7 +12,7 @@ public class CardFan : MonoBehaviour
 {
     [Header("Card Spawn")]
     [SerializeField] private Sprite cardBackSprite;
-    [SerializeField, Min(1)] private int cardCount = 5;
+    [SerializeField, Min(1)] private int cardCount = PlayerFortuneState.DefaultCardIdCount;
 
     [Header("Fan Shape")]
     [SerializeField, Min(0f)] private float width = 10f;
@@ -63,6 +63,12 @@ public class CardFan : MonoBehaviour
 
     private void Start()
     {
+        PlayerFortuneState state = PlayerFortuneState.Instance;
+        if (state != null)
+        {
+            cardCount = state.CardIdCount;
+        }
+
         SpawnCards();
 
         if (unfoldOnStart)

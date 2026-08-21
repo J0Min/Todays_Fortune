@@ -3,31 +3,26 @@ using UnityEngine;
 [DefaultExecutionOrder(-100)]
 public sealed class DataTestRopeSelectionTester : MonoBehaviour
 {
-    private const int MinimumRopeId = 1;
-    private const int MaximumRopeId = 5;
-    private const int MinimumCardId = 1;
-    private const int MaximumCardId = 12;
-
     [Header("Test Selection")]
-    [Tooltip("Enter a RopeId from 1 to 5.")]
+    [Tooltip("Enter a RopeId configured in PlayerFortuneState.")]
     [SerializeField] private int testRopeId = 1;
 
-    [Tooltip("Enter a CardId from 1 to 12.")]
+    [Tooltip("Enter a CardId configured in PlayerFortuneState.")]
     [SerializeField] private int testCardId = 1;
 
     private void Start()
     {
-        if (!ValidateTestIds())
-        {
-            return;
-        }
-
         PlayerFortuneState state = PlayerFortuneState.Instance;
         if (state == null)
         {
             Debug.LogError(
                 "[DataTestRopeSelectionTester] PlayerFortuneState.Instance is missing.",
                 this);
+            return;
+        }
+
+        if (!ValidateTestIds(state))
+        {
             return;
         }
 
@@ -39,24 +34,24 @@ public sealed class DataTestRopeSelectionTester : MonoBehaviour
             this);
     }
 
-    private bool ValidateTestIds()
+    private bool ValidateTestIds(PlayerFortuneState state)
     {
         bool isValid = true;
 
-        if (testRopeId < MinimumRopeId || testRopeId > MaximumRopeId)
+        if (!state.IsValidRopeId(testRopeId))
         {
             Debug.LogError(
                 $"[DataTestRopeSelectionTester] Test Rope Id={testRopeId} is invalid. " +
-                $"Enter a value from {MinimumRopeId} to {MaximumRopeId}.",
+                $"Enter a value from {PlayerFortuneState.MinimumSelectionId} to {state.RopeIdCount}.",
                 this);
             isValid = false;
         }
 
-        if (testCardId < MinimumCardId || testCardId > MaximumCardId)
+        if (!state.IsValidCardId(testCardId))
         {
             Debug.LogError(
                 $"[DataTestRopeSelectionTester] Test Card Id={testCardId} is invalid. " +
-                $"Enter a value from {MinimumCardId} to {MaximumCardId}.",
+                $"Enter a value from {PlayerFortuneState.MinimumSelectionId} to {state.CardIdCount}.",
                 this);
             isValid = false;
         }

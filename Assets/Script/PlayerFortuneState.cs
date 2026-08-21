@@ -3,13 +3,17 @@ using UnityEngine.SceneManagement;
 
 public sealed class PlayerFortuneState : MonoBehaviour
 {
+    public const int MinimumSelectionId = 1;
+    public const int DefaultRopeIdCount = 5;
+    public const int DefaultCardIdCount = 12;
+
     [Header("Inactivity Reset")]
     [SerializeField] private string startSceneName = "StartScene";
 
     [SerializeField] private bool runResetTestOnStart = true;
     [Header("Random Selection")]
-    [SerializeField, Min(1)] private int ropeIdCount = 5;
-    [SerializeField, Min(1)] private int cardIdCount = 12;
+    [SerializeField, Min(1)] private int ropeIdCount = DefaultRopeIdCount;
+    [SerializeField, Min(1)] private int cardIdCount = DefaultCardIdCount;
 
     [HideInInspector]
     [SerializeField] private string testSceneName;
@@ -21,6 +25,14 @@ public sealed class PlayerFortuneState : MonoBehaviour
     public FortuneDataReader.FortuneData FortuneResult { get; private set; }
     public int RopeIdCount => ropeIdCount;
     public int CardIdCount => cardIdCount;
+
+    public bool IsValidRopeId(int ropeId) => IsValidSelectionId(ropeId, RopeIdCount);
+    public bool IsValidCardId(int cardId) => IsValidSelectionId(cardId, CardIdCount);
+
+    public static bool IsValidSelectionId(int id, int selectionCount)
+    {
+        return id >= MinimumSelectionId && id <= selectionCount;
+    }
 
     private InactivityTimer inactivityTimer;
 
@@ -61,12 +73,12 @@ public sealed class PlayerFortuneState : MonoBehaviour
 
     public void SelectRandomRope()
     {
-        RopeId = Random.Range(1, ropeIdCount + 1);
+        RopeId = Random.Range(MinimumSelectionId, ropeIdCount + 1);
     }
 
     public void SelectRandomCard()
     {
-        CardId = Random.Range(1, cardIdCount + 1);
+        CardId = Random.Range(MinimumSelectionId, cardIdCount + 1);
     }
 
     public void SelectRopeCard(int cardId, int ropeId)
@@ -116,6 +128,7 @@ public sealed class PlayerFortuneState : MonoBehaviour
         }
 
         ResetData();
+        Buttons.ResetPauseState();
         SceneManager.LoadScene(startSceneName);
     }
 
