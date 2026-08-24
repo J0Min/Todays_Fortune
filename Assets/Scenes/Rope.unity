@@ -143,6 +143,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 329210067544246540, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_Texture
+      value: 
+      objectReference: {fileID: 2800000, guid: 51778e68279c44b4687332c8f83ec703, type: 3}
+    - target: {fileID: 513030869147284045, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1025
+      objectReference: {fileID: 0}
+    - target: {fileID: 513030869147284045, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 135
+      objectReference: {fileID: 0}
+    - target: {fileID: 1007854717857712857, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_Texture
+      value: 
+      objectReference: {fileID: 2800000, guid: e4b37ccb9e27eaf4e8a95c2e415591b4, type: 3}
+    - target: {fileID: 1826917814972844884, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 885
+      objectReference: {fileID: 0}
+    - target: {fileID: 1826917814972844884, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 188
+      objectReference: {fileID: 0}
     - target: {fileID: 2764664457859539097, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -153,7 +177,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4808071967332943310, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6339290268488235687, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_Pivot.x
@@ -235,6 +259,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8157703934194712956, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_Texture
+      value: 
+      objectReference: {fileID: 2800000, guid: 54039221454f4204487e240c58cc350f, type: 3}
     - target: {fileID: 8298407371609149115, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_Sprite
       value: 
