@@ -165,6 +165,16 @@ public sealed class SceneVideoController : MonoBehaviour
         SceneManager.LoadScene(sceneNameToOpen);
     }
 
+    public void SetVideoSpeed1x()
+    {
+        SetVideoPlaybackSpeed(1f);
+    }
+
+    public void SetVideoSpeed2x()
+    {
+        SetVideoPlaybackSpeed(2f);
+    }
+
     public void SkipVideo()
     {
         if (videoPlayer == null)
@@ -174,6 +184,17 @@ public sealed class SceneVideoController : MonoBehaviour
         }
 
         FinishVideo();
+    }
+
+    private void SetVideoPlaybackSpeed(float speed)
+    {
+        if (videoPlayer == null)
+        {
+            Debug.LogError("SceneVideoController needs a VideoPlayer.", this);
+            return;
+        }
+
+        videoPlayer.playbackSpeed = speed;
     }
 
     private void HandleVideoFinished(VideoPlayer finishedVideoPlayer)

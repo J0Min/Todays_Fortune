@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 8205608213673163296}
   - component: {fileID: 5977918035953597510}
   - component: {fileID: 377715413405861271}
+  - component: {fileID: 363253629587103617}
   m_Layer: 5
   m_Name: Button_Home
   m_TagString: Untagged
@@ -216,6 +217,19 @@ MonoBehaviour:
           m_StringArgument: StartScene
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &363253629587103617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1911230075554353863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f94d2a1cd0be554aa772b42059ae02e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RawImageAlphaRaycastFilter
+  alphaThreshold: 0.1
 --- !u!1 &2234261410573481348
 GameObject:
   m_ObjectHideFlags: 0
@@ -494,6 +508,7 @@ GameObject:
   - component: {fileID: 3571168861836927177}
   - component: {fileID: 6581201819028758760}
   - component: {fileID: 2206637280752146520}
+  - component: {fileID: 1587710248565467517}
   m_Layer: 5
   m_Name: Button_Resume
   m_TagString: Untagged
@@ -635,6 +650,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1587710248565467517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5603692974619993300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f94d2a1cd0be554aa772b42059ae02e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RawImageAlphaRaycastFilter
+  alphaThreshold: 0.1
 --- !u!1 &5711152899565737535
 GameObject:
   m_ObjectHideFlags: 0
@@ -647,6 +675,7 @@ GameObject:
   - component: {fileID: 8395576380935769021}
   - component: {fileID: 6416826266465726320}
   - component: {fileID: 4204993686464814191}
+  - component: {fileID: 7469064434465192615}
   m_Layer: 5
   m_Name: Button_Sound
   m_TagString: Untagged
@@ -764,6 +793,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &7469064434465192615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5711152899565737535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f94d2a1cd0be554aa772b42059ae02e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RawImageAlphaRaycastFilter
+  alphaThreshold: 0.1
 --- !u!1 &6002536261913729282
 GameObject:
   m_ObjectHideFlags: 0
@@ -776,6 +818,7 @@ GameObject:
   - component: {fileID: 8264558550147221419}
   - component: {fileID: 2988781972992134806}
   - component: {fileID: 4850288345835074640}
+  - component: {fileID: 5158434097513946526}
   m_Layer: 5
   m_Name: Button_X
   m_TagString: Untagged
@@ -917,6 +960,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &5158434097513946526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6002536261913729282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f94d2a1cd0be554aa772b42059ae02e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RawImageAlphaRaycastFilter
+  alphaThreshold: 0.1
 --- !u!1 &6014762868344987066
 GameObject:
   m_ObjectHideFlags: 0
@@ -1001,6 +1057,7 @@ GameObject:
   - component: {fileID: 1275023636893055735}
   - component: {fileID: 8737247353985424247}
   - component: {fileID: 9029670192589923569}
+  - component: {fileID: 3688063748344360392}
   m_Layer: 5
   m_Name: Button_Home
   m_TagString: Untagged
@@ -1142,6 +1199,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+--- !u!114 &3688063748344360392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6428867513274141213}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f94d2a1cd0be554aa772b42059ae02e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RawImageAlphaRaycastFilter
+  alphaThreshold: 0.1
 --- !u!1 &7860317470047349970
 GameObject:
   m_ObjectHideFlags: 0
