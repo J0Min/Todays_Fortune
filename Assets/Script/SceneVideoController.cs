@@ -10,6 +10,9 @@ using UnityEngine.Video;
 /// </summary>
 public sealed class SceneVideoController : MonoBehaviour
 {
+    private static SceneVideoController pendingOutgoingController;
+    private static string pendingIncomingSceneName;
+
     private enum VideoPhase
     {
         Intro,
@@ -44,6 +47,8 @@ public sealed class SceneVideoController : MonoBehaviour
     private AsyncOperation preloadOperation;
     private string preloadedSceneName;
     private Coroutine prepareTimeoutRoutine;
+    private Coroutine sceneActivationRoutine;
+    private Coroutine handoffCompletionRoutine;
     private bool isPreparing;
     private bool isFinishing;
     private VideoPhase currentPhase;
@@ -67,8 +72,10 @@ public sealed class SceneVideoController : MonoBehaviour
         if (videoPlayer != null)
         {
             videoPlayer.prepareCompleted += HandleVideoPrepared;
+            videoPlayer.frameReady += HandleVideoFrameReady;
             videoPlayer.loopPointReached += HandleVideoFinished;
             videoPlayer.errorReceived += HandleVideoError;
+            videoPlayer.sendFrameReadyEvents = true;
         }
     }
 
@@ -77,6 +84,7 @@ public sealed class SceneVideoController : MonoBehaviour
         if (videoPlayer != null)
         {
             videoPlayer.prepareCompleted -= HandleVideoPrepared;
+            videoPlayer.frameReady -= HandleVideoFrameReady;
             videoPlayer.loopPointReached -= HandleVideoFinished;
             videoPlayer.errorReceived -= HandleVideoError;
         }
@@ -141,7 +149,12 @@ public sealed class SceneVideoController : MonoBehaviour
 
         if (preloadOperation != null && preloadedSceneName == sceneNameToOpen)
         {
-            preloadOperation.allowSceneActivation = true;
+            if (sceneActivationRoutine == null)
+            {
+                PrepareAdditiveHandoff();
+                preloadOperation.allowSceneActivation = true;
+                sceneActivationRoutine = StartCoroutine(WaitForPreloadedSceneActivation());
+            }
             return;
         }
 
@@ -182,6 +195,7 @@ public sealed class SceneVideoController : MonoBehaviour
         if (currentPhase == VideoPhase.Intro)
         {
             HideVideoOutput();
+            CompletePendingHandoff(gameObject.scene);
             SetUiVisible(true);
             onIntroVideoFinished?.Invoke();
         }
@@ -247,7 +261,7 @@ public sealed class SceneVideoController : MonoBehaviour
             return;
         }
 
-        preloadOperation = SceneManager.LoadSceneAsync(sceneNameToOpen);
+        preloadOperation = SceneManager.LoadSceneAsync(sceneNameToOpen, LoadSceneMode.Additive);
         if (preloadOperation == null)
         {
             Debug.LogError($"Failed to begin loading scene '{sceneNameToOpen}'.", this);
@@ -345,6 +359,147 @@ public sealed class SceneVideoController : MonoBehaviour
         HideUi();
         videoPlayer.targetCameraAlpha = 1f;
         videoPlayer.Play();
+    }
+
+    private void HandleVideoFrameReady(VideoPlayer preparedVideoPlayer, long frameIndex)
+    {
+        if (preparedVideoPlayer != videoPlayer || currentPhase != VideoPhase.Intro ||
+            !IsPendingIncomingScene(gameObject.scene) || handoffCompletionRoutine != null)
+        {
+            return;
+        }
+
+        handoffCompletionRoutine = StartCoroutine(CompleteHandoffAfterFrame());
+    }
+
+    private IEnumerator CompleteHandoffAfterFrame()
+    {
+        yield return new WaitForEndOfFrame();
+        CompletePendingHandoff(gameObject.scene);
+        handoffCompletionRoutine = null;
+    }
+
+    private void PrepareAdditiveHandoff()
+    {
+        pendingOutgoingController = this;
+        pendingIncomingSceneName = preloadedSceneName;
+
+        Camera videoCamera = videoPlayer != null ? videoPlayer.targetCamera : null;
+        if (videoCamera != null)
+        {
+            // Keep the outgoing video's final frame above the incoming scene until
+            // the incoming intro video has produced its first frame.
+            videoCamera.depth = short.MaxValue;
+        }
+
+        SetSceneAudioListenersEnabled(gameObject.scene, false);
+    }
+
+    private IEnumerator WaitForPreloadedSceneActivation()
+    {
+        while (preloadOperation != null && !preloadOperation.isDone)
+        {
+            yield return null;
+        }
+
+        Scene incomingScene = SceneManager.GetSceneByName(preloadedSceneName);
+        if (!incomingScene.IsValid() || !incomingScene.isLoaded)
+        {
+            Debug.LogError($"Failed to activate preloaded scene '{preloadedSceneName}'.", this);
+            yield break;
+        }
+
+        if (!HasPlayableSceneIntro(incomingScene))
+        {
+            CompletePendingHandoff(incomingScene);
+        }
+    }
+
+    private static bool HasPlayableSceneIntro(Scene scene)
+    {
+        GameObject[] rootObjects = scene.GetRootGameObjects();
+        for (int i = 0; i < rootObjects.Length; i++)
+        {
+            SceneVideoController[] controllers =
+                rootObjects[i].GetComponentsInChildren<SceneVideoController>(true);
+
+            for (int j = 0; j < controllers.Length; j++)
+            {
+                SceneVideoController controller = controllers[j];
+                if (controller.isActiveAndEnabled && controller.playOnSceneStart &&
+                    controller.sceneStartVideo != null && controller.videoPlayer != null)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsPendingIncomingScene(Scene scene)
+    {
+        return pendingOutgoingController != null && scene.IsValid() &&
+               scene.name == pendingIncomingSceneName;
+    }
+
+    private static void CompletePendingHandoff(Scene incomingScene)
+    {
+        if (!IsPendingIncomingScene(incomingScene))
+        {
+            return;
+        }
+
+        SceneVideoController outgoingController = pendingOutgoingController;
+        Scene outgoingScene = outgoingController.gameObject.scene;
+
+        pendingOutgoingController = null;
+        pendingIncomingSceneName = null;
+
+        SceneManager.SetActiveScene(incomingScene);
+        SetSceneCamerasEnabled(outgoingScene, false);
+        outgoingController.HideVideoOutput();
+
+        if (outgoingScene.IsValid() && outgoingScene.isLoaded && outgoingScene != incomingScene)
+        {
+            SceneManager.UnloadSceneAsync(outgoingScene);
+        }
+    }
+
+    private static void SetSceneCamerasEnabled(Scene scene, bool enabled)
+    {
+        if (!scene.IsValid() || !scene.isLoaded)
+        {
+            return;
+        }
+
+        GameObject[] rootObjects = scene.GetRootGameObjects();
+        for (int i = 0; i < rootObjects.Length; i++)
+        {
+            Camera[] cameras = rootObjects[i].GetComponentsInChildren<Camera>(true);
+            for (int j = 0; j < cameras.Length; j++)
+            {
+                cameras[j].enabled = enabled;
+            }
+        }
+    }
+
+    private static void SetSceneAudioListenersEnabled(Scene scene, bool enabled)
+    {
+        if (!scene.IsValid() || !scene.isLoaded)
+        {
+            return;
+        }
+
+        GameObject[] rootObjects = scene.GetRootGameObjects();
+        for (int i = 0; i < rootObjects.Length; i++)
+        {
+            AudioListener[] listeners = rootObjects[i].GetComponentsInChildren<AudioListener>(true);
+            for (int j = 0; j < listeners.Length; j++)
+            {
+                listeners[j].enabled = enabled;
+            }
+        }
     }
 
     private void HandleVideoError(VideoPlayer failedVideoPlayer, string message)
