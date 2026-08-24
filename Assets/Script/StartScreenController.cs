@@ -1,77 +1,44 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 #endif
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using UnityEngine.Video;
 
 public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
 {
     private const string TouchMessage = "Start Screen Touched";
-    private const string TransitionFinishedMessage = "Start Transition Finished";
     private static bool hasPendingEndingReturn;
     private static bool pendingReturnNeedsInputRelease;
-#if UNITY_EDITOR
-    private const string IntroShortVideoAssetPath = "Assets/Video/intro3.mp4";
-#endif
 
     [Header("Title Exit")]
     [SerializeField] private TitleExitAnimation titleExitAnimation;
 
-    [Header("Intro Short Video")]
-    [SerializeField] private VideoClip introShortVideo;
-    [Min(0.01f)]
-    [SerializeField] private float introCrossfadeDuration = 0.25f;
-    [SerializeField, Min(1f)] private float introPrepareTimeoutSeconds = 15f;
+    [Header("Scene Start Video")]
+    [SerializeField] private CanvasGroup canvasToFade;
+    [SerializeField, Min(0f)] private float canvasFadeDuration = 0.25f;
 
-    [Header("Scene Transition")]
-    [SerializeField] private string sceneNameToOpen;
+    [Header("Events")]
+    [SerializeField] private UnityEvent onTitleExitFinished;
 
     private bool hasStartedTransition;
-    private bool hasReportedMissingIntroShortVideo;
-    private VideoPlayer introVideoPlayer;
-    private RawImage introVideoImage;
-    private bool isTitleExitFinished;
-    private bool isIntroVideoPrepared;
     private bool isReturnInputGuardActive;
     private bool hasLoggedWaitingForRelease;
     private bool hasObservedReturnInputRelease;
-    private Coroutine introPrepareTimeoutRoutine;
+    private Coroutine canvasFadeRoutine;
 
     private void Awake()
     {
         Buttons.ResetPauseState();
         ApplyPendingEndingReturnGuard();
-#if UNITY_EDITOR
-        ResolveIntroShortVideoReference();
-#endif
+        if (canvasToFade != null)
+        {
+            canvasToFade.alpha = 1f;
+        }
         EnsureEventSystem();
     }
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        ResolveIntroShortVideoReference();
-    }
-
-    private void ResolveIntroShortVideoReference()
-    {
-        if (introShortVideo != null)
-        {
-            return;
-        }
-
-        introShortVideo = UnityEditor.AssetDatabase.LoadAssetAtPath<VideoClip>(IntroShortVideoAssetPath);
-        if (introShortVideo != null)
-        {
-            UnityEditor.EditorUtility.SetDirty(this);
-        }
-    }
-#endif
 
     private void Update()
     {
@@ -151,21 +118,6 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
         Debug.Log("[StartScreen] Start input enabled", this);
     }
 
-    private void OnDestroy()
-    {
-        StopIntroPrepareTimeout();
-
-        if (introVideoPlayer == null)
-        {
-            return;
-        }
-
-        introVideoPlayer.prepareCompleted -= OnIntroVideoPrepared;
-        introVideoPlayer.frameReady -= OnIntroVideoFrameReady;
-        introVideoPlayer.loopPointReached -= OnIntroVideoFinished;
-        introVideoPlayer.errorReceived -= OnIntroVideoError;
-    }
-
     private void BeginTransition()
     {
         if (hasStartedTransition)
@@ -179,193 +131,53 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(sceneNameToOpen) ||
-            !Application.CanStreamedLevelBeLoaded(sceneNameToOpen))
-        {
-            Debug.LogError("StartScreenController needs a scene registered in Build Settings.", this);
-            return;
-        }
-
-        if (introShortVideo == null)
-        {
-            if (!hasReportedMissingIntroShortVideo)
-            {
-                hasReportedMissingIntroShortVideo = true;
-                Debug.LogError("StartScreenController needs an intro short video.", this);
-            }
-            return;
-        }
-
         hasStartedTransition = true;
         Debug.Log(TouchMessage);
-
-        Canvas canvas = GetComponentInChildren<Canvas>();
-        if (canvas == null)
-        {
-            Debug.LogError("StartScreenController needs a child Canvas.", this);
-            hasStartedTransition = false;
-            return;
-        }
-
-        CreateIntroVideoPlayer(canvas.transform);
-        introPrepareTimeoutRoutine = StartCoroutine(WaitForIntroVideoPrepare());
-        introVideoPlayer.Prepare();
-        titleExitAnimation.Play(OnTitleExitFinished);
+        titleExitAnimation.Play(HandleTitleExitFinished);
     }
 
-    private void OnTitleExitFinished()
+    private void HandleTitleExitFinished()
     {
-        isTitleExitFinished = true;
-        PlayIntroVideoWhenReady();
+        StartCanvasFade();
+        onTitleExitFinished?.Invoke();
     }
 
-    private void CreateIntroVideoPlayer(Transform canvasTransform)
+    private void StartCanvasFade()
     {
-        GameObject videoObject = new GameObject(
-            "Intro Short Video",
-            typeof(RectTransform),
-            typeof(CanvasRenderer),
-            typeof(RawImage),
-            typeof(AspectRatioFitter),
-            typeof(VideoPlayer));
-        videoObject.transform.SetParent(canvasTransform, false);
-        videoObject.transform.SetAsLastSibling();
-
-        RectTransform rect = videoObject.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0.5f, 0.5f);
-        rect.anchorMax = new Vector2(0.5f, 0.5f);
-        rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.anchoredPosition = Vector2.zero;
-
-        AspectRatioFitter fitter = videoObject.GetComponent<AspectRatioFitter>();
-        fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
-        fitter.aspectRatio = introShortVideo.height > 0
-            ? (float)introShortVideo.width / introShortVideo.height
-            : 16f / 9f;
-
-        introVideoImage = videoObject.GetComponent<RawImage>();
-        introVideoImage.color = new Color(1f, 1f, 1f, 0f);
-        introVideoImage.raycastTarget = true;
-        introVideoImage.enabled = false;
-
-        introVideoPlayer = videoObject.GetComponent<VideoPlayer>();
-        introVideoPlayer.playOnAwake = false;
-        introVideoPlayer.isLooping = false;
-        introVideoPlayer.renderMode = VideoRenderMode.APIOnly;
-        introVideoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
-        introVideoPlayer.source = VideoSource.VideoClip;
-        introVideoPlayer.clip = introShortVideo;
-        introVideoPlayer.sendFrameReadyEvents = true;
-        introVideoPlayer.prepareCompleted += OnIntroVideoPrepared;
-        introVideoPlayer.frameReady += OnIntroVideoFrameReady;
-        introVideoPlayer.loopPointReached += OnIntroVideoFinished;
-        introVideoPlayer.errorReceived += OnIntroVideoError;
-    }
-
-    private void OnIntroVideoPrepared(VideoPlayer player)
-    {
-        if (player != introVideoPlayer)
+        if (canvasToFade == null)
         {
             return;
         }
 
-        StopIntroPrepareTimeout();
-        isIntroVideoPrepared = true;
-        PlayIntroVideoWhenReady();
-    }
-
-    private void PlayIntroVideoWhenReady()
-    {
-        if (isTitleExitFinished && isIntroVideoPrepared)
+        if (canvasFadeDuration <= 0f)
         {
-            introVideoPlayer.Play();
-        }
-    }
-
-    private void OnIntroVideoFrameReady(VideoPlayer player, long frameIndex)
-    {
-        if (introVideoImage.enabled || player.texture == null)
-        {
+            canvasToFade.alpha = 0f;
             return;
         }
 
-        introVideoImage.texture = player.texture;
-        introVideoImage.enabled = true;
-        StartCoroutine(FadeInIntroVideo());
+        if (canvasFadeRoutine != null)
+        {
+            StopCoroutine(canvasFadeRoutine);
+        }
+
+        canvasFadeRoutine = StartCoroutine(FadeOutCanvas());
     }
 
-    private IEnumerator FadeInIntroVideo()
+    private IEnumerator FadeOutCanvas()
     {
         float startedAt = Time.unscaledTime;
         float elapsed = 0f;
-        while (elapsed < introCrossfadeDuration)
+
+        while (elapsed < canvasFadeDuration)
         {
             elapsed = Time.unscaledTime - startedAt;
-            float normalizedTime = Mathf.Clamp01(elapsed / introCrossfadeDuration);
-            float alpha = Mathf.SmoothStep(0f, 1f, normalizedTime);
-            introVideoImage.color = new Color(1f, 1f, 1f, alpha);
+            float normalizedTime = Mathf.Clamp01(elapsed / canvasFadeDuration);
+            canvasToFade.alpha = 1f - Mathf.SmoothStep(0f, 1f, normalizedTime);
             yield return null;
         }
 
-        introVideoImage.color = Color.white;
-    }
-
-    private void OnIntroVideoFinished(VideoPlayer player)
-    {
-        if (player != introVideoPlayer)
-        {
-            return;
-        }
-
-        Debug.Log(TransitionFinishedMessage);
-        OpenTargetScene();
-    }
-
-    private void OnIntroVideoError(VideoPlayer player, string message)
-    {
-        if (player != introVideoPlayer)
-        {
-            return;
-        }
-
-        Debug.LogError("Intro short video failed: " + message, this);
-        OpenTargetScene();
-    }
-
-    private IEnumerator WaitForIntroVideoPrepare()
-    {
-        yield return new WaitForSecondsRealtime(introPrepareTimeoutSeconds);
-
-        if (!isIntroVideoPrepared)
-        {
-            Debug.LogError("Intro short video preparation timed out.", this);
-            OpenTargetScene();
-        }
-    }
-
-    private void StopIntroPrepareTimeout()
-    {
-        if (introPrepareTimeoutRoutine == null)
-        {
-            return;
-        }
-
-        StopCoroutine(introPrepareTimeoutRoutine);
-        introPrepareTimeoutRoutine = null;
-    }
-
-    private void OpenTargetScene()
-    {
-        StopIntroPrepareTimeout();
-
-        if (!Application.CanStreamedLevelBeLoaded(sceneNameToOpen))
-        {
-            hasStartedTransition = false;
-            Debug.LogError("StartScreenController target scene is not registered in Build Settings.", this);
-            return;
-        }
-
-        SceneManager.LoadScene(sceneNameToOpen);
+        canvasToFade.alpha = 0f;
+        canvasFadeRoutine = null;
     }
 
     private static bool WasPrimaryInputPressedThisFrame()

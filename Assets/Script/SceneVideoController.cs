@@ -22,6 +22,7 @@ public sealed class SceneVideoController : MonoBehaviour
     [SerializeField] private VideoPlayer videoPlayer;
     [SerializeField] private bool restartFromBeginning = true;
     [SerializeField, Min(1f)] private float prepareTimeoutSeconds = 15f;
+    [SerializeField, Min(0f)] private float fadeInDuration;
 
     [Header("Events")]
     [SerializeField] private UnityEvent onIntroVideoFinished;
@@ -47,8 +48,10 @@ public sealed class SceneVideoController : MonoBehaviour
     private AsyncOperation preloadOperation;
     private string preloadedSceneName;
     private Coroutine prepareTimeoutRoutine;
+    private Coroutine fadeInRoutine;
     private Coroutine sceneActivationRoutine;
     private Coroutine handoffCompletionRoutine;
+    private bool hasReceivedFirstFrame;
     private bool isPreparing;
     private bool isFinishing;
     private VideoPhase currentPhase;
@@ -90,6 +93,7 @@ public sealed class SceneVideoController : MonoBehaviour
         }
 
         StopPrepareTimeout();
+        StopFadeIn();
         isPreparing = false;
         inactivityTimer?.Resume(this);
         HideVideoOutput();
@@ -190,6 +194,7 @@ public sealed class SceneVideoController : MonoBehaviour
         isFinishing = true;
         isPreparing = false;
         StopPrepareTimeout();
+        StopFadeIn();
         inactivityTimer?.Resume(this);
 
         if (currentPhase == VideoPhase.Intro)
@@ -206,7 +211,7 @@ public sealed class SceneVideoController : MonoBehaviour
         }
     }
 
-    private void PlaySceneStartVideo()
+    public void PlaySceneStartVideo()
     {
         if (videoPlayer == null || sceneStartVideo == null)
             return;
@@ -216,14 +221,22 @@ public sealed class SceneVideoController : MonoBehaviour
         PrepareVideo(VideoPhase.Intro);
     }
 
+    public void PlaySceneStartVideo(float fadeDuration)
+    {
+        fadeInDuration = Mathf.Max(0f, fadeDuration);
+        PlaySceneStartVideo();
+    }
+
     private void PrepareVideo(VideoPhase phase)
     {
         inactivityTimer?.Pause(this);
         currentPhase = phase;
         isPreparing = true;
         isFinishing = false;
+        hasReceivedFirstFrame = false;
         videoPlayer.targetCameraAlpha = 0f;
         StopPrepareTimeout();
+        StopFadeIn();
         prepareTimeoutRoutine = StartCoroutine(WaitForVideoPrepare());
         videoPlayer.Prepare();
     }
@@ -357,19 +370,61 @@ public sealed class SceneVideoController : MonoBehaviour
         }
 
         HideUi();
-        videoPlayer.targetCameraAlpha = 1f;
+        videoPlayer.targetCameraAlpha = fadeInDuration > 0f ? 0f : 1f;
         videoPlayer.Play();
     }
 
     private void HandleVideoFrameReady(VideoPlayer preparedVideoPlayer, long frameIndex)
     {
-        if (preparedVideoPlayer != videoPlayer || currentPhase != VideoPhase.Intro ||
+        if (preparedVideoPlayer != videoPlayer)
+        {
+            return;
+        }
+
+        if (!hasReceivedFirstFrame)
+        {
+            hasReceivedFirstFrame = true;
+            if (fadeInDuration > 0f)
+            {
+                fadeInRoutine = StartCoroutine(FadeInVideo());
+            }
+        }
+
+        if (currentPhase != VideoPhase.Intro ||
             !IsPendingIncomingScene(gameObject.scene) || handoffCompletionRoutine != null)
         {
             return;
         }
 
         handoffCompletionRoutine = StartCoroutine(CompleteHandoffAfterFrame());
+    }
+
+    private IEnumerator FadeInVideo()
+    {
+        float startedAt = Time.unscaledTime;
+        float elapsed = 0f;
+
+        while (elapsed < fadeInDuration)
+        {
+            elapsed = Time.unscaledTime - startedAt;
+            float normalizedTime = Mathf.Clamp01(elapsed / fadeInDuration);
+            videoPlayer.targetCameraAlpha = Mathf.SmoothStep(0f, 1f, normalizedTime);
+            yield return null;
+        }
+
+        videoPlayer.targetCameraAlpha = 1f;
+        fadeInRoutine = null;
+    }
+
+    private void StopFadeIn()
+    {
+        if (fadeInRoutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(fadeInRoutine);
+        fadeInRoutine = null;
     }
 
     private IEnumerator CompleteHandoffAfterFrame()
