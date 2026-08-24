@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 103688807}
   - component: {fileID: 103688806}
+  - component: {fileID: 103688808}
   m_Layer: 0
   m_Name: CardFan
   m_TagString: Untagged
@@ -200,6 +201,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 103688808}
+        m_TargetAssemblyTypeName: TapSwipeInputEvent, Assembly-CSharp
+        m_MethodName: SetInputEnabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
   enableHover: 1
   hoverSpreadDistance: 1
   hoverDuration: 0.15
@@ -221,6 +234,37 @@ Transform:
   - {fileID: 1274637246}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &103688808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 103688805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b974b6b3d3f7498c8c2b7cfb92991f4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TapSwipeInputEvent
+  inputEnabled: 0
+  acceptTap: 1
+  acceptSwipe: 1
+  swipeDistance: 60
+  onInputReceived:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2118569155}
+        m_TargetAssemblyTypeName: SceneVideoController, Assembly-CSharp
+        m_MethodName: VideoPlay
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &209927365
 GameObject:
   m_ObjectHideFlags: 0

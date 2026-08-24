@@ -43,20 +43,13 @@ public sealed class SelectionFlow : MonoBehaviour
             return;
         }
 
-        CompleteSelection();
+        SaveSelection();
     }
 
     public void CompleteSelection()
     {
-        if (hasHandledSelection)
+        if (!SaveSelection())
             return;
-
-        PlayerFortuneState state = PlayerFortuneState.Instance;
-        if (state == null)
-        {
-            Debug.LogError("SelectionFlow needs an active PlayerFortuneState.", this);
-            return;
-        }
 
         if (sceneVideoController == null)
         {
@@ -64,20 +57,36 @@ public sealed class SelectionFlow : MonoBehaviour
             return;
         }
 
-        int selectedId;
+        int selectedId = selectionStage == SelectionStage.Rope
+            ? PlayerFortuneState.Instance.RopeId
+            : PlayerFortuneState.Instance.CardId;
+
+        sceneVideoController.VideoPlay(selectedId);
+    }
+
+    private bool SaveSelection()
+    {
+        if (hasHandledSelection)
+            return false;
+
+        PlayerFortuneState state = PlayerFortuneState.Instance;
+        if (state == null)
+        {
+            Debug.LogError("SelectionFlow needs an active PlayerFortuneState.", this);
+            return false;
+        }
+
         if (selectionStage == SelectionStage.Rope)
         {
             state.SelectRandomRope();
-            selectedId = state.RopeId;
         }
         else
         {
             state.SelectRandomCard();
-            selectedId = state.CardId;
         }
 
         hasHandledSelection = true;
-        sceneVideoController.VideoPlay(selectedId);
+        return true;
     }
 
 }
