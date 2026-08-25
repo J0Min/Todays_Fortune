@@ -25,6 +25,7 @@ public class DragManager2D : MonoBehaviour
 
     private DragAnchor2D activeAnchor;
     private DragAnchor2D confirmedAnchor;
+    private bool activeDragUsesTouch;
     private readonly Collider2D[] overlapResults = new Collider2D[8];
 
     public DragAnchor2D ConfirmedAnchor => confirmedAnchor;
@@ -41,13 +42,15 @@ public class DragManager2D : MonoBehaviour
         if (targetCamera == null) return;
         if (lockAfterSelection && HasConfirmedAnchor) return;
 
-        if (WasLeftMousePressedThisFrame())
-            TryBeginDrag();
+        if (activeAnchor == null && TryGetPrimaryInputPressedThisFrame(
+                out Vector2 pressedScreenPosition, out bool usesTouch))
+            TryBeginDrag(pressedScreenPosition, usesTouch);
 
-        if (activeAnchor != null && IsLeftMousePressed())
-            activeAnchor.DragTo(GetMouseWorldPosition(activeAnchor.transform.position.z));
+        if (activeAnchor != null && IsActiveDragInputPressed())
+            activeAnchor.DragTo(GetScreenWorldPosition(
+                GetActiveDragScreenPosition(), activeAnchor.transform.position.z));
 
-        if (activeAnchor != null && WasLeftMouseReleasedThisFrame())
+        if (activeAnchor != null && WasActiveDragInputReleasedThisFrame())
         {
             DragAnchor2D releasedAnchor = activeAnchor;
             releasedAnchor.EndDrag();
@@ -77,61 +80,104 @@ public class DragManager2D : MonoBehaviour
         onAnchorConfirmed?.Invoke(anchor);
     }
 
-    private void TryBeginDrag()
+    private void TryBeginDrag(Vector2 screenPosition, bool usesTouch)
     {
-        Vector2 mouseWorldPosition = GetMouseWorldPosition(0f);
-        Collider2D hit = Physics2D.OverlapPoint(mouseWorldPosition, draggableLayers);
+        Vector2 worldPosition = GetScreenWorldPosition(screenPosition, 0f);
+        Collider2D hit = Physics2D.OverlapPoint(worldPosition, draggableLayers);
         if (hit == null) return;
 
         DragAnchor2D anchor = hit.GetComponentInParent<DragAnchor2D>();
         if (anchor == null) return;
 
         activeAnchor = anchor;
-        activeAnchor.BeginDrag(GetMouseWorldPosition(activeAnchor.transform.position.z));
+        activeDragUsesTouch = usesTouch;
+        activeAnchor.BeginDrag(GetScreenWorldPosition(
+            screenPosition, activeAnchor.transform.position.z));
     }
 
-    private Vector3 GetMouseWorldPosition(float worldZ)
+    private Vector3 GetScreenWorldPosition(Vector2 screenPosition, float worldZ)
     {
-        Vector3 screenPosition = GetMouseScreenPosition();
-        screenPosition.z = Mathf.Abs(targetCamera.transform.position.z - worldZ);
-        Vector3 worldPosition = targetCamera.ScreenToWorldPoint(screenPosition);
+        Vector3 cameraScreenPosition = screenPosition;
+        cameraScreenPosition.z = Mathf.Abs(targetCamera.transform.position.z - worldZ);
+        Vector3 worldPosition = targetCamera.ScreenToWorldPoint(cameraScreenPosition);
         worldPosition.z = worldZ;
         return worldPosition;
     }
 
-    private static bool WasLeftMousePressedThisFrame()
+    private static bool TryGetPrimaryInputPressedThisFrame(out Vector2 screenPosition, out bool usesTouch)
     {
 #if ENABLE_INPUT_SYSTEM
-        return Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            screenPosition = Mouse.current.position.ReadValue();
+            usesTouch = false;
+            return true;
+        }
+
+        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
+        {
+            screenPosition = Touchscreen.current.primaryTouch.position.ReadValue();
+            usesTouch = true;
+            return true;
+        }
 #else
-        return Input.GetMouseButtonDown(0);
+        if (Input.GetMouseButtonDown(0))
+        {
+            screenPosition = Input.mousePosition;
+            usesTouch = false;
+            return true;
+        }
+
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        {
+            screenPosition = Input.GetTouch(0).position;
+            usesTouch = true;
+            return true;
+        }
+#endif
+        screenPosition = default;
+        usesTouch = false;
+        return false;
+    }
+
+    private bool IsActiveDragInputPressed()
+    {
+#if ENABLE_INPUT_SYSTEM
+        return activeDragUsesTouch
+            ? Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed
+            : Mouse.current != null && Mouse.current.leftButton.isPressed;
+#else
+        return activeDragUsesTouch
+            ? Input.touchCount > 0 && Input.GetTouch(0).phase != TouchPhase.Ended &&
+              Input.GetTouch(0).phase != TouchPhase.Canceled
+            : Input.GetMouseButton(0);
 #endif
     }
 
-    private static bool IsLeftMousePressed()
+    private bool WasActiveDragInputReleasedThisFrame()
     {
 #if ENABLE_INPUT_SYSTEM
-        return Mouse.current != null && Mouse.current.leftButton.isPressed;
+        return activeDragUsesTouch
+            ? Touchscreen.current == null || Touchscreen.current.primaryTouch.press.wasReleasedThisFrame
+            : Mouse.current == null || Mouse.current.leftButton.wasReleasedThisFrame;
 #else
-        return Input.GetMouseButton(0);
+        return activeDragUsesTouch
+            ? Input.touchCount == 0 || Input.GetTouch(0).phase == TouchPhase.Ended ||
+              Input.GetTouch(0).phase == TouchPhase.Canceled
+            : Input.GetMouseButtonUp(0);
 #endif
     }
 
-    private static bool WasLeftMouseReleasedThisFrame()
+    private Vector2 GetActiveDragScreenPosition()
     {
 #if ENABLE_INPUT_SYSTEM
-        return Mouse.current == null || Mouse.current.leftButton.wasReleasedThisFrame;
+        return activeDragUsesTouch && Touchscreen.current != null
+            ? Touchscreen.current.primaryTouch.position.ReadValue()
+            : Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
 #else
-        return Input.GetMouseButtonUp(0);
-#endif
-    }
-
-    private static Vector3 GetMouseScreenPosition()
-    {
-#if ENABLE_INPUT_SYSTEM
-        return Mouse.current != null ? Mouse.current.position.ReadValue() : Vector3.zero;
-#else
-        return Input.mousePosition;
+        return activeDragUsesTouch && Input.touchCount > 0
+            ? Input.GetTouch(0).position
+            : Input.mousePosition;
 #endif
     }
 }

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: cada9e78999e83a4f8cc7929e8c4add3
+guid: f097588974a3aa94bbe9f7925f264041
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4241438515895025174
-    second: Dark-Icon_No-Sound_0
+      213: 3487617031764677464
+    second: Dark-Icon_Sound_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Dark-Icon_No-Sound_0
+      name: Dark-Icon_Sound_0
       rect:
         serializedVersion: 2
         x: 127
-        y: 970
+        y: 973
         width: 98
-        height: 88
+        height: 84
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 61e359cabdd9cda30800000000000000
-      internalID: 4241438515895025174
+      spriteID: 8539fe25631866030800000000000000
+      internalID: 3487617031764677464
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Dark-Icon_No-Sound_0: 4241438515895025174
+      Dark-Icon_Sound_0: 3487617031764677464
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

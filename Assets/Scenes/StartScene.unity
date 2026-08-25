@@ -6387,13 +6387,61 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1028351397}
     - target: {fileID: 4204993686464814191, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4204993686464814191, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4204993686464814191, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4204993686464814191, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2108468323}
+    - target: {fileID: 4204993686464814191, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4204993686464814191, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ToggleMute
+      objectReference: {fileID: 0}
+    - target: {fileID: 4204993686464814191, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Buttons, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4204993686464814191, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: Buttons, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4204993686464814191, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
       value: 
-      objectReference: {fileID: 2800000, guid: e34f08c117acece4aa71c65d73293d1d, type: 3}
+      objectReference: {fileID: 0}
+    - target: {fileID: 4204993686464814191, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 4808071967332943310, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_Name
       value: Canvas_Overlay
       objectReference: {fileID: 0}
+    - target: {fileID: 4947820578143062438, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: soundOnTexture
+      value: 
+      objectReference: {fileID: 2800000, guid: f097588974a3aa94bbe9f7925f264041, type: 3}
+    - target: {fileID: 4947820578143062438, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: soundOffTexture
+      value: 
+      objectReference: {fileID: 2800000, guid: cada9e78999e83a4f8cc7929e8c4add3, type: 3}
+    - target: {fileID: 4947820578143062438, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: soundButtonImage
+      value: 
+      objectReference: {fileID: 1028351397}
     - target: {fileID: 6339290268488235687, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -6477,7 +6525,7 @@ PrefabInstance:
     - target: {fileID: 6416826266465726320, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_Texture
       value: 
-      objectReference: {fileID: 2800000, guid: cada9e78999e83a4f8cc7929e8c4add3, type: 3}
+      objectReference: {fileID: 2800000, guid: f097588974a3aa94bbe9f7925f264041, type: 3}
     - target: {fileID: 8737247353985424247, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_Texture
       value: 
@@ -9452,6 +9500,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1832317769607672450, guid: 547916af3529f09478904c1b25f77d21, type: 3}
   m_PrefabInstance: {fileID: 1350013804}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2108468323 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4947820578143062438, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+  m_PrefabInstance: {fileID: 1350013804}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d459970725a5991408f0f03fbfc917c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Buttons
 --- !u!1 &2115590610
 GameObject:
   m_ObjectHideFlags: 0
