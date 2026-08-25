@@ -145,6 +145,16 @@ public class VerletRope2D : MonoBehaviour
         UpdateVisuals();
     }
 
+    public Vector3 StartAnchorPosition => startAnchor != null ? startAnchor.position : transform.position;
+
+    public void SetStartAnchorPosition(Vector3 worldPosition)
+    {
+        if (startAnchor == null)
+            return;
+
+        startAnchor.position = new Vector3(worldPosition.x, worldPosition.y, startAnchor.position.z);
+    }
+
     private void Simulate(float deltaTime)
     {
         float dt = Mathf.Min(deltaTime, 0.033f);
