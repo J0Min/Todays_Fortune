@@ -52,9 +52,12 @@ public sealed class SceneVideoController : MonoBehaviour
     private Coroutine sceneActivationRoutine;
     private Coroutine handoffCompletionRoutine;
     private bool hasReceivedFirstFrame;
+    private bool isWaitingForFirstFrame;
     private bool isPreparing;
     private bool isFinishing;
     private VideoPhase currentPhase;
+
+    public bool IsWaitingForFirstFrame => isWaitingForFirstFrame;
 
     private void Awake()
     {
@@ -94,6 +97,7 @@ public sealed class SceneVideoController : MonoBehaviour
 
         StopPrepareTimeout();
         StopFadeIn();
+        isWaitingForFirstFrame = false;
         isPreparing = false;
         inactivityTimer?.Resume(this);
         HideVideoOutput();
@@ -236,6 +240,7 @@ public sealed class SceneVideoController : MonoBehaviour
 
         isFinishing = true;
         isPreparing = false;
+        isWaitingForFirstFrame = false;
         StopPrepareTimeout();
         StopFadeIn();
         inactivityTimer?.Resume(this);
@@ -277,6 +282,7 @@ public sealed class SceneVideoController : MonoBehaviour
         isPreparing = true;
         isFinishing = false;
         hasReceivedFirstFrame = false;
+        isWaitingForFirstFrame = true;
         videoPlayer.targetCameraAlpha = 0f;
         StopPrepareTimeout();
         StopFadeIn();
@@ -412,8 +418,8 @@ public sealed class SceneVideoController : MonoBehaviour
             videoPlayer.time = 0d;
         }
 
-        HideUi();
-        videoPlayer.targetCameraAlpha = fadeInDuration > 0f ? 0f : 1f;
+        // Preparation does not guarantee that a decoded frame has reached the
+        // camera output yet. Keep the video hidden until frameReady confirms it.
         videoPlayer.Play();
     }
 
@@ -427,9 +433,15 @@ public sealed class SceneVideoController : MonoBehaviour
         if (!hasReceivedFirstFrame)
         {
             hasReceivedFirstFrame = true;
+            isWaitingForFirstFrame = false;
+            HideUi();
             if (fadeInDuration > 0f)
             {
                 fadeInRoutine = StartCoroutine(FadeInVideo());
+            }
+            else
+            {
+                videoPlayer.targetCameraAlpha = 1f;
             }
         }
 
