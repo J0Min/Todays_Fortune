@@ -292,6 +292,16 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4808071967332943310, guid: 547916af3529f09478904c1b25f77d21, type: 3}
   m_PrefabInstance: {fileID: 486908046}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2890919350 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2890919350220095331, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+  m_PrefabInstance: {fileID: 486908046}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6014762868 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6014762868344987066, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+  m_PrefabInstance: {fileID: 486908046}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &496048754 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5711152899565737535, guid: 547916af3529f09478904c1b25f77d21, type: 3}
@@ -837,7 +847,7 @@ MonoBehaviour:
   ropePrefab: {fileID: 4032674730601933885, guid: 558fefbe0d43c1641836936461f4261c, type: 3}
   ropeCount: 5
   horizontalSpacing: 3.31
-  spawnOffset: {x: 0, y: 5.6}
+  spawnOffset: {x: 0, y: 10}
   selectedRopePivot: {fileID: 1435165797}
   selectionDuration: 0.35
   selectionEase:
@@ -1005,6 +1015,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   lockAfterSelection: 1
+  initialInstructionUi: {fileID: 2890919350}
+  initialInstructionBlankUi: {fileID: 6014762868}
+  failedReturnDuration: 2.2
+  failedReturnAccelerationPower: 3.5
+  failedReturnBrakeStart: 0.85
   onAnchorConfirmed:
     m_PersistentCalls:
       m_Calls:
@@ -1223,7 +1238,7 @@ Transform:
   m_GameObject: {fileID: 1585384101}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0372, y: -3.78, z: 0}
+  m_LocalPosition: {x: -0.0372, y: -5.15, z: 0}
   m_LocalScale: {x: 18, y: 3.1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

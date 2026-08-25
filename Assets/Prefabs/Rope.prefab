@@ -48,7 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DragAnchor2D
   preserveClickOffset: 1
   useMovementBounds: 1
-  movementBoundsMinOffset: {x: -2, y: -2}
+  movementBoundsMinOffset: {x: -2, y: -5.5}
   movementBoundsMaxOffset: {x: 2, y: 2}
 --- !u!50 &3191264767956574844
 Rigidbody2D:
@@ -207,7 +207,7 @@ MonoBehaviour:
   segmentCount: 30
   ropeLength: 8
   clampEndAnchorToRopeLength: 1
-  maxStretchRatio: 0.5
+  maxStretchRatio: 0.7
   releaseEndAnchorOnMouseUp: 1
   constraintIterations: 15
   gravity: {x: 0, y: -60}

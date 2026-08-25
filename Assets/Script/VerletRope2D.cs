@@ -51,9 +51,14 @@ public class VerletRope2D : MonoBehaviour
 
     private readonly List<RopePoint> points = new List<RopePoint>();
     private readonly List<SpriteRenderer> renderers = new List<SpriteRenderer>();
+    private readonly List<Vector2> idleShape = new List<Vector2>();
+    private readonly List<Vector2> returnStartShape = new List<Vector2>();
     private DragAnchor2D endDragAnchor;
     private float segmentLength;
     private bool initialized;
+    private bool interactionInProgress;
+    private bool endWasDragging;
+    private bool endWasReturning;
 
     private struct RopePoint
     {
@@ -84,6 +89,41 @@ public class VerletRope2D : MonoBehaviour
         if (!initialized) BuildRope();
         if (!initialized) return;
 
+        bool endIsDragging = endDragAnchor != null && endDragAnchor.IsDragging;
+        bool endIsReturning = endDragAnchor != null && endDragAnchor.IsReturning;
+
+        if (endIsDragging && !endWasDragging && !interactionInProgress)
+            interactionInProgress = true;
+
+        if (endIsReturning && !endWasReturning)
+            CaptureShape(returnStartShape);
+
+        if (endIsReturning)
+        {
+            ApplyKinematicReturn(endDragAnchor.ReturnProgress);
+            endWasDragging = endIsDragging;
+            endWasReturning = true;
+            return;
+        }
+
+        if (endWasReturning)
+        {
+            if (endIsDragging)
+                SynchronizePreviousPositions();
+            else
+            {
+                ApplyKinematicReturn(1f);
+                interactionInProgress = false;
+                CaptureShape(idleShape);
+                endWasDragging = false;
+                endWasReturning = false;
+                return;
+            }
+        }
+
+        endWasDragging = endIsDragging;
+        endWasReturning = false;
+
         PinAnchors();
         Simulate(Time.fixedDeltaTime);
         SolveConstraints();
@@ -96,6 +136,9 @@ public class VerletRope2D : MonoBehaviour
         }
 
         SyncReleasedEndAnchor();
+
+        if (!interactionInProgress && !endIsDragging)
+            CaptureShape(idleShape);
     }
 
     private void LateUpdate()
@@ -109,7 +152,12 @@ public class VerletRope2D : MonoBehaviour
     {
         ClearVisuals();
         points.Clear();
+        idleShape.Clear();
+        returnStartShape.Clear();
         CacheEndDragAnchor();
+        interactionInProgress = false;
+        endWasDragging = endDragAnchor != null && endDragAnchor.IsDragging;
+        endWasReturning = endDragAnchor != null && endDragAnchor.IsReturning;
 
         segmentCount = Mathf.Max(2, segmentCount);
         segmentLength = ropeLength / segmentCount;
@@ -121,6 +169,8 @@ public class VerletRope2D : MonoBehaviour
             float t = (float)i / segmentCount;
             points.Add(new RopePoint(Vector2.Lerp(start, end, t), i == 0));
         }
+
+        CaptureShape(idleShape);
 
         if (ropeSprite != null)
         {
@@ -134,7 +184,7 @@ public class VerletRope2D : MonoBehaviour
                     : ropeSprite;
                 spriteRenderer.color = ropeColor;
                 spriteRenderer.sortingLayerName = sortingLayerName;
-                spriteRenderer.sortingOrder = sortingOrder;
+                spriteRenderer.sortingOrder = sortingOrder + (i == segmentCount - 1 ? 1 : 0);
                 renderers.Add(spriteRenderer);
             }
         }
@@ -336,6 +386,43 @@ public class VerletRope2D : MonoBehaviour
         point.previousPosition = position;
         point.pinned = true;
         points[index] = point;
+    }
+
+    private void CaptureShape(List<Vector2> target)
+    {
+        target.Clear();
+        for (int i = 0; i < points.Count; i++)
+            target.Add(points[i].position);
+    }
+
+    private void ApplyKinematicReturn(float progress)
+    {
+        if (returnStartShape.Count != points.Count || idleShape.Count != points.Count)
+            return;
+
+        float t = Mathf.Clamp01(progress);
+        for (int i = 0; i < points.Count; i++)
+        {
+            Vector2 position = Vector2.LerpUnclamped(returnStartShape[i], idleShape[i], t);
+            RopePoint point = points[i];
+            point.position = position;
+            point.previousPosition = position;
+            point.pinned = i == 0 || i == points.Count - 1;
+            points[i] = point;
+        }
+
+        Vector2 endPosition = points[points.Count - 1].position;
+        endAnchor.position = new Vector3(endPosition.x, endPosition.y, endAnchor.position.z);
+    }
+
+    private void SynchronizePreviousPositions()
+    {
+        for (int i = 0; i < points.Count; i++)
+        {
+            RopePoint point = points[i];
+            point.previousPosition = point.position;
+            points[i] = point;
+        }
     }
 
     private void UpdateVisuals()
