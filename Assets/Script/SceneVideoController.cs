@@ -186,6 +186,28 @@ public sealed class SceneVideoController : MonoBehaviour
         FinishVideo();
     }
 
+    public void VideoPause()
+    {
+        if (videoPlayer == null)
+        {
+            Debug.LogError("SceneVideoController needs a VideoPlayer.", this);
+            return;
+        }
+
+        videoPlayer.Pause();
+    }
+
+    public void VideoResume()
+    {
+        if (videoPlayer == null)
+        {
+            Debug.LogError("SceneVideoController needs a VideoPlayer.", this);
+            return;
+        }
+
+        videoPlayer.Play();
+    }
+
     private void SetVideoPlaybackSpeed(float speed)
     {
         if (videoPlayer == null)
