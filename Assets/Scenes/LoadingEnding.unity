@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94fc58b014c64b47ba07487a291e885f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LoadingEndingController
-  loadingVideo: {fileID: 32900000, guid: ad9fe396089232e42ad4634b7e51e34c, type: 3}
+  loadingVideo: {fileID: 32900000, guid: 8d38074d26253df448a3f0b77a3abebe, type: 3}
   loadingFadeFromBlackDuration: 1.2
   endingTextures:
   - {fileID: 2800000, guid: 1772b1c15b812254ba87263a4571152b, type: 3}
