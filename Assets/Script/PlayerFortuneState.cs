@@ -62,6 +62,7 @@ public sealed class PlayerFortuneState : MonoBehaviour
         {
             inactivityTimer.TimedOut += ReturnToStartAfterInactivity;
         }
+
     }
 
     private void OnDisable()
@@ -70,6 +71,7 @@ public sealed class PlayerFortuneState : MonoBehaviour
         {
             inactivityTimer.TimedOut -= ReturnToStartAfterInactivity;
         }
+
     }
 
     public void SelectRandomRope()
@@ -103,6 +105,7 @@ public sealed class PlayerFortuneState : MonoBehaviour
         RopeId = 0;
         CardId = 0;
         FortuneResult = null;
+        IsMuted = false;
     }
 
     public void OpenTestScene()
