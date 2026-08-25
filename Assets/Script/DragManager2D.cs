@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -26,6 +27,12 @@ public class DragManager2D : MonoBehaviour
     private GameObject initialInstructionUi;
     [SerializeField, Tooltip("Background hidden together with the initial instruction.")]
     private GameObject initialInstructionBlankUi;
+    [Header("Pull Gauge")]
+    [SerializeField] private Collider2D selectionZoneCollider;
+    [SerializeField] private Sprite pullGaugeBackgroundSprite;
+    [SerializeField] private Sprite pullGaugeFillSprite;
+    [SerializeField] private Vector2 pullGaugeSize = new Vector2(1299f, 135f);
+    [SerializeField] private Vector2 pullGaugeAnchoredPosition = new Vector2(0f, 110f);
     [Header("Failed Drag Return")]
     [SerializeField, Min(0f), Tooltip("Time in seconds for an unconfirmed rope end to return to its starting position.")]
     private float failedReturnDuration = 2.2f;
@@ -38,6 +45,10 @@ public class DragManager2D : MonoBehaviour
     private DragAnchor2D activeAnchor;
     private DragAnchor2D lockedAnchor;
     private DragAnchor2D confirmedAnchor;
+    private GameObject pullGaugeUi;
+    private Image pullGaugeFillImage;
+    private Collider2D gaugeAnchorCollider;
+    private float gaugeStartY;
     private readonly Collider2D[] overlapResults = new Collider2D[8];
 
     public DragAnchor2D ConfirmedAnchor => confirmedAnchor;
@@ -47,10 +58,14 @@ public class DragManager2D : MonoBehaviour
     {
         if (targetCamera == null)
             targetCamera = Camera.main;
+
+        CreatePullGaugeUi();
     }
 
     private void Update()
     {
+        UpdatePullGauge();
+
         if (targetCamera == null) return;
         if (lockAfterSelection && HasConfirmedAnchor) return;
 
@@ -111,6 +126,8 @@ public class DragManager2D : MonoBehaviour
             initialInstructionUi.SetActive(false);
         if (initialInstructionBlankUi != null)
             initialInstructionBlankUi.SetActive(false);
+        if (pullGaugeUi != null)
+            pullGaugeUi.SetActive(true);
 
         activeAnchor = anchor;
         activeAnchor.BeginDrag(GetMouseWorldPosition(activeAnchor.transform.position.z));
@@ -124,6 +141,8 @@ public class DragManager2D : MonoBehaviour
             lockedAnchor.ReturnCompleted -= HandleLockedAnchorReturnCompleted;
 
         lockedAnchor = anchor;
+        gaugeStartY = anchor.transform.position.y;
+        gaugeAnchorCollider = anchor.GetComponent<Collider2D>();
         lockedAnchor.ReturnCompleted += HandleLockedAnchorReturnCompleted;
     }
 
@@ -132,7 +151,96 @@ public class DragManager2D : MonoBehaviour
         if (anchor != lockedAnchor) return;
 
         lockedAnchor.ReturnCompleted -= HandleLockedAnchorReturnCompleted;
+        SetPullGaugeValue(0f);
+        gaugeAnchorCollider = null;
         lockedAnchor = null;
+    }
+
+    private void CreatePullGaugeUi()
+    {
+        if (initialInstructionBlankUi == null ||
+            pullGaugeBackgroundSprite == null || pullGaugeFillSprite == null)
+            return;
+
+        Transform gaugeParent = initialInstructionBlankUi.transform.parent;
+        pullGaugeUi = new GameObject(
+            "Gauge-bar-background",
+            typeof(RectTransform),
+            typeof(CanvasRenderer),
+            typeof(Image),
+            typeof(RectMask2D));
+        RectTransform backgroundRect = pullGaugeUi.GetComponent<RectTransform>();
+        backgroundRect.SetParent(gaugeParent, false);
+        backgroundRect.anchorMin = new Vector2(0.5f, 0f);
+        backgroundRect.anchorMax = new Vector2(0.5f, 0f);
+        backgroundRect.pivot = new Vector2(0.5f, 0.5f);
+        backgroundRect.sizeDelta = pullGaugeSize;
+        backgroundRect.anchoredPosition = pullGaugeAnchoredPosition;
+
+        Image backgroundImage = pullGaugeUi.GetComponent<Image>();
+        backgroundImage.sprite = pullGaugeBackgroundSprite;
+        backgroundImage.raycastTarget = false;
+
+        GameObject fillObject = new GameObject(
+            "Full-gauge",
+            typeof(RectTransform),
+            typeof(CanvasRenderer),
+            typeof(Image));
+        RectTransform fillRect = fillObject.GetComponent<RectTransform>();
+        fillRect.SetParent(backgroundRect, false);
+        fillRect.anchorMin = new Vector2(0f, 0.5f);
+        fillRect.anchorMax = new Vector2(0f, 0.5f);
+        fillRect.pivot = new Vector2(0f, 0.5f);
+
+        Rect backgroundSpriteRect = pullGaugeBackgroundSprite.rect;
+        Rect fillSpriteRect = pullGaugeFillSprite.rect;
+        float horizontalScale = pullGaugeSize.x / backgroundSpriteRect.width;
+        float verticalScale = pullGaugeSize.y / backgroundSpriteRect.height;
+        fillRect.sizeDelta = new Vector2(
+            fillSpriteRect.width * horizontalScale,
+            fillSpriteRect.height * verticalScale);
+        fillRect.anchoredPosition = new Vector2(
+            (fillSpriteRect.xMin - backgroundSpriteRect.xMin) * horizontalScale,
+            (fillSpriteRect.center.y - backgroundSpriteRect.center.y) * verticalScale);
+
+        pullGaugeFillImage = fillObject.GetComponent<Image>();
+        pullGaugeFillImage.sprite = pullGaugeFillSprite;
+        pullGaugeFillImage.type = Image.Type.Filled;
+        pullGaugeFillImage.fillMethod = Image.FillMethod.Horizontal;
+        pullGaugeFillImage.fillOrigin = (int)Image.OriginHorizontal.Left;
+        pullGaugeFillImage.fillAmount = 0f;
+        pullGaugeFillImage.raycastTarget = false;
+
+        pullGaugeUi.SetActive(false);
+    }
+
+    private void UpdatePullGauge()
+    {
+        if (lockedAnchor == null || pullGaugeFillImage == null ||
+            selectionZoneCollider == null)
+            return;
+
+        if (confirmedAnchor == lockedAnchor)
+        {
+            SetPullGaugeValue(1f);
+            return;
+        }
+
+        float anchorBottomOffset = gaugeAnchorCollider != null
+            ? gaugeAnchorCollider.bounds.min.y - lockedAnchor.transform.position.y
+            : 0f;
+        float fullGaugeY = selectionZoneCollider.bounds.max.y - anchorBottomOffset;
+        float distanceToFull = gaugeStartY - fullGaugeY;
+        float fillAmount = distanceToFull <= Mathf.Epsilon
+            ? 0f
+            : (gaugeStartY - lockedAnchor.transform.position.y) / distanceToFull;
+        SetPullGaugeValue(fillAmount);
+    }
+
+    private void SetPullGaugeValue(float value)
+    {
+        if (pullGaugeFillImage != null)
+            pullGaugeFillImage.fillAmount = Mathf.Clamp01(value);
     }
 
     private void OnDestroy()
