@@ -6163,6 +6163,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1989313678}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
 --- !u!1 &1335341351
 GameObject:
   m_ObjectHideFlags: 0
@@ -6471,6 +6483,10 @@ PrefabInstance:
     - target: {fileID: 4808071967332943310, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_Name
       value: Canvas_Overlay
+      objectReference: {fileID: 0}
+    - target: {fileID: 4808071967332943310, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4850288345835074640, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
@@ -8812,6 +8828,11 @@ MonoBehaviour:
   periodSeconds: 4.272727
   phaseOffset: 97.496895
   rotationAxis: {x: 0, y: 0, z: 1}
+--- !u!1 &1989313678 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4808071967332943310, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+  m_PrefabInstance: {fileID: 1350013804}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2000000001
 GameObject:
   m_ObjectHideFlags: 0
