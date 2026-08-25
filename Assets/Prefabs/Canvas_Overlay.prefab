@@ -781,13 +781,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6416826266465726320}
-        m_TargetAssemblyTypeName: UnityEngine.UI.RawImage, UnityEngine.UI
-        m_MethodName: set_texture
-        m_Mode: 2
+      - m_Target: {fileID: 4947820578143062438}
+        m_TargetAssemblyTypeName: Buttons, Assembly-CSharp
+        m_MethodName: ToggleMute
+        m_Mode: 1
         m_Arguments:
-          m_ObjectArgument: {fileID: 2800000, guid: 5a4ea0ad8ff9c0f4ca194411d7dff6db, type: 3}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Texture, UnityEngine
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1334,6 +1334,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d459970725a5991408f0f03fbfc917c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Buttons
+  soundOnTexture: {fileID: 2800000, guid: 565781b477d70f441baa6e2bdf153690, type: 3}
+  soundOffTexture: {fileID: 2800000, guid: 5a4ea0ad8ff9c0f4ca194411d7dff6db, type: 3}
+  soundButtonImage: {fileID: 6416826266465726320}
 --- !u!1 &8842666299908284891
 GameObject:
   m_ObjectHideFlags: 0

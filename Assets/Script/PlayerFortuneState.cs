@@ -23,6 +23,7 @@ public sealed class PlayerFortuneState : MonoBehaviour
     public int RopeId { get; private set; }
     public int CardId { get; private set; }
     public FortuneDataReader.FortuneData FortuneResult { get; private set; }
+    public bool IsMuted { get; private set; }
     public int RopeIdCount => ropeIdCount;
     public int CardIdCount => cardIdCount;
 
@@ -90,6 +91,11 @@ public sealed class PlayerFortuneState : MonoBehaviour
     public void SetFortuneResult(FortuneDataReader.FortuneData fortuneResult)
     {
         FortuneResult = fortuneResult;
+    }
+
+    public void SetMuted(bool isMuted)
+    {
+        IsMuted = isMuted;
     }
 
     public void ResetData()
@@ -197,6 +203,11 @@ public sealed class PlayerFortuneStateEditor : UnityEditor.Editor
             {
                 state.SelectRopeCard(cardId, ropeId);
                 UnityEditor.EditorUtility.SetDirty(state);
+            }
+
+            using (new UnityEditor.EditorGUI.DisabledScope(true))
+            {
+                UnityEditor.EditorGUILayout.Toggle("Muted", state.IsMuted);
             }
         }
 

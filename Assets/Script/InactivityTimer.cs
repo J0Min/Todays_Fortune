@@ -47,7 +47,7 @@ public sealed class InactivityTimer : MonoBehaviour
             return;
         }
 
-        ElapsedTime += Time.unscaledDeltaTime;
+        ElapsedTime += Time.deltaTime;
 
         if (ElapsedTime >= inactivityTimeout)
         {
