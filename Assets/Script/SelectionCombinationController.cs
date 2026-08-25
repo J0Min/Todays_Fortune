@@ -55,8 +55,6 @@ public sealed class SelectionCombinationController : MonoBehaviour
     [SerializeField] private float fullyTransparentProgress = 0.95f;
     [Range(0.01f, 1f)]
     [SerializeField] private float finalScale = 0.5f;
-    [Range(0f, 1f)]
-    [SerializeField] private float finalBackgroundBrightness = 0.25f;
     [Min(0f)]
     [SerializeField] private float postFadeHoldDuration = 0.5f;
 
@@ -232,9 +230,6 @@ public sealed class SelectionCombinationController : MonoBehaviour
         SetImageAlpha(cardImage, alpha);
         SetImageAlpha(titleImage, alpha);
 
-        float darknessProgress = 1f - alpha;
-        float brightness = Mathf.Lerp(1f, finalBackgroundBrightness, darknessProgress);
-        backgroundImage.color = new Color(brightness, brightness, brightness, BackgroundOpacity);
     }
 
     private void OpenLoadingScene()
