@@ -17,6 +17,7 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
     [SerializeField] private TitleExitAnimation titleExitAnimation;
 
     [Header("Scene Start Video")]
+    [SerializeField] private SceneVideoController sceneVideoController;
     [SerializeField] private CanvasGroup canvasToFade;
     [SerializeField, Min(0f)] private float canvasFadeDuration = 0.25f;
 
@@ -138,8 +139,20 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
 
     private void HandleTitleExitFinished()
     {
-        StartCanvasFade();
         onTitleExitFinished?.Invoke();
+
+        if (sceneVideoController != null && sceneVideoController.IsWaitingForFirstFrame)
+            StartCoroutine(WaitForFirstVideoFrame());
+        else
+            StartCanvasFade();
+    }
+
+    private IEnumerator WaitForFirstVideoFrame()
+    {
+        while (sceneVideoController != null && sceneVideoController.IsWaitingForFirstFrame)
+            yield return null;
+
+        StartCanvasFade();
     }
 
     private void StartCanvasFade()

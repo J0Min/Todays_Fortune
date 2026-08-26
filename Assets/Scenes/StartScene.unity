@@ -6167,6 +6167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StartScreenController
   titleExitAnimation: {fileID: 2000000006}
+  sceneVideoController: {fileID: 1042478354}
   canvasToFade: {fileID: 2000000007}
   canvasFadeDuration: 0.25
   onTitleExitFinished:
@@ -6908,7 +6909,7 @@ PrefabInstance:
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: sceneStartVideo
       value: 
-      objectReference: {fileID: 32900000, guid: d457a7b27ee09604d8586e931cb6d5ff, type: 3}
+      objectReference: {fileID: 32900000, guid: 4a554ccac3f6195439126eaa4f12e0f1, type: 3}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: playOnSceneStart
       value: 0

@@ -172,18 +172,18 @@ MonoBehaviour:
   - {fileID: -8107568306115097492, guid: f4df2cff8a91a4d4dbf4ea41dd50516b, type: 3}
   - {fileID: -8397764329073281751, guid: 0f7b772d5a3f868498f067bd1503033e, type: 3}
   cardSprites:
-  - {fileID: 9076628614930282163, guid: fc7fd248e8bb6b94a9aa5c4382b9c661, type: 3}
-  - {fileID: -5389402044013689998, guid: f2edc643eb31a454cabb2200a9ba8f46, type: 3}
-  - {fileID: 7601115183742932854, guid: 896942f6f007f02489f333fec85f33fb, type: 3}
-  - {fileID: 1302094626286971163, guid: 0367cfc502b2d154b94df5d9d410a909, type: 3}
-  - {fileID: -3094865916263203818, guid: baa190b87fd64f94d80474065b30c0b7, type: 3}
-  - {fileID: 3113471139962205135, guid: 253f626a4bd5aa543aa89b76569d7c85, type: 3}
-  - {fileID: -4683971045844663902, guid: e2f5d2fd2c4691e40b78c6105a31da65, type: 3}
-  - {fileID: 1548625764075229096, guid: b526ba2b04498b54788ac1baec9507ee, type: 3}
-  - {fileID: 1238658789631275073, guid: 9793c41b44c8cae40a2cba313067dfb6, type: 3}
-  - {fileID: -5640297085573600746, guid: e247abbdadd89e8458baf0d39a0b37d2, type: 3}
-  - {fileID: -779471905111198307, guid: 3c8b6173eaac8864cb7192278caee591, type: 3}
-  - {fileID: -1187966464889483631, guid: ae61a9764caf78b4e8f111540fe71716, type: 3}
+  - {fileID: -6413736930619164500, guid: 76106a2ed2f0ba24ebade0e212cc5063, type: 3}
+  - {fileID: -975494625811638176, guid: 5a11ae40c3cb6c24aa9daec198af2e52, type: 3}
+  - {fileID: 5668769200465569731, guid: 4cd425b52eb7a0d448bbe786569308c3, type: 3}
+  - {fileID: 5307328184230871484, guid: f0ce1589ab342594483c02ca38c79e7a, type: 3}
+  - {fileID: -5086565031036716788, guid: ff4f036636c4cb74c82950bd0e53061c, type: 3}
+  - {fileID: -8655584406885841439, guid: c2295dff11264ac498ff3b8461d312ef, type: 3}
+  - {fileID: 7554036420409295438, guid: f531de828e009934c9b6ed6cd6afa3f5, type: 3}
+  - {fileID: 4816948533714735112, guid: 1d08460c0025be746a76b48a72bcd63b, type: 3}
+  - {fileID: 3836373901172144039, guid: 9bc14b5b80c42ac4c9fdb23ef52ab209, type: 3}
+  - {fileID: 8164169931901825974, guid: 739310d6cb7a5d4479a97d043fbe2cd7, type: 3}
+  - {fileID: 6090364682085759322, guid: 8d96dde24b198ed4f92ef34ce0837d29, type: 3}
+  - {fileID: -483026073818960902, guid: 0e081248704eaec4a9e283c1826bf8ab, type: 3}
   usePreviewIdsWhenSelectionMissing: 1
   previewRopeId: 1
   previewCardId: 1
@@ -204,7 +204,6 @@ MonoBehaviour:
   fadeStartProgress: 0.33
   fullyTransparentProgress: 0.95
   finalScale: 0.5
-  finalBackgroundBrightness: 0.25
   postFadeHoldDuration: 0.5
   loadingSceneName: LoadingEnding
 --- !u!1 &200000
