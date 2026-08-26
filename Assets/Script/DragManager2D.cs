@@ -117,6 +117,10 @@ public class DragManager2D : MonoBehaviour
         if (anchorCollider.Overlap(filter, overlapResults) == 0) return false;
 
         confirmedAnchor = anchor;
+
+        if (pullGaugeUi != null)
+            pullGaugeUi.SetActive(false);
+
         Debug.Log($"Rope selected: {anchor.name}", anchor);
         onAnchorConfirmed?.Invoke(anchor);
         return true;
@@ -176,7 +180,10 @@ public class DragManager2D : MonoBehaviour
             pullGaugeBackgroundSprite == null || pullGaugeFillSprite == null)
             return;
 
-        Transform gaugeParent = initialInstructionBlankUi.transform.parent;
+        Canvas gaugeCanvas = initialInstructionBlankUi.GetComponentInParent<Canvas>();
+        Transform gaugeParent = gaugeCanvas != null
+            ? gaugeCanvas.transform
+            : initialInstructionBlankUi.transform.parent;
         pullGaugeUi = new GameObject(
             "Gauge-bar-background",
             typeof(RectTransform),
