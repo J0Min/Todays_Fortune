@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragAnchor2D
   preserveClickOffset: 1
+  touchHitAreaUpwardReach: 4.8
   useMovementBounds: 1
   movementBoundsMinOffset: {x: -2, y: -5.5}
   movementBoundsMaxOffset: {x: 2, y: 2}
@@ -217,7 +218,7 @@ MonoBehaviour:
   endSprite: {fileID: 21300000, guid: 716facebe95fc094083b94da1d887c8f, type: 3}
   endScale: {x: 1, y: 2}
   spriteIsVertical: 1
-  thickness: 1.5
+  thickness: 1
   segmentOverlap: 1.1
   sortingLayerName: Default
   sortingOrder: 5

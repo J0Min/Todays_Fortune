@@ -36,6 +36,12 @@ public class DragManager2D : MonoBehaviour
     [Header("Failed Drag Return")]
     [SerializeField, Min(0f), Tooltip("Time in seconds for an unconfirmed rope end to return to its starting position.")]
     private float failedReturnDuration = 2.2f;
+    [SerializeField, Min(1f), Tooltip("Blends a non-zero starting speed into the failed-return acceleration curve. 1 uses the original curve; higher values start faster without a mid-return slowdown.")]
+    private float failedReturnInitialSpeedMultiplier = 5f;
+    [SerializeField, Min(1f), Tooltip("Smoothly increases return speed after the rope has covered its first third.")]
+    private float failedReturnRemainingSpeedMultiplier = 2f;
+    [SerializeField, Range(0.1f, 1f), Tooltip("Speed multiplier applied near the final 15% of a failed return. 0.6 keeps 60% of the current speed before the existing arrival easing.")]
+    private float failedReturnFinalSpeedMultiplier = 0.6f;
     [SerializeField, Min(1f), Tooltip("Power-curve exponent for failed returns. Higher values start slower and accelerate more sharply near the end.")]
     private float failedReturnAccelerationPower = 3.5f;
     [SerializeField, Range(0.5f, 0.95f), Tooltip("Normalized return time at which the rope starts braking toward zero arrival speed.")]
@@ -86,6 +92,9 @@ public class DragManager2D : MonoBehaviour
             if (!TryConfirmAnchor(releasedAnchor))
                 releasedAnchor.ReturnToOriginalPosition(
                     failedReturnDuration,
+                    failedReturnInitialSpeedMultiplier,
+                    failedReturnRemainingSpeedMultiplier,
+                    failedReturnFinalSpeedMultiplier,
                     failedReturnAccelerationPower,
                     failedReturnBrakeStart);
         }

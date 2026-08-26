@@ -8,9 +8,18 @@ using UnityEngine;
 [DefaultExecutionOrder(-50)]
 public class DragAnchor2D : MonoBehaviour
 {
+    private const float FirstThirdProgress = 1f / 3f;
+    private const float RemainingSpeedRampEndProgress = 0.5f;
+    private const float FinalSlowdownStartProgress = 0.85f;
+    private const float FinalSlowdownBlendEndProgress = 0.9025f;
+
     [Header("Drag")]
     [SerializeField, Tooltip("Keeps the distance between the click position and this anchor while dragging. Disable to snap the anchor to the click position.")]
     private bool preserveClickOffset = true;
+
+    [Header("Touch Hit Area")]
+    [SerializeField, Min(0f), Tooltip("Invisible input-only reach above the Rope End in local units. Width is copied from the existing physical BoxCollider2D.")]
+    private float touchHitAreaUpwardReach = 4.8f;
 
     [Header("Movement Bounds")]
     [SerializeField] private bool useMovementBounds;
@@ -24,10 +33,13 @@ public class DragAnchor2D : MonoBehaviour
     private Vector3 dragTargetPosition;
     private Vector3 movementBoundsOriginLocal;
     private Vector3 returnStartLocalPosition;
-    private float returnElapsed;
     private float activeReturnDuration;
+    private float activeReturnInitialSpeedMultiplier = 1f;
+    private float activeReturnRemainingSpeedMultiplier = 1f;
+    private float activeReturnFinalSpeedMultiplier = 1f;
     private float activeReturnAccelerationPower = 1f;
     private float activeReturnBrakeStart = 0.85f;
+    private float returnAnimationTime;
     private float returnProgress;
     private float savedGravityScale;
 
@@ -40,12 +52,35 @@ public class DragAnchor2D : MonoBehaviour
     {
         attachedBody = GetComponent<Rigidbody2D>();
         movementBoundsOriginLocal = transform.localPosition;
+        CreateTouchHitArea();
+    }
+
+    private void CreateTouchHitArea()
+    {
+        BoxCollider2D physicalCollider = GetComponent<BoxCollider2D>();
+        if (physicalCollider == null || touchHitAreaUpwardReach <= 0f)
+            return;
+
+        float bottom = physicalCollider.offset.y - 0.5f * physicalCollider.size.y;
+        float top = Mathf.Max(bottom, touchHitAreaUpwardReach);
+
+        GameObject hitAreaObject = new GameObject("Touch Hit Area");
+        hitAreaObject.layer = gameObject.layer;
+        hitAreaObject.transform.SetParent(transform, false);
+
+        BoxCollider2D hitArea = hitAreaObject.AddComponent<BoxCollider2D>();
+        hitArea.isTrigger = true;
+        hitArea.size = new Vector2(
+            physicalCollider.size.x,
+            top - bottom);
+        hitArea.offset = new Vector2(
+            physicalCollider.offset.x,
+            0.5f * (bottom + top));
     }
 
     public void BeginDrag(Vector3 mouseWorldPosition)
     {
         isReturning = false;
-        returnElapsed = 0f;
         returnProgress = 0f;
 
         if (attachedBody == null)
@@ -105,15 +140,21 @@ public class DragAnchor2D : MonoBehaviour
 
     public void ReturnToOriginalPosition(
         float duration,
+        float initialSpeedMultiplier,
+        float remainingSpeedMultiplier,
+        float finalSpeedMultiplier,
         float accelerationPower,
         float brakeStart)
     {
         isDragging = false;
         isReturning = true;
         returnStartLocalPosition = transform.localPosition;
-        returnElapsed = 0f;
         returnProgress = 0f;
+        returnAnimationTime = 0f;
         activeReturnDuration = Mathf.Max(0f, duration);
+        activeReturnInitialSpeedMultiplier = Mathf.Max(1f, initialSpeedMultiplier);
+        activeReturnRemainingSpeedMultiplier = Mathf.Max(1f, remainingSpeedMultiplier);
+        activeReturnFinalSpeedMultiplier = Mathf.Clamp(finalSpeedMultiplier, 0.01f, 1f);
         activeReturnAccelerationPower = Mathf.Max(1f, accelerationPower);
         activeReturnBrakeStart = Mathf.Clamp(brakeStart, 0.5f, 0.95f);
 
@@ -128,18 +169,20 @@ public class DragAnchor2D : MonoBehaviour
     {
         if (isReturning)
         {
-            returnElapsed += Time.fixedDeltaTime;
-            float t = activeReturnDuration <= 0f
+            float normalizedStep = activeReturnDuration <= 0f
                 ? 1f
-                : Mathf.Clamp01(returnElapsed / activeReturnDuration);
-            float easedT = EvaluateReturnProgress(t);
+                : Time.fixedDeltaTime / activeReturnDuration;
+            float speedMultiplier = EvaluateReturnSpeedMultiplier(returnProgress);
+            returnAnimationTime = Mathf.Clamp01(
+                returnAnimationTime + normalizedStep * speedMultiplier);
+            float easedT = EvaluateReturnProgress(returnAnimationTime);
             returnProgress = easedT;
             MoveToLocalPosition(Vector3.Lerp(
                 returnStartLocalPosition,
                 movementBoundsOriginLocal,
                 easedT));
 
-            if (t >= 1f)
+            if (returnAnimationTime >= 1f)
                 CompleteReturn();
 
             return;
@@ -167,16 +210,16 @@ public class DragAnchor2D : MonoBehaviour
     private float EvaluateReturnProgress(float t)
     {
         if (t <= activeReturnBrakeStart)
-            return Mathf.Pow(t, activeReturnAccelerationPower);
+            return EvaluateAcceleratingProgress(t);
 
         float brakeDuration = 1f - activeReturnBrakeStart;
         float brakeT = (t - activeReturnBrakeStart) / brakeDuration;
-        float brakeStartPosition = Mathf.Pow(
-            activeReturnBrakeStart,
-            activeReturnAccelerationPower);
-        float brakeStartSlope = activeReturnAccelerationPower * Mathf.Pow(
-            activeReturnBrakeStart,
-            activeReturnAccelerationPower - 1f);
+        float linearWeight = GetInitialSpeedLinearWeight();
+        float brakeStartPosition = EvaluateAcceleratingProgress(activeReturnBrakeStart);
+        float brakeStartSlope = linearWeight +
+            (1f - linearWeight) * activeReturnAccelerationPower * Mathf.Pow(
+                activeReturnBrakeStart,
+                activeReturnAccelerationPower - 1f);
         float brakeStartTangent = brakeStartSlope * brakeDuration;
 
         float brakeT2 = brakeT * brakeT;
@@ -188,6 +231,45 @@ public class DragAnchor2D : MonoBehaviour
         return startPositionWeight * brakeStartPosition +
                startTangentWeight * brakeStartTangent +
                endPositionWeight;
+    }
+
+    private float EvaluateAcceleratingProgress(float t)
+    {
+        float linearWeight = GetInitialSpeedLinearWeight();
+        float acceleratedProgress = Mathf.Pow(t, activeReturnAccelerationPower);
+        return Mathf.Lerp(acceleratedProgress, t, linearWeight);
+    }
+
+    private float GetInitialSpeedLinearWeight()
+    {
+        return 1f - 1f / activeReturnInitialSpeedMultiplier;
+    }
+
+    private float EvaluateReturnSpeedMultiplier(float progress)
+    {
+        float remainingRamp = Mathf.InverseLerp(
+            FirstThirdProgress,
+            RemainingSpeedRampEndProgress,
+            progress);
+        float speedMultiplier = Mathf.Lerp(
+            1f,
+            activeReturnRemainingSpeedMultiplier,
+            Mathf.SmoothStep(0f, 1f, remainingRamp));
+
+        if (progress > FinalSlowdownStartProgress)
+        {
+            float slowdownRamp = Mathf.InverseLerp(
+                FinalSlowdownStartProgress,
+                FinalSlowdownBlendEndProgress,
+                progress);
+            float slowdownMultiplier = Mathf.Lerp(
+                1f,
+                activeReturnFinalSpeedMultiplier,
+                Mathf.SmoothStep(0f, 1f, slowdownRamp));
+            speedMultiplier *= slowdownMultiplier;
+        }
+
+        return speedMultiplier;
     }
 
     private void MoveToLocalPosition(Vector3 localPosition)
