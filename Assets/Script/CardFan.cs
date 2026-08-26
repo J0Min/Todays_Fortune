@@ -83,7 +83,10 @@ public class CardFan : MonoBehaviour
 
     private void Update()
     {
-        if (!isCardPointerHeld || Mouse.current == null || !Mouse.current.leftButton.wasReleasedThisFrame) return;
+        bool mouseReleased = Mouse.current != null && Mouse.current.leftButton.wasReleasedThisFrame;
+        bool touchReleased = Touchscreen.current != null &&
+                             Touchscreen.current.primaryTouch.press.wasReleasedThisFrame;
+        if (!isCardPointerHeld || (!mouseReleased && !touchReleased)) return;
 
         isCardPointerHeld = false;
         if (hoveredCard == null) return;

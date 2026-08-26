@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Added automatically to cards spawned by CardFan.
@@ -14,10 +15,39 @@ public class Card2D : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (Buttons.IsWorldInputBlocked) return;
+        BeginPointerHold();
+    }
 
-        if (cardFan != null)
-            cardFan.BeginCardPointerHold(transform);
+    private void Update()
+    {
+        if (Touchscreen.current == null ||
+            !Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
+        {
+            return;
+        }
+
+        Camera mainCamera = Camera.main;
+        if (mainCamera == null)
+        {
+            return;
+        }
+
+        RaycastHit2D hit = Physics2D.GetRayIntersection(
+            mainCamera.ScreenPointToRay(Touchscreen.current.primaryTouch.position.ReadValue()));
+        if (hit.collider != null && hit.collider.gameObject == gameObject)
+        {
+            BeginPointerHold();
+        }
+    }
+
+    private void BeginPointerHold()
+    {
+        if (Buttons.IsWorldInputBlocked || cardFan == null)
+        {
+            return;
+        }
+
+        cardFan.BeginCardPointerHold(transform);
     }
 
     private void OnMouseEnter()
