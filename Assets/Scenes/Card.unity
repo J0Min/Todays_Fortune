@@ -364,6 +364,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1093632624771534572, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4204993686464814191, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_TargetGraphic
       value: 
@@ -677,6 +681,10 @@ PrefabInstance:
       propertyPath: 'videoClips.Array.data[11]'
       value: 
       objectReference: {fileID: 32900000, guid: ebb5cb52a00f4934eb383df499e14c02, type: 3}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: incomingSceneActivationLeadTime
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: onIntroVideoFinished.m_PersistentCalls.m_Calls.Array.size
       value: 2

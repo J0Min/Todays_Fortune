@@ -13,6 +13,7 @@ public sealed class SelectionCombinationController : MonoBehaviour
     [Header("Presentation Assets")]
     [SerializeField] private Sprite backgroundSprite;
     [SerializeField] private Sprite titleSprite;
+    [SerializeField] private Camera canvasCamera;
     [Tooltip("Element 0 maps to Rope ID 1.")]
     [SerializeField] private Sprite[] ropeSprites = new Sprite[PlayerFortuneState.DefaultRopeIdCount];
     [Tooltip("Element 0 maps to Card ID 1.")]
@@ -259,7 +260,8 @@ public sealed class SelectionCombinationController : MonoBehaviour
             typeof(GraphicRaycaster));
 
         Canvas canvas = canvasObject.GetComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.renderMode = RenderMode.ScreenSpaceCamera;
+        canvas.worldCamera = canvasCamera;
         canvas.sortingOrder = 100;
 
         CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();

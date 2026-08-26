@@ -1372,6 +1372,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 32900000, guid: c64a2f662be7e3c4188a07500b97fdcb, type: 3}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: incomingSceneActivationLeadTime
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: onVideoFinished.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
