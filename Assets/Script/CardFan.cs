@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Places this object's child cards in a wide, tarot-style fan.
@@ -54,6 +55,9 @@ public class CardFan : MonoBehaviour
     private readonly List<Transform> spawnedCards = new List<Transform>();
     private bool isUnfolding;
     private bool cardSelected;
+    private bool isCardPointerHeld;
+    private bool pointerStartedOnPendingCard;
+    private Transform pendingSelectionCard;
     private Transform hoveredCard;
 
     private void Reset()
@@ -77,11 +81,33 @@ public class CardFan : MonoBehaviour
             SnapToFan();
     }
 
+    private void Update()
+    {
+        if (!isCardPointerHeld || Mouse.current == null || !Mouse.current.leftButton.wasReleasedThisFrame) return;
+
+        isCardPointerHeld = false;
+        if (hoveredCard == null) return;
+
+        if (pointerStartedOnPendingCard && hoveredCard == pendingSelectionCard)
+        {
+            SelectCard(hoveredCard);
+        }
+        else
+        {
+            pendingSelectionCard = hoveredCard;
+        }
+
+        pointerStartedOnPendingCard = false;
+    }
+
     [ContextMenu("Spawn Cards")]
     public void SpawnCards()
     {
         ClearSpawnedCards();
         cardSelected = false;
+        isCardPointerHeld = false;
+        pointerStartedOnPendingCard = false;
+        pendingSelectionCard = null;
 
         if (cardBackSprite == null)
         {
@@ -141,15 +167,29 @@ public class CardFan : MonoBehaviour
         if (isUnfolding || cardSelected || !spawnedCards.Contains(selectedCard)) return;
 
         cardSelected = true;
+        pendingSelectionCard = null;
         hoveredCard = null;
         if (hoverRoutine != null)
             StopCoroutine(hoverRoutine);
         FocusCard(selectedCard);
     }
 
+    public void BeginCardPointerHold(Transform card)
+    {
+        if (isUnfolding || cardSelected || !spawnedCards.Contains(card)) return;
+
+        isCardPointerHeld = true;
+        pointerStartedOnPendingCard = card == pendingSelectionCard;
+
+        if (card == hoveredCard) return;
+
+        hoveredCard = card;
+        StartHoverLayoutAnimation();
+    }
+
     public void HoverCard(Transform card)
     {
-        if (!enableHover || isUnfolding || cardSelected || card == hoveredCard || !spawnedCards.Contains(card)) return;
+        if (!enableHover || isUnfolding || cardSelected || (!isCardPointerHeld && pendingSelectionCard != null) || card == hoveredCard || !spawnedCards.Contains(card)) return;
 
         hoveredCard = card;
         StartHoverLayoutAnimation();
@@ -157,7 +197,7 @@ public class CardFan : MonoBehaviour
 
     public void ClearHoverCard(Transform card)
     {
-        if (card != hoveredCard || cardSelected) return;
+        if (card != hoveredCard || cardSelected || isCardPointerHeld || card == pendingSelectionCard) return;
 
         hoveredCard = null;
         StartHoverLayoutAnimation();

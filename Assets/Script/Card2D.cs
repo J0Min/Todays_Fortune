@@ -12,12 +12,12 @@ public class Card2D : MonoBehaviour
         cardFan = owner;
     }
 
-    private void OnMouseUpAsButton()
+    private void OnMouseDown()
     {
         if (Buttons.IsWorldInputBlocked) return;
 
         if (cardFan != null)
-            cardFan.SelectCard(transform);
+            cardFan.BeginCardPointerHold(transform);
     }
 
     private void OnMouseEnter()
