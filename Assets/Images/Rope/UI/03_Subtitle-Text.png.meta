@@ -103,9 +103,9 @@ TextureImporter:
       name: 03_Subtitle-Text_0
       rect:
         serializedVersion: 2
-        x: 442
+        x: 488
         y: 35
-        width: 1025
+        width: 933
         height: 135
       alignment: 0
       pivot: {x: 0, y: 0}

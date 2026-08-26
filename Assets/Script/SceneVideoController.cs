@@ -34,7 +34,8 @@ public sealed class SceneVideoController : MonoBehaviour
     [SerializeField] private VideoClip sceneStartVideo;
 
     [Header("UI")]
-    [SerializeField] private Canvas[] uiCanvases;
+    [SerializeField, InspectorName("UI")] private GameObject[] ui;
+    [HideInInspector, SerializeField] private Canvas[] uiCanvases;
     [SerializeField] private bool hideUiWhileVideoPlays = true;
 
     [Header("Video Clips")]
@@ -60,6 +61,13 @@ public sealed class SceneVideoController : MonoBehaviour
     {
         if (videoPlayer == null)
             videoPlayer = GetComponent<VideoPlayer>();
+
+        MigrateLegacyUiCanvases();
+    }
+
+    private void OnValidate()
+    {
+        MigrateLegacyUiCanvases();
     }
 
     private void Start()
@@ -149,6 +157,11 @@ public sealed class SceneVideoController : MonoBehaviour
         if (!CanOpenConfiguredScene())
         {
             return;
+        }
+
+        if (sceneNameToOpen == "StartScene")
+        {
+            PlayerFortuneState.Instance?.ResetData();
         }
 
         if (preloadOperation != null && preloadedSceneName == sceneNameToOpen)
@@ -358,14 +371,29 @@ public sealed class SceneVideoController : MonoBehaviour
 
     private void SetUiVisible(bool visible)
     {
-        if (!hideUiWhileVideoPlays || uiCanvases == null || uiCanvases.Length == 0)
+        if (!hideUiWhileVideoPlays || ui == null || ui.Length == 0)
             return;
 
+        for (int i = 0; i < ui.Length; i++)
+        {
+            if (ui[i] != null)
+                ui[i].SetActive(visible);
+        }
+    }
+
+    private void MigrateLegacyUiCanvases()
+    {
+        if (ui != null || uiCanvases == null || uiCanvases.Length == 0)
+            return;
+
+        ui = new GameObject[uiCanvases.Length];
         for (int i = 0; i < uiCanvases.Length; i++)
         {
             if (uiCanvases[i] != null)
-                uiCanvases[i].enabled = visible;
+                ui[i] = uiCanvases[i].gameObject;
         }
+
+        uiCanvases = null;
     }
 
     private void HideUi()

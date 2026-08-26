@@ -53,6 +53,7 @@ public sealed class PlayerFortuneState : MonoBehaviour
 
     private void OnEnable()
     {
+        Application.targetFrameRate = 60;
         if (Instance != this)
         {
             return;

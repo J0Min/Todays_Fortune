@@ -362,7 +362,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4808071967332943310, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5711152899565737535, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6339290268488235687, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_Pivot.x
@@ -444,6 +448,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6428867513274141213, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6491383614915373845, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9029670192589923569, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_TargetGraphic
       value: 
@@ -482,7 +494,7 @@ Canvas:
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &397277241 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 4808071967332943310, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+  m_CorrespondingSourceObject: {fileID: 1093632624771534572, guid: 547916af3529f09478904c1b25f77d21, type: 3}
   m_PrefabInstance: {fileID: 397277237}
   m_PrefabAsset: {fileID: 0}
 --- !u!223 &1076468792 stripped
@@ -562,6 +574,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1906870089}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: ui.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: uiCanvasGroup
       value: 
       objectReference: {fileID: 1076468794}
@@ -581,6 +597,10 @@ PrefabInstance:
       propertyPath: playOnSceneStart
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: 'ui.Array.data[0]'
+      value: 
+      objectReference: {fileID: 397277241}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: uiCanvases.Array.size
       value: 2
@@ -651,7 +671,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: onOutroVideoFinished.m_PersistentCalls.m_Calls.Array.size
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: onIntroVideoFinished.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
