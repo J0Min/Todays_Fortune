@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragAnchor2D
   preserveClickOffset: 1
+  touchHitAreaUpwardReach: 4.8
   useMovementBounds: 1
   movementBoundsMinOffset: {x: -2, y: -5.5}
   movementBoundsMaxOffset: {x: 2, y: 2}

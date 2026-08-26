@@ -17,6 +17,10 @@ public class DragAnchor2D : MonoBehaviour
     [SerializeField, Tooltip("Keeps the distance between the click position and this anchor while dragging. Disable to snap the anchor to the click position.")]
     private bool preserveClickOffset = true;
 
+    [Header("Touch Hit Area")]
+    [SerializeField, Min(0f), Tooltip("Invisible input-only reach above the Rope End in local units. Width is copied from the existing physical BoxCollider2D.")]
+    private float touchHitAreaUpwardReach = 4.8f;
+
     [Header("Movement Bounds")]
     [SerializeField] private bool useMovementBounds;
     [SerializeField] private Vector2 movementBoundsMinOffset = new Vector2(-10f, -10f);
@@ -48,6 +52,30 @@ public class DragAnchor2D : MonoBehaviour
     {
         attachedBody = GetComponent<Rigidbody2D>();
         movementBoundsOriginLocal = transform.localPosition;
+        CreateTouchHitArea();
+    }
+
+    private void CreateTouchHitArea()
+    {
+        BoxCollider2D physicalCollider = GetComponent<BoxCollider2D>();
+        if (physicalCollider == null || touchHitAreaUpwardReach <= 0f)
+            return;
+
+        float bottom = physicalCollider.offset.y - 0.5f * physicalCollider.size.y;
+        float top = Mathf.Max(bottom, touchHitAreaUpwardReach);
+
+        GameObject hitAreaObject = new GameObject("Touch Hit Area");
+        hitAreaObject.layer = gameObject.layer;
+        hitAreaObject.transform.SetParent(transform, false);
+
+        BoxCollider2D hitArea = hitAreaObject.AddComponent<BoxCollider2D>();
+        hitArea.isTrigger = true;
+        hitArea.size = new Vector2(
+            physicalCollider.size.x,
+            top - bottom);
+        hitArea.offset = new Vector2(
+            physicalCollider.offset.x,
+            0.5f * (bottom + top));
     }
 
     public void BeginDrag(Vector3 mouseWorldPosition)
