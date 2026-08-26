@@ -966,6 +966,9 @@ MonoBehaviour:
   pullGaugeSize: {x: 1299, y: 82}
   pullGaugeAnchoredPosition: {x: 0, y: 110}
   failedReturnDuration: 2.2
+  failedReturnInitialSpeedMultiplier: 5
+  failedReturnRemainingSpeedMultiplier: 2
+  failedReturnFinalSpeedMultiplier: 0.6
   failedReturnAccelerationPower: 3.5
   failedReturnBrakeStart: 0.85
   onAnchorConfirmed:
