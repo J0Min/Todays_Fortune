@@ -691,6 +691,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Canvas_Overlay
       objectReference: {fileID: 0}
+    - target: {fileID: 6020125275592991661, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 435647005}
+    - target: {fileID: 6020125275592991661, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SkipVideo
+      objectReference: {fileID: 0}
+    - target: {fileID: 6020125275592991661, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_FloatArgument
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 6339290268488235687, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -780,6 +792,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+--- !u!1 &1106916635 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3520354019214359214, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+  m_PrefabInstance: {fileID: 1106916634}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1150530915 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1093632624771534572, guid: 547916af3529f09478904c1b25f77d21, type: 3}
@@ -1378,7 +1395,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: preloadSceneDuringIntro
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: 'uiCanvases.Array.data[0]'
@@ -1409,8 +1426,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 32900000, guid: 63a1ab250b0f2674a8b40795c4b43da1, type: 3}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: objectToShowAfterOutroVideo
+      value: 
+      objectReference: {fileID: 1106916635}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: incomingSceneActivationLeadTime
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: showObjectAfterOutroVideoSeconds
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: onVideoFinished.m_PersistentCalls.m_Calls.Array.size

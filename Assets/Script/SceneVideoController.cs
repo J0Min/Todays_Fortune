@@ -41,6 +41,12 @@ public sealed class SceneVideoController : MonoBehaviour
     [HideInInspector, SerializeField] private Canvas[] uiCanvases;
     [SerializeField] private bool hideUiWhileVideoPlays = true;
 
+    [Header("Object After Outro Video")]
+    [Tooltip("The object to activate after the configured delay.")]
+    [SerializeField] private GameObject objectToShowAfterOutroVideo;
+    [Tooltip("Activate the object this many seconds after an outro video's first visible frame. Set to a negative value to disable this behavior.")]
+    [SerializeField] private float showObjectAfterOutroVideoSeconds = -1f;
+
     [Header("Video Clips")]
     [Tooltip("The selected result ID 1 maps to element 0, ID 2 maps to element 1, and so on.")]
     [SerializeField] private VideoClip[] videoClips;
@@ -54,6 +60,7 @@ public sealed class SceneVideoController : MonoBehaviour
     private string preloadedSceneName;
     private Coroutine prepareTimeoutRoutine;
     private Coroutine fadeInRoutine;
+    private Coroutine showObjectAfterVideoRoutine;
     private Coroutine sceneActivationRoutine;
     private Coroutine scenePreActivationRoutine;
     private Coroutine handoffCompletionRoutine;
@@ -112,6 +119,7 @@ public sealed class SceneVideoController : MonoBehaviour
 
         StopPrepareTimeout();
         StopFadeIn();
+        StopShowObjectAfterVideo();
         StopScenePreActivation();
         isWaitingForFirstFrame = false;
         isPreparing = false;
@@ -270,6 +278,7 @@ public sealed class SceneVideoController : MonoBehaviour
         isWaitingForFirstFrame = false;
         StopPrepareTimeout();
         StopFadeIn();
+        StopShowObjectAfterVideo();
         inactivityTimer?.Resume(this);
 
         if (currentPhase == VideoPhase.Intro)
@@ -343,6 +352,7 @@ public sealed class SceneVideoController : MonoBehaviour
         videoPlayer.targetCameraAlpha = 0f;
         StopPrepareTimeout();
         StopFadeIn();
+        StopShowObjectAfterVideo();
         prepareTimeoutRoutine = StartCoroutine(WaitForVideoPrepare());
         videoPlayer.Prepare();
     }
@@ -514,6 +524,7 @@ public sealed class SceneVideoController : MonoBehaviour
             hasReceivedFirstFrame = true;
             isWaitingForFirstFrame = false;
             HideUi();
+            StartShowObjectAfterOutroVideo();
             if (ShouldHideIncomingVideoUntilHandoff())
             {
                 videoPlayer.targetCameraAlpha = 0f;
@@ -563,6 +574,41 @@ public sealed class SceneVideoController : MonoBehaviour
 
         StopCoroutine(fadeInRoutine);
         fadeInRoutine = null;
+    }
+
+    private void StartShowObjectAfterOutroVideo()
+    {
+        if (currentPhase != VideoPhase.Outro || objectToShowAfterOutroVideo == null ||
+            showObjectAfterOutroVideoSeconds < 0f)
+        {
+            return;
+        }
+
+        StopShowObjectAfterVideo();
+        showObjectAfterVideoRoutine = StartCoroutine(ShowObjectAfterOutroVideo());
+    }
+
+    private IEnumerator ShowObjectAfterOutroVideo()
+    {
+        yield return new WaitForSecondsRealtime(showObjectAfterOutroVideoSeconds);
+
+        if (!isFinishing && currentPhase == VideoPhase.Outro)
+        {
+            objectToShowAfterOutroVideo.SetActive(true);
+        }
+
+        showObjectAfterVideoRoutine = null;
+    }
+
+    private void StopShowObjectAfterVideo()
+    {
+        if (showObjectAfterVideoRoutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(showObjectAfterVideoRoutine);
+        showObjectAfterVideoRoutine = null;
     }
 
     private IEnumerator CompleteHandoffAfterFrame()
