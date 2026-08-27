@@ -89,6 +89,10 @@ public sealed class SelectionCombinationController : MonoBehaviour
 
     private void Start()
     {
+        float presentationDuration = introFadeDuration + secondImageFadeDuration +
+            initialHoldDuration + animationDuration + postFadeHoldDuration;
+        AmbientAudioManager.Instance?.FadeThroughSelection(presentationDuration);
+
         if (!TryApplySelection())
         {
             return;

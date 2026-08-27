@@ -56,6 +56,11 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
         }
     }
 
+    private void Start()
+    {
+        AmbientAudioManager.Instance?.RestoreBaseVolumeImmediately();
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         if (isReturnInputGuardActive)
@@ -133,6 +138,7 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
         }
 
         hasStartedTransition = true;
+        AmbientAudioManager.Instance?.SetContentVolumeImmediately();
         Debug.Log(TouchMessage);
         titleExitAnimation.Play(HandleTitleExitFinished);
     }
