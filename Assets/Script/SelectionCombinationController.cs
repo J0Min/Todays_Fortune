@@ -61,6 +61,20 @@ public sealed class SelectionCombinationController : MonoBehaviour
 
     [Header("Scene Transition")]
     [SerializeField] private string loadingSceneName = "LoadingEnding";
+    [SerializeField] private AdditiveSceneVideoPreloader additiveSceneVideoPreloader;
+
+    [Header("Result Presentation")]
+    [SerializeField] private GameObject resultCanvas;
+    [SerializeField] private CanvasGroup resultCanvasGroup;
+    [SerializeField] private RawImage resultRawImage;
+    [Tooltip("Element 0 corresponds to ID 1.")]
+    [SerializeField] private Texture2D[] resultTextures = new Texture2D[60];
+    [Min(0f)]
+    [SerializeField] private float resultDisplayDuration = 3.5f;
+    [Min(0f)]
+    [SerializeField] private float resultFadeInDuration = 1f;
+    [Min(0f)]
+    [SerializeField] private float resultFadeOutDuration = 1f;
 
     private RectTransform ropeRectTransform;
     private RectTransform cardRectTransform;
@@ -203,7 +217,108 @@ public sealed class SelectionCombinationController : MonoBehaviour
             yield return new WaitForSeconds(postFadeHoldDuration);
         }
 
+        yield return ShowResultThenOpenLoadingScene();
+    }
+
+    private IEnumerator ShowResultThenOpenLoadingScene()
+    {
+        if (!TryShowResult())
+        {
+            OpenLoadingScene();
+            yield break;
+        }
+
+        yield return FadeInResultCanvas();
+
+        if (resultDisplayDuration > 0f)
+        {
+            yield return new WaitForSeconds(resultDisplayDuration);
+        }
+
+        additiveSceneVideoPreloader?.BeginIncomingSceneActivation();
+        yield return FadeOutResultCanvas();
+        resultCanvas.SetActive(false);
+
+        if (additiveSceneVideoPreloader != null)
+        {
+            yield return additiveSceneVideoPreloader.CompleteTransition();
+            yield break;
+        }
+
         OpenLoadingScene();
+    }
+
+    private IEnumerator FadeInResultCanvas()
+    {
+        if (resultCanvasGroup == null || resultFadeInDuration <= 0f)
+        {
+            yield break;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < resultFadeInDuration)
+        {
+            elapsed += Time.deltaTime;
+            float progress = Mathf.Clamp01(elapsed / resultFadeInDuration);
+            resultCanvasGroup.alpha = Mathf.SmoothStep(0f, 1f, progress);
+            yield return null;
+        }
+
+        resultCanvasGroup.alpha = 1f;
+    }
+
+    private IEnumerator FadeOutResultCanvas()
+    {
+        if (resultCanvasGroup == null || resultFadeOutDuration <= 0f)
+        {
+            yield break;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < resultFadeOutDuration)
+        {
+            elapsed += Time.deltaTime;
+            float progress = Mathf.Clamp01(elapsed / resultFadeOutDuration);
+            float alpha = 1f - Mathf.SmoothStep(0f, 1f, progress);
+            resultCanvasGroup.alpha = alpha;
+            SetImageAlpha(titleImage, alpha);
+            yield return null;
+        }
+
+        resultCanvasGroup.alpha = 0f;
+        SetImageAlpha(titleImage, 0f);
+    }
+
+    private bool TryShowResult()
+    {
+        if (resultCanvas == null || resultRawImage == null)
+        {
+            Debug.LogError("[SelectionCombination] Result Canvas or Result Raw Image is not assigned.", this);
+            return false;
+        }
+
+        PlayerFortuneState state = PlayerFortuneState.Instance;
+        if (state == null || state.ID <= 0)
+        {
+            Debug.LogError("[SelectionCombination] A valid result ID has not been saved.", this);
+            return false;
+        }
+
+        int textureIndex = state.ID - PlayerFortuneState.MinimumSelectionId;
+        if (resultTextures == null || textureIndex >= resultTextures.Length || resultTextures[textureIndex] == null)
+        {
+            Debug.LogError($"[SelectionCombination] Result texture is missing for ID={state.ID}.", this);
+            return false;
+        }
+
+        resultRawImage.texture = resultTextures[textureIndex];
+        if (resultCanvasGroup != null)
+        {
+            resultCanvasGroup.alpha = 0f;
+        }
+
+        resultCanvas.SetActive(true);
+        return true;
     }
 
     private void ApplyIdleMotion(float elapsed, float normalizedHoldTime)
@@ -229,8 +344,6 @@ public sealed class SelectionCombinationController : MonoBehaviour
         float alpha = 1f - Mathf.InverseLerp(fadeStartProgress, safeTransparentProgress, progress);
         SetImageAlpha(ropeImage, alpha);
         SetImageAlpha(cardImage, alpha);
-        SetImageAlpha(titleImage, alpha);
-
     }
 
     private void OpenLoadingScene()
