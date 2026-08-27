@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
@@ -626,6 +627,7 @@ public sealed class SceneVideoController : MonoBehaviour
         // The incoming scene may have its own Global Light 2D. Disable this
         // scene's 2D lights before activating it so the two do not overlap.
         SetSceneLightsEnabled(gameObject.scene, false);
+        SetSceneEventSystemsEnabled(gameObject.scene, false);
 
         Camera videoCamera = videoPlayer != null ? videoPlayer.targetCamera : null;
         if (videoCamera != null)
@@ -893,6 +895,24 @@ public sealed class SceneVideoController : MonoBehaviour
             for (int j = 0; j < lights.Length; j++)
             {
                 lights[j].enabled = enabled;
+            }
+        }
+    }
+
+    private static void SetSceneEventSystemsEnabled(Scene scene, bool enabled)
+    {
+        if (!scene.IsValid() || !scene.isLoaded)
+        {
+            return;
+        }
+
+        GameObject[] rootObjects = scene.GetRootGameObjects();
+        for (int i = 0; i < rootObjects.Length; i++)
+        {
+            EventSystem[] eventSystems = rootObjects[i].GetComponentsInChildren<EventSystem>(true);
+            for (int j = 0; j < eventSystems.Length; j++)
+            {
+                eventSystems[j].enabled = enabled;
             }
         }
     }
