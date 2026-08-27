@@ -56,12 +56,15 @@ public sealed class RopeSpawner2D : MonoBehaviour
         float firstRopeX = -0.5f * (ropeCount - 1) * horizontalSpacing;
         for (int index = 0; index < ropeCount; index++)
         {
-            GameObject rope = Instantiate(ropePrefab, transform);
-            rope.name = $"Rope {index + 1}";
-            rope.transform.localPosition = new Vector3(
+            Vector3 localPosition = new Vector3(
                 spawnOffset.x + firstRopeX + horizontalSpacing * index,
                 spawnOffset.y,
                 0f);
+            Vector3 worldPosition = transform.TransformPoint(localPosition);
+            Quaternion worldRotation = transform.rotation * ropePrefab.transform.localRotation;
+
+            GameObject rope = Instantiate(ropePrefab, worldPosition, worldRotation, transform);
+            rope.name = $"Rope {index + 1}";
             spawnedRopes.Add(rope);
         }
     }
