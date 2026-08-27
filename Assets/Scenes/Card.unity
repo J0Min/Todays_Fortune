@@ -620,7 +620,7 @@ PrefabInstance:
       objectReference: {fileID: 1906870089}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: ui.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: uiCanvasGroup
@@ -646,6 +646,10 @@ PrefabInstance:
       propertyPath: 'ui.Array.data[0]'
       value: 
       objectReference: {fileID: 397277241}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: 'ui.Array.data[1]'
+      value: 
+      objectReference: {fileID: 103688805}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: uiCanvases.Array.size
       value: 2
