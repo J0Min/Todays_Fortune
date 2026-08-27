@@ -622,7 +622,6 @@ MonoBehaviour:
   ropeCount: 5
   horizontalSpacing: 3.31
   spawnOffset: {x: 0, y: 10}
-  selectedRopePivot: {fileID: 1435165797}
   selectionDuration: 0.35
   selectionEase:
     serializedVersion: 2
@@ -648,10 +647,30 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  selectedRopeScale: {x: 1, y: 1, z: 1}
+  selectedRopeScale: {x: 1.1, y: 2, z: 1}
+  selectedRopeSegmentCount: 20
+  selectedRopeBodySprite: {fileID: -500009913405275181, guid: d9951bbfd4cad7d4bbdb0ad5c58e14a5, type: 3}
+  selectedRopeHeadSprite: {fileID: 21300000, guid: 7132acf00f806794aa20dde7ebbe1872, type: 3}
+  moveSelectedRopeToPivot: 0
+  selectedRopePivot: {fileID: 1435165797}
+  moveCameraToSelectedRopeEnd: 1
+  selectionCamera: {fileID: 519420031}
+  selectionCameraOffset: {x: 0, y: 7.65}
   onRopeSelectionFinished:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 435647005}
+        m_TargetAssemblyTypeName: SceneVideoController, Assembly-CSharp
+        m_MethodName: VideoPlay
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1001 &1106916634
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -802,7 +821,7 @@ Transform:
   m_GameObject: {fileID: 1435165796}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 6.8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -920,7 +939,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1574325689}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b974b6b3d3f7498c8c2b7cfb92991f4e, type: 3}
   m_Name: 
@@ -1358,6 +1377,10 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: preloadSceneDuringIntro
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: 'uiCanvases.Array.data[0]'
       value: 
       objectReference: {fileID: 1841837623}
@@ -1368,23 +1391,23 @@ PrefabInstance:
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: 'videoClips.Array.data[0]'
       value: 
-      objectReference: {fileID: 32900000, guid: 945562ddb0a8c8b45b1ae58da1783b34, type: 3}
+      objectReference: {fileID: 32900000, guid: 1420bc0def41c3849b890bb71ec3449a, type: 3}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: 'videoClips.Array.data[1]'
       value: 
-      objectReference: {fileID: 32900000, guid: c179296ee975d0849a5293c4ec466f8d, type: 3}
+      objectReference: {fileID: 32900000, guid: a591601d38858cb48a552a38cc871feb, type: 3}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: 'videoClips.Array.data[2]'
       value: 
-      objectReference: {fileID: 32900000, guid: b17e2065844a7c343973a28b1fab1a48, type: 3}
+      objectReference: {fileID: 32900000, guid: 43e757bd8fcb4614fbb669a0dbb7f7fe, type: 3}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: 'videoClips.Array.data[3]'
       value: 
-      objectReference: {fileID: 32900000, guid: bb204c17153c28e40b75aeef6e26fbb9, type: 3}
+      objectReference: {fileID: 32900000, guid: b3c094f4ec63f5f49a78a68e758e45a2, type: 3}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: 'videoClips.Array.data[4]'
       value: 
-      objectReference: {fileID: 32900000, guid: c64a2f662be7e3c4188a07500b97fdcb, type: 3}
+      objectReference: {fileID: 32900000, guid: 63a1ab250b0f2674a8b40795c4b43da1, type: 3}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: incomingSceneActivationLeadTime
       value: 0.5

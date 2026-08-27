@@ -196,6 +196,7 @@ public class VerletRope2D : MonoBehaviour
     }
 
     public Vector3 StartAnchorPosition => startAnchor != null ? startAnchor.position : transform.position;
+    public Vector3 EndAnchorPosition => endAnchor != null ? endAnchor.position : transform.position;
 
     public void SetStartAnchorPosition(Vector3 worldPosition)
     {
@@ -203,6 +204,20 @@ public class VerletRope2D : MonoBehaviour
             return;
 
         startAnchor.position = new Vector3(worldPosition.x, worldPosition.y, startAnchor.position.z);
+    }
+
+    /// <summary>
+    /// Applies supplied rope visuals and segment count, then rebuilds the generated segments.
+    /// </summary>
+    public void ApplySelectionVisuals(Sprite bodySprite, Sprite headSprite, int newSegmentCount)
+    {
+        if (bodySprite != null)
+            ropeSprite = bodySprite;
+        if (headSprite != null)
+            endSprite = headSprite;
+        segmentCount = Mathf.Max(2, newSegmentCount);
+
+        BuildRope();
     }
 
     private void Simulate(float deltaTime)

@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.Video;
@@ -12,6 +13,7 @@ public sealed class SceneVideoController : MonoBehaviour
 {
     private static SceneVideoController pendingOutgoingController;
     private static string pendingIncomingSceneName;
+    private static float pendingIncomingIntroStartSeconds;
 
     private enum VideoPhase
     {
@@ -61,6 +63,7 @@ public sealed class SceneVideoController : MonoBehaviour
     private bool isFinishing;
     private bool hasFinishedTransitionVideo;
     private VideoPhase currentPhase;
+    private float introStartTimeAtHandoff;
 
     public bool IsWaitingForFirstFrame => isWaitingForFirstFrame;
 
@@ -194,11 +197,22 @@ public sealed class SceneVideoController : MonoBehaviour
 
     public void SkipVideo()
     {
+        SkipVideo(0f);
+    }
+
+    public void SkipVideo(float nextIntroStartSeconds)
+    {
         if (videoPlayer == null)
         {
             Debug.LogError("SceneVideoController needs a VideoPlayer.", this);
             return;
         }
+
+        bool skipsToPreloadedScene = preloadOperation != null &&
+            (currentPhase == VideoPhase.Outro ||
+             (currentPhase == VideoPhase.Intro && preloadSceneDuringIntro));
+        if (skipsToPreloadedScene)
+            pendingIncomingIntroStartSeconds = Mathf.Max(0f, nextIntroStartSeconds);
 
         FinishVideo();
     }
@@ -308,6 +322,10 @@ public sealed class SceneVideoController : MonoBehaviour
     {
         inactivityTimer?.Pause(this);
         currentPhase = phase;
+        introStartTimeAtHandoff = phase == VideoPhase.Intro &&
+                                    IsPendingIncomingScene(gameObject.scene)
+            ? pendingIncomingIntroStartSeconds
+            : 0f;
         if (phase == VideoPhase.Outro)
         {
             hasFinishedTransitionVideo = false;
@@ -559,6 +577,10 @@ public sealed class SceneVideoController : MonoBehaviour
         pendingOutgoingController = this;
         pendingIncomingSceneName = preloadedSceneName;
 
+        // The incoming scene may have its own Global Light 2D. Disable this
+        // scene's 2D lights before activating it so the two do not overlap.
+        SetSceneLightsEnabled(gameObject.scene, false);
+
         Camera videoCamera = videoPlayer != null ? videoPlayer.targetCamera : null;
         if (videoCamera != null)
         {
@@ -711,6 +733,7 @@ public sealed class SceneVideoController : MonoBehaviour
         SetSceneAudioListenersEnabled(incomingScene, true);
         outgoingController.HideVideoOutput();
         RevealIncomingSceneVideos(incomingScene);
+        pendingIncomingIntroStartSeconds = 0f;
 
         if (outgoingScene.IsValid() && outgoingScene.isLoaded && outgoingScene != incomingScene)
         {
@@ -761,6 +784,13 @@ public sealed class SceneVideoController : MonoBehaviour
             return;
         }
 
+        if (introStartTimeAtHandoff > 0f)
+        {
+            videoPlayer.time = introStartTimeAtHandoff;
+            videoPlayer.Play();
+            introStartTimeAtHandoff = 0f;
+        }
+
         if (fadeInDuration > 0f)
         {
             StopFadeIn();
@@ -799,6 +829,24 @@ public sealed class SceneVideoController : MonoBehaviour
             for (int j = 0; j < cameras.Length; j++)
             {
                 cameras[j].enabled = enabled;
+            }
+        }
+    }
+
+    private static void SetSceneLightsEnabled(Scene scene, bool enabled)
+    {
+        if (!scene.IsValid() || !scene.isLoaded)
+        {
+            return;
+        }
+
+        GameObject[] rootObjects = scene.GetRootGameObjects();
+        for (int i = 0; i < rootObjects.Length; i++)
+        {
+            Light2D[] lights = rootObjects[i].GetComponentsInChildren<Light2D>(true);
+            for (int j = 0; j < lights.Length; j++)
+            {
+                lights[j].enabled = enabled;
             }
         }
     }
