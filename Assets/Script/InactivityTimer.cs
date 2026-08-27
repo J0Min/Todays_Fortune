@@ -7,16 +7,22 @@ using UnityEngine.SceneManagement;
 public sealed class InactivityTimer : MonoBehaviour
 {
     [SerializeField, Min(0.1f)] private float inactivityTimeout = 30f;
+    [SerializeField, Min(1)] private int warningSeconds = 5;
     [SerializeField] private string[] inactiveSceneNames = { "StartScene" };
 
     public event Action TimedOut;
+    public event Action<int> WarningSecondChanged;
+    public event Action TimerReset;
 
     public float ElapsedTime;
     public bool HasTimedOut { get; private set; }
     public bool IsPaused => pauseSources.Count > 0;
     public float RemainingTime => Mathf.Max(0f, inactivityTimeout - ElapsedTime);
+    public int RemainingSeconds => Mathf.CeilToInt(RemainingTime);
+    public int WarningSeconds => warningSeconds;
 
     private readonly HashSet<object> pauseSources = new();
+    private int lastPublishedRemainingSecond = -1;
 
     private void OnEnable()
     {
@@ -48,6 +54,7 @@ public sealed class InactivityTimer : MonoBehaviour
         }
 
         ElapsedTime += Time.deltaTime;
+        PublishWarningSecond();
 
         if (ElapsedTime >= inactivityTimeout)
         {
@@ -64,6 +71,8 @@ public sealed class InactivityTimer : MonoBehaviour
     {
         ElapsedTime = 0f;
         HasTimedOut = false;
+        lastPublishedRemainingSecond = -1;
+        TimerReset?.Invoke();
     }
 
     public void Pause(object source)
@@ -106,5 +115,24 @@ public sealed class InactivityTimer : MonoBehaviour
         HasTimedOut = true;
         Debug.Log("[InactivityTimer] Timeout - 대기 화면 복귀 필요", this);
         TimedOut?.Invoke();
+    }
+
+    private void PublishWarningSecond()
+    {
+        int remainingSeconds = RemainingSeconds;
+
+        if (remainingSeconds > warningSeconds)
+        {
+            lastPublishedRemainingSecond = -1;
+            return;
+        }
+
+        if (remainingSeconds == lastPublishedRemainingSecond)
+        {
+            return;
+        }
+
+        lastPublishedRemainingSecond = remainingSeconds;
+        WarningSecondChanged?.Invoke(remainingSeconds);
     }
 }

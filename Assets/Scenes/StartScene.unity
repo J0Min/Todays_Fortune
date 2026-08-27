@@ -4487,7 +4487,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63ad6ccdb37dccf4095a2ec36e97f6dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InactivityTimer
-  inactivityTimeout: 120
+  inactivityTimeout: 10
+  warningSeconds: 5
   inactiveSceneNames:
   - StartScene
   ElapsedTime: 0
