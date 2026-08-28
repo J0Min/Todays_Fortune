@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 
 public sealed class LoadingEndingController : MonoBehaviour
 {
-    private const int RequiredEndingLayerCount = 6;
+    private const int RequiredEndingLayerCount = 7;
 
     [Header("Loading Video")]
     [Tooltip("When enabled, this controller creates and plays its own VideoPlayer. Disable it when SceneVideoController plays the loading video as the scene intro.")]
@@ -18,7 +18,7 @@ public sealed class LoadingEndingController : MonoBehaviour
     [Min(0f)]
     [SerializeField] private float loadingFadeFromBlackDuration = 1.2f;
 
-    [Header("Temporary Ending Textures (01 - 06)")]
+    [Header("Temporary Ending Textures (01 - 07)")]
     [SerializeField] private Texture2D[] endingTextures;
     [Min(0f)]
     [SerializeField] private float endingFadeDuration = 0.5f;
