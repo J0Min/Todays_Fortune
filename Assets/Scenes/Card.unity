@@ -186,6 +186,7 @@ MonoBehaviour:
   selectedCardPivot: {fileID: 1274637246}
   selectionDuration: 0.5
   selectedCardScale: {x: 2.2, y: 2.2, z: 1}
+  selectedCardSprite: {fileID: 428256285823226975, guid: f9421a42eb3211e4294b306508d41379, type: 3}
   onCardSelectionFinished:
     m_PersistentCalls:
       m_Calls:

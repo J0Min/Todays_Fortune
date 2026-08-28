@@ -37,6 +37,8 @@ public class CardFan : MonoBehaviour
     [SerializeField, Min(0f)] private float selectionDuration = 0.35f;
     [SerializeField, Tooltip("Local scale applied to the selected card at the selection pivot.")]
     private Vector3 selectedCardScale = Vector3.one;
+    [SerializeField, Tooltip("Sprite shown on the selected card before it moves to the selection pivot.")]
+    private Sprite selectedCardSprite;
     [SerializeField] private UnityEvent onCardSelectionFinished;
 
     [Header("Card Hover")]
@@ -174,6 +176,14 @@ public class CardFan : MonoBehaviour
         hoveredCard = null;
         if (hoverRoutine != null)
             StopCoroutine(hoverRoutine);
+
+        if (selectedCardSprite != null)
+        {
+            SpriteRenderer spriteRenderer = selectedCard.GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+                spriteRenderer.sprite = selectedCardSprite;
+        }
+
         FocusCard(selectedCard);
     }
 
