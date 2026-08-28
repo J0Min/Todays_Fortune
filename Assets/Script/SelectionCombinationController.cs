@@ -60,7 +60,7 @@ public sealed class SelectionCombinationController : MonoBehaviour
     [SerializeField] private float postFadeHoldDuration = 0.5f;
 
     [Header("After Combination")]
-    [Tooltip("Shown after the rope and card have finished fading out.")]
+    [Tooltip("Shown after the rope and card have finished fading out. The title is attached to this object when it is shown.")]
     [SerializeField] private GameObject objectToShowAfterCombination;
     [Min(0f)]
     [SerializeField] private float objectHoldDuration = 2f;
@@ -234,6 +234,7 @@ public sealed class SelectionCombinationController : MonoBehaviour
         if (objectToShowAfterCombination != null)
         {
             objectToShowAfterCombination.SetActive(true);
+            AttachTitleToAfterCombination();
         }
 
         onCombinationFinished?.Invoke();
@@ -290,8 +291,17 @@ public sealed class SelectionCombinationController : MonoBehaviour
         float alpha = 1f - Mathf.InverseLerp(fadeStartProgress, safeTransparentProgress, progress);
         SetImageAlpha(ropeImage, alpha);
         SetImageAlpha(cardImage, alpha);
-        SetImageAlpha(titleImage, alpha);
+    }
 
+    private void AttachTitleToAfterCombination()
+    {
+        if (titleImage == null || objectToShowAfterCombination == null)
+        {
+            return;
+        }
+
+        titleImage.rectTransform.SetParent(objectToShowAfterCombination.transform, false);
+        titleImage.rectTransform.SetAsLastSibling();
     }
 
     /// <summary>
