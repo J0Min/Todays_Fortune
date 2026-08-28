@@ -658,7 +658,7 @@ PrefabInstance:
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: sceneStartVideo
       value: 
-      objectReference: {fileID: 32900000, guid: 6a105a90c7d5ef6408db94a08abc7f54, type: 3}
+      objectReference: {fileID: 32900000, guid: 801909ef74efa664d9a0876e5ebbb6fd, type: 3}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: playOnSceneStart
       value: 1

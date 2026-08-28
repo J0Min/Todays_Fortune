@@ -389,6 +389,9 @@ MonoBehaviour:
   restartFromBeginning: 1
   prepareTimeoutSeconds: 15
   fadeInDuration: 0
+  onIntroVideoEndingSoon:
+    m_PersistentCalls:
+      m_Calls: []
   onIntroVideoFinished:
     m_PersistentCalls:
       m_Calls: []
@@ -398,6 +401,7 @@ MonoBehaviour:
   playOnSceneStart: 0
   sceneStartVideo: {fileID: 0}
   preloadSceneDuringIntro: 0
+  introEndingEventLeadTime: 0
   ui: []
   uiCanvases: []
   hideUiWhileVideoPlays: 1
@@ -417,6 +421,7 @@ GameObject:
   - component: {fileID: 330611432}
   - component: {fileID: 330611434}
   - component: {fileID: 330611433}
+  - component: {fileID: 330611435}
   m_Layer: 5
   m_Name: Image_Main_Changing
   m_TagString: Untagged
@@ -463,7 +468,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 154df1a2d89970f4aa6dac3aa49fd459, type: 3}
+  m_Texture: {fileID: 2800000, guid: d98575e6d7c14da49a3b22da1d143f59, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -478,6 +483,79 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330611431}
   m_CullTransparentMesh: 1
+--- !u!114 &330611435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330611431}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 263b7b158a228024f8a2012339aa6f5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FortuneResultRawImage
+  resultImages:
+  - {fileID: 2800000, guid: d98575e6d7c14da49a3b22da1d143f59, type: 3}
+  - {fileID: 2800000, guid: 3a062ed2328c06a4f932b41cae643122, type: 3}
+  - {fileID: 2800000, guid: 17a8912e23c28a94da922cf5f9e5beb9, type: 3}
+  - {fileID: 2800000, guid: 4de9e0b3938ff7e46955b19ea8163519, type: 3}
+  - {fileID: 2800000, guid: f830feb880bd7b24cb912f1a1cc44dbb, type: 3}
+  - {fileID: 2800000, guid: cf66e349c80434a4c863c8ead75c0905, type: 3}
+  - {fileID: 2800000, guid: ec9972bcbdbd56a48b8a029f2392e5b8, type: 3}
+  - {fileID: 2800000, guid: cdc0050068112da4895a65450aa1e7f1, type: 3}
+  - {fileID: 2800000, guid: 2a3ba7bfa2441f4438c549edb5a86aaa, type: 3}
+  - {fileID: 2800000, guid: a03c5749ea4886d46ba53a24711be7ad, type: 3}
+  - {fileID: 2800000, guid: 252056e23b8b34246bed72fc4d3ab19f, type: 3}
+  - {fileID: 2800000, guid: 6fcab36b32042644f9d23b3f66a4876b, type: 3}
+  - {fileID: 2800000, guid: 10b8790d1ecb0d14093d34378b685e0e, type: 3}
+  - {fileID: 2800000, guid: 0e8328d1c3bc431449df2a7734e02ce2, type: 3}
+  - {fileID: 2800000, guid: f39e56f4cd4c64641a264b984ea285bf, type: 3}
+  - {fileID: 2800000, guid: 48faf8f2b3e8dab46b5919762631df90, type: 3}
+  - {fileID: 2800000, guid: 65db1c699ff0965468eb195086998bde, type: 3}
+  - {fileID: 2800000, guid: 15f91ac7cc20e0b478834eebd813d2ae, type: 3}
+  - {fileID: 2800000, guid: 8f8554c6db16ffd498879c01b7cb40eb, type: 3}
+  - {fileID: 2800000, guid: 97250e7be8dd4f943b7130ade3c62391, type: 3}
+  - {fileID: 2800000, guid: cdf2e5e93fdbd47499482a6783a43f42, type: 3}
+  - {fileID: 2800000, guid: 9927e37730241054eb705fd06fc50b21, type: 3}
+  - {fileID: 2800000, guid: f1d460e607995a944a20b24956cff330, type: 3}
+  - {fileID: 2800000, guid: ec1c4bc03f33e85458453d7037fd263d, type: 3}
+  - {fileID: 2800000, guid: bb292b4265be2974e83b5bb6ff8ec8c5, type: 3}
+  - {fileID: 2800000, guid: 837681429d139e94ab09ad08182335c8, type: 3}
+  - {fileID: 2800000, guid: f431ac2adb6b3f242ba87c8e4f96d991, type: 3}
+  - {fileID: 2800000, guid: 753e49a7f281b3043a4d4a652c9f5866, type: 3}
+  - {fileID: 2800000, guid: 7b2b04548e18ea64890ded1b40a48b7c, type: 3}
+  - {fileID: 2800000, guid: c280b245bd4282b40af5a3976a6d1f3b, type: 3}
+  - {fileID: 2800000, guid: 32ae9aef873f24c408dfab6089369135, type: 3}
+  - {fileID: 2800000, guid: 364bc3df95e82994d88b0ec7ffa26fa9, type: 3}
+  - {fileID: 2800000, guid: 8dc557ba4825d80448dd8d97bbedb5a3, type: 3}
+  - {fileID: 2800000, guid: 1f8497c27d0cb264ebcc067b8e77f025, type: 3}
+  - {fileID: 2800000, guid: 4bc5a244d2e1f3547b86050fc64fa140, type: 3}
+  - {fileID: 2800000, guid: 3ce3f1d0efa60ba4abf7c8e938227fc6, type: 3}
+  - {fileID: 2800000, guid: f795977fb8d63fa4b89628c91e8ee346, type: 3}
+  - {fileID: 2800000, guid: e812b9774f4fe05459881affe0c85076, type: 3}
+  - {fileID: 2800000, guid: ef40678048859ea42ab12ad25b270cad, type: 3}
+  - {fileID: 2800000, guid: bd44c3bbde4e9a44b85a25dcc54000b7, type: 3}
+  - {fileID: 2800000, guid: b3bdec3cc1c4402419808a4d4c251176, type: 3}
+  - {fileID: 2800000, guid: 763eac8ef54cb774b96d30e3fbc7ba89, type: 3}
+  - {fileID: 2800000, guid: 467662c1a4ddb754b8835dbc4570ceef, type: 3}
+  - {fileID: 2800000, guid: 4a34b884b69dc22418167cfc39326e36, type: 3}
+  - {fileID: 2800000, guid: 223d38864bf8e5d48a8db8918924d46b, type: 3}
+  - {fileID: 2800000, guid: 8cfbb1b1300a8894da680ec3f7ca61be, type: 3}
+  - {fileID: 2800000, guid: becf9cf53c5a0554ca89c6b8e9581486, type: 3}
+  - {fileID: 2800000, guid: e68061918bfedac43a6970e5927393bb, type: 3}
+  - {fileID: 2800000, guid: 185b42c29b88c874ca9c54eefc55a304, type: 3}
+  - {fileID: 2800000, guid: 4d5e021b1927f904db046e1df0ecb695, type: 3}
+  - {fileID: 2800000, guid: 4f5d0b4b230f6c241ba8bf16e4265081, type: 3}
+  - {fileID: 2800000, guid: aa851945f2fa4804b9dddd79ed0612f2, type: 3}
+  - {fileID: 2800000, guid: dd25333db49576c45a173600e2c95c58, type: 3}
+  - {fileID: 2800000, guid: f133ec493720aa848b7e631646f7bfd8, type: 3}
+  - {fileID: 2800000, guid: cc279de7c6fc6c341a0d1192019853fa, type: 3}
+  - {fileID: 2800000, guid: bb8c8f4d69dc8bb49ad796f192af7c3b, type: 3}
+  - {fileID: 2800000, guid: f6cde40a5cba3854da5d7a137d3dc50a, type: 3}
+  - {fileID: 2800000, guid: cfcac69046bde7643b05559ab1a14571, type: 3}
+  - {fileID: 2800000, guid: 28c120f166cf9614783702e0b7582531, type: 3}
+  - {fileID: 2800000, guid: 87d4a29f7d71d64479dbd09bbe467134, type: 3}
 --- !u!1 &520631581
 GameObject:
   m_ObjectHideFlags: 0
@@ -720,7 +798,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: faee12027adc3f04fa71bb4407d2fc7f, type: 3}
+  m_Texture: {fileID: 2800000, guid: 934b33da93191d346acd970caf58f5a2, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
