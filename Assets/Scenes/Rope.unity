@@ -622,7 +622,7 @@ MonoBehaviour:
   ropeCount: 5
   horizontalSpacing: 3.31
   spawnOffset: {x: 0, y: 10}
-  selectionDuration: 0.35
+  selectionDuration: 0.5
   selectionEase:
     serializedVersion: 2
     m_Curve:
@@ -808,6 +808,10 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: firstFadeOutDuration
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: firstGroup.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -929,6 +933,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3520354019214359214, guid: 547916af3529f09478904c1b25f77d21, type: 3}
   m_PrefabInstance: {fileID: 1106916634}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1106916636 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+  m_PrefabInstance: {fileID: 1106916634}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1150530915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0ea4e23941d5864599cbbbe615b970c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RawImageGroupFadeIn
 --- !u!1 &1150530915 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1093632624771534572, guid: 547916af3529f09478904c1b25f77d21, type: 3}
@@ -1057,6 +1072,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1262871522}
         m_TargetAssemblyTypeName: SelectionFlow, Assembly-CSharp
         m_MethodName: HandleRopeSelected
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1106916636}
+        m_TargetAssemblyTypeName: RawImageGroupFadeIn, Assembly-CSharp
+        m_MethodName: PlayFadeOut
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -187,6 +187,21 @@ MonoBehaviour:
   selectionDuration: 0.5
   selectedCardScale: {x: 2.2, y: 2.2, z: 1}
   selectedCardSprite: {fileID: 428256285823226975, guid: f9421a42eb3211e4294b306508d41379, type: 3}
+  onCardSelected:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 392529525}
+        m_TargetAssemblyTypeName: RawImageGroupFadeIn, Assembly-CSharp
+        m_MethodName: PlayFadeOut
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onCardSelectionFinished:
     m_PersistentCalls:
       m_Calls:
@@ -369,6 +384,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &392529525 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+  m_PrefabInstance: {fileID: 397277237}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 397277241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0ea4e23941d5864599cbbbe615b970c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RawImageGroupFadeIn
 --- !u!1001 &397277237
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -516,6 +542,14 @@ PrefabInstance:
     - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: secondFadeDuration
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: firstFadeOutDuration
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: secondFadeOutDuration
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 9029670192589923569, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_TargetGraphic
