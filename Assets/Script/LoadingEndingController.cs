@@ -22,6 +22,9 @@ public sealed class LoadingEndingController : MonoBehaviour
     [SerializeField] private Texture2D[] endingTextures;
     [Min(0f)]
     [SerializeField] private float endingFadeDuration = 0.5f;
+    [Tooltip("Fade-in duration for ending textures 03-07 (array indices 2-6).")]
+    [Min(0f)]
+    [SerializeField] private float fadeInDurationFromTexture2 = 0.5f;
     [Min(0f)]
     [SerializeField] private float endingHoldDuration = 0.5f;
 
@@ -207,7 +210,7 @@ public sealed class LoadingEndingController : MonoBehaviour
         {
             CanvasGroup layer = endingLayers[i];
             Debug.Log($"[LoadingEnding] Ending layer {i + 1:00} started.", this);
-            yield return FadeIn(layer);
+            yield return FadeIn(layer, fadeInDurationFromTexture2);
 
             if (endingHoldDuration > 0f)
             {
@@ -354,9 +357,9 @@ public sealed class LoadingEndingController : MonoBehaviour
 #endif
     }
 
-    private IEnumerator FadeIn(CanvasGroup layer)
+    private IEnumerator FadeIn(CanvasGroup layer, float duration)
     {
-        if (endingFadeDuration <= 0f)
+        if (duration <= 0f)
         {
             layer.alpha = 1f;
             yield break;
@@ -364,10 +367,10 @@ public sealed class LoadingEndingController : MonoBehaviour
 
         float startedAt = Time.unscaledTime;
         float elapsed = 0f;
-        while (elapsed < endingFadeDuration)
+        while (elapsed < duration)
         {
             elapsed = Time.unscaledTime - startedAt;
-            float normalizedTime = Mathf.Clamp01(elapsed / endingFadeDuration);
+            float normalizedTime = Mathf.Clamp01(elapsed / duration);
             layer.alpha = Mathf.SmoothStep(0f, 1f, normalizedTime);
             yield return null;
         }

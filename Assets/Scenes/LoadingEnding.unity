@@ -175,6 +175,7 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 7ea879e4e8734d9489308c432ebebe02, type: 3}
   - {fileID: 2800000, guid: e6f995320e057c543ae93bcb650159ec, type: 3}
   endingFadeDuration: 0
+  fadeInDurationFromTexture2: 1
   endingHoldDuration: 0.5
   inputEnableDelay: 2
   autoReturnDelay: 20
