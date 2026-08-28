@@ -28,6 +28,7 @@ public sealed class SceneVideoController : MonoBehaviour
     [SerializeField, Min(0f)] private float fadeInDuration;
 
     [Header("Events")]
+    [SerializeField] private UnityEvent onIntroVideoEndingSoon;
     [SerializeField] private UnityEvent onIntroVideoFinished;
     [FormerlySerializedAs("onVideoFinished")]
     [SerializeField] private UnityEvent onOutroVideoFinished;
@@ -36,6 +37,7 @@ public sealed class SceneVideoController : MonoBehaviour
     [SerializeField] private bool playOnSceneStart;
     [SerializeField] private VideoClip sceneStartVideo;
     [SerializeField] private bool preloadSceneDuringIntro;
+    [SerializeField, Min(0f)] private float introEndingEventLeadTime;
 
     [Header("UI")]
     [SerializeField, InspectorName("UI")] private GameObject[] ui;
@@ -65,11 +67,13 @@ public sealed class SceneVideoController : MonoBehaviour
     private Coroutine sceneActivationRoutine;
     private Coroutine scenePreActivationRoutine;
     private Coroutine handoffCompletionRoutine;
+    private Coroutine introEndingEventRoutine;
     private bool hasReceivedFirstFrame;
     private bool isWaitingForFirstFrame;
     private bool isPreparing;
     private bool isFinishing;
     private bool hasFinishedTransitionVideo;
+    private bool hasInvokedIntroEndingSoon;
     private VideoPhase currentPhase;
     private float introStartTimeAtHandoff;
 
@@ -122,6 +126,7 @@ public sealed class SceneVideoController : MonoBehaviour
         StopFadeIn();
         StopShowObjectAfterVideo();
         StopScenePreActivation();
+        StopIntroEndingEventRoutine();
         isWaitingForFirstFrame = false;
         isPreparing = false;
         inactivityTimer?.Resume(this);
@@ -171,6 +176,80 @@ public sealed class SceneVideoController : MonoBehaviour
         videoPlayer.clip = videoClip;
         BeginScenePreload();
         PrepareVideo(VideoPhase.Outro);
+    }
+
+    /// <summary>
+    /// Starts loading the configured next scene without starting a video.
+    /// Call <see cref="ActivateNextSceneWithoutVideo"/> when the caller is ready
+    /// to complete the transition.
+    /// </summary>
+    public void PreloadNextScene()
+    {
+        BeginScenePreload();
+    }
+
+    /// <summary>
+    /// Activates the configured next scene through the existing additive handoff
+    /// without waiting for an outgoing video to finish.
+    /// </summary>
+    public void ActivateNextSceneWithoutVideo()
+    {
+        PreActivateNextSceneWithoutVideo();
+        CompleteNextSceneTransitionWithoutVideo();
+    }
+
+    /// <summary>
+    /// Activates the configured scene so its intro can start playing behind the
+    /// outgoing scene, but keeps the outgoing scene visible until completion is
+    /// explicitly requested.
+    /// </summary>
+    public void PreActivateNextSceneWithoutVideo()
+    {
+        if (!CanOpenConfiguredScene())
+        {
+            return;
+        }
+
+        if (sceneNameToOpen == "StartScene")
+        {
+            PlayerFortuneState.Instance?.ResetData();
+        }
+
+        if (preloadOperation == null)
+        {
+            BeginScenePreload();
+        }
+
+        if (preloadOperation == null || preloadedSceneName != sceneNameToOpen)
+        {
+            return;
+        }
+
+        hasFinishedTransitionVideo = false;
+        StopScenePreActivation();
+        ActivatePreloadedScene();
+    }
+
+    /// <summary>
+    /// Completes a handoff that was started by
+    /// <see cref="PreActivateNextSceneWithoutVideo"/>.
+    /// </summary>
+    public void CompleteNextSceneTransitionWithoutVideo()
+    {
+        if (preloadOperation == null || preloadedSceneName != sceneNameToOpen)
+        {
+            PreActivateNextSceneWithoutVideo();
+        }
+
+        if (preloadOperation == null || preloadedSceneName != sceneNameToOpen)
+        {
+            return;
+        }
+
+        hasFinishedTransitionVideo = true;
+        StopScenePreActivation();
+        ActivatePreloadedScene();
+        CompleteHandoffIfReady();
     }
 
     public void OpenScene()
@@ -224,6 +303,14 @@ public sealed class SceneVideoController : MonoBehaviour
             pendingIncomingIntroStartSeconds = Mathf.Max(0f, nextIntroStartSeconds);
 
         FinishVideo();
+
+        // A skip must complete the scene transition even when the outgoing
+        // video's finish event is not wired to OpenScene in the Inspector.
+        if (skipsToPreloadedScene)
+        {
+            ActivatePreloadedScene();
+            CompleteHandoffIfReady();
+        }
     }
 
     public void VideoPause()
@@ -275,11 +362,21 @@ public sealed class SceneVideoController : MonoBehaviour
         }
 
         isFinishing = true;
+        if (currentPhase == VideoPhase.Intro)
+        {
+            InvokeIntroEndingSoonOnce();
+        }
+
         isPreparing = false;
         isWaitingForFirstFrame = false;
         StopPrepareTimeout();
         StopFadeIn();
         StopShowObjectAfterVideo();
+        if (currentPhase == VideoPhase.Outro && objectToShowAfterOutroVideo != null)
+        {
+            objectToShowAfterOutroVideo.SetActive(false);
+        }
+        StopIntroEndingEventRoutine();
         inactivityTimer?.Resume(this);
 
         if (currentPhase == VideoPhase.Intro)
@@ -349,6 +446,7 @@ public sealed class SceneVideoController : MonoBehaviour
         isPreparing = true;
         isFinishing = false;
         hasReceivedFirstFrame = false;
+        hasInvokedIntroEndingSoon = false;
         isWaitingForFirstFrame = true;
         videoPlayer.targetCameraAlpha = 0f;
         StopPrepareTimeout();
@@ -511,6 +609,51 @@ public sealed class SceneVideoController : MonoBehaviour
         {
             scenePreActivationRoutine = StartCoroutine(ActivatePreloadedSceneBeforeOutroEnds());
         }
+
+        if (currentPhase == VideoPhase.Intro)
+        {
+            StopIntroEndingEventRoutine();
+            introEndingEventRoutine = StartCoroutine(InvokeIntroEndingEventBeforeFinish());
+        }
+    }
+
+    private IEnumerator InvokeIntroEndingEventBeforeFinish()
+    {
+        while (!isFinishing && currentPhase == VideoPhase.Intro)
+        {
+            if (videoPlayer.length > 0d &&
+                videoPlayer.time >= Mathf.Max(0f, (float)videoPlayer.length - introEndingEventLeadTime))
+            {
+                InvokeIntroEndingSoonOnce();
+                break;
+            }
+
+            yield return null;
+        }
+
+        introEndingEventRoutine = null;
+    }
+
+    private void InvokeIntroEndingSoonOnce()
+    {
+        if (hasInvokedIntroEndingSoon)
+        {
+            return;
+        }
+
+        hasInvokedIntroEndingSoon = true;
+        onIntroVideoEndingSoon?.Invoke();
+    }
+
+    private void StopIntroEndingEventRoutine()
+    {
+        if (introEndingEventRoutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(introEndingEventRoutine);
+        introEndingEventRoutine = null;
     }
 
     private void HandleVideoFrameReady(VideoPlayer preparedVideoPlayer, long frameIndex)
@@ -635,6 +778,13 @@ public sealed class SceneVideoController : MonoBehaviour
             // Keep the outgoing video's final frame above the incoming scene until
             // the incoming intro video has produced its first frame.
             videoCamera.depth = short.MaxValue;
+        }
+        else
+        {
+            // A transition without an outgoing VideoPlayer still needs its
+            // current camera above the newly activated scene while that scene's
+            // intro is warming up behind the UI fade.
+            SetSceneCameraDepthsForHandoff(gameObject.scene);
         }
 
     }
@@ -877,6 +1027,26 @@ public sealed class SceneVideoController : MonoBehaviour
             for (int j = 0; j < cameras.Length; j++)
             {
                 cameras[j].enabled = enabled;
+            }
+        }
+    }
+
+    private static void SetSceneCameraDepthsForHandoff(Scene scene)
+    {
+        if (!scene.IsValid() || !scene.isLoaded)
+        {
+            return;
+        }
+
+        float cameraDepth = short.MaxValue;
+        GameObject[] rootObjects = scene.GetRootGameObjects();
+        for (int i = 0; i < rootObjects.Length; i++)
+        {
+            Camera[] cameras = rootObjects[i].GetComponentsInChildren<Camera>(true);
+            for (int j = 0; j < cameras.Length; j++)
+            {
+                cameras[j].depth = cameraDepth;
+                cameraDepth -= 1f;
             }
         }
     }

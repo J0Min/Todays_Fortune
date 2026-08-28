@@ -1,6 +1,6 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 /// <summary>
@@ -59,8 +59,18 @@ public sealed class SelectionCombinationController : MonoBehaviour
     [Min(0f)]
     [SerializeField] private float postFadeHoldDuration = 0.5f;
 
+    [Header("After Combination")]
+    [Tooltip("Shown after the rope and card have finished fading out.")]
+    [SerializeField] private GameObject objectToShowAfterCombination;
+    [Min(0f)]
+    [SerializeField] private float objectHoldDuration = 2f;
+    [Min(0f)]
+    [SerializeField] private float objectFadeOutDuration = 1f;
+    [SerializeField] private UnityEvent onCombinationFinished;
+
     [Header("Scene Transition")]
-    [SerializeField] private string loadingSceneName = "LoadingEnding";
+    [Tooltip("Optionally preloads the next scene on start. The scene is not activated until Continue To Next Scene is called.")]
+    [SerializeField] private SceneVideoController sceneVideoController;
 
     private RectTransform ropeRectTransform;
     private RectTransform cardRectTransform;
@@ -68,12 +78,24 @@ public sealed class SelectionCombinationController : MonoBehaviour
     private Image titleImage;
     private Image ropeImage;
     private Image cardImage;
+    private CanvasGroup objectToShowCanvasGroup;
     private InactivityTimer inactivityTimer;
     private bool isTransitioning;
 
     private void Awake()
     {
         CreatePresentation();
+        if (objectToShowAfterCombination != null)
+        {
+            objectToShowCanvasGroup = objectToShowAfterCombination.GetComponent<CanvasGroup>();
+            if (objectToShowCanvasGroup == null)
+            {
+                objectToShowCanvasGroup = objectToShowAfterCombination.AddComponent<CanvasGroup>();
+            }
+
+            objectToShowCanvasGroup.alpha = 1f;
+            objectToShowAfterCombination.SetActive(false);
+        }
     }
 
     private void OnEnable()
@@ -92,6 +114,8 @@ public sealed class SelectionCombinationController : MonoBehaviour
         float presentationDuration = introFadeDuration + secondImageFadeDuration +
             initialHoldDuration + animationDuration + postFadeHoldDuration;
         AmbientAudioManager.Instance?.FadeThroughSelection(presentationDuration);
+
+        sceneVideoController?.PreloadNextScene();
 
         if (!TryApplySelection())
         {
@@ -207,7 +231,40 @@ public sealed class SelectionCombinationController : MonoBehaviour
             yield return new WaitForSeconds(postFadeHoldDuration);
         }
 
-        OpenLoadingScene();
+        if (objectToShowAfterCombination != null)
+        {
+            objectToShowAfterCombination.SetActive(true);
+        }
+
+        onCombinationFinished?.Invoke();
+
+        if (objectToShowCanvasGroup == null)
+        {
+            yield break;
+        }
+
+        if (objectHoldDuration > 0f)
+        {
+            yield return new WaitForSeconds(objectHoldDuration);
+        }
+
+        // Activate LoadingEnding at the start of this fade. Its intro plays
+        // hidden and muted behind the outgoing scene until the fade completes.
+        sceneVideoController?.PreActivateNextSceneWithoutVideo();
+
+        elapsed = 0f;
+        while (elapsed < objectFadeOutDuration)
+        {
+            elapsed += Time.deltaTime;
+            objectToShowCanvasGroup.alpha = 1f - Mathf.SmoothStep(
+                0f,
+                1f,
+                Mathf.Clamp01(elapsed / Mathf.Max(0.01f, objectFadeOutDuration)));
+            yield return null;
+        }
+
+        objectToShowCanvasGroup.alpha = 0f;
+        ContinueToNextScene();
     }
 
     private void ApplyIdleMotion(float elapsed, float normalizedHoldTime)
@@ -237,21 +294,27 @@ public sealed class SelectionCombinationController : MonoBehaviour
 
     }
 
-    private void OpenLoadingScene()
+    /// <summary>
+    /// Call this from the revealed object's animation event, button, or other
+    /// completion signal when it is actually time to leave this scene.
+    /// </summary>
+    public void ContinueToNextScene()
     {
         if (isTransitioning)
         {
             return;
         }
 
-        isTransitioning = true;
-        if (string.IsNullOrWhiteSpace(loadingSceneName) || !Application.CanStreamedLevelBeLoaded(loadingSceneName))
+        if (sceneVideoController == null)
         {
-            Debug.LogError($"[SelectionCombination] Scene '{loadingSceneName}' is not available in Build Settings.", this);
+            Debug.LogError(
+                "[SelectionCombination] Continue To Next Scene needs a SceneVideoController.",
+                this);
             return;
         }
 
-        SceneManager.LoadScene(loadingSceneName);
+        isTransitioning = true;
+        sceneVideoController.CompleteNextSceneTransitionWithoutVideo();
     }
 
     private void CreatePresentation()

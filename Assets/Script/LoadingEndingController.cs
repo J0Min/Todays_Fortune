@@ -9,14 +9,16 @@ using UnityEngine.InputSystem;
 
 public sealed class LoadingEndingController : MonoBehaviour
 {
-    private const int RequiredEndingLayerCount = 6;
+    private const int RequiredEndingLayerCount = 7;
 
     [Header("Loading Video")]
+    [Tooltip("When enabled, this controller creates and plays its own VideoPlayer. Disable it when SceneVideoController plays the loading video as the scene intro.")]
+    [SerializeField] private bool useInternalLoadingVideoPlayer = true;
     [SerializeField] private VideoClip loadingVideo;
     [Min(0f)]
     [SerializeField] private float loadingFadeFromBlackDuration = 1.2f;
 
-    [Header("Temporary Ending Textures (01 - 06)")]
+    [Header("Temporary Ending Textures (01 - 07)")]
     [SerializeField] private Texture2D[] endingTextures;
     [Min(0f)]
     [SerializeField] private float endingFadeDuration = 0.5f;
@@ -51,6 +53,11 @@ public sealed class LoadingEndingController : MonoBehaviour
     {
         inactivityTimer = FindAnyObjectByType<InactivityTimer>();
         inactivityTimer?.Pause(this);
+
+        if (!useInternalLoadingVideoPlayer)
+        {
+            return;
+        }
 
         if (loadingVideoPlayer == null)
         {
@@ -144,7 +151,17 @@ public sealed class LoadingEndingController : MonoBehaviour
         StartEndingOnce();
     }
 
-    private void StartEndingOnce()
+    public void StartEndingOnce()
+    {
+        StartEnding();
+    }
+
+    public void StartEndingBeforeIntroFinishes()
+    {
+        StartEnding();
+    }
+
+    private void StartEnding()
     {
         if (hasStartedEnding)
         {
@@ -178,7 +195,15 @@ public sealed class LoadingEndingController : MonoBehaviour
             yield break;
         }
 
-        for (int i = 0; i < RequiredEndingLayerCount; i++)
+        Debug.Log("[LoadingEnding] Ending layers 01-02 started together.", this);
+        yield return FadeInTogether(endingLayers[0], endingLayers[1]);
+
+        if (endingHoldDuration > 0f)
+        {
+            yield return new WaitForSecondsRealtime(endingHoldDuration);
+        }
+
+        for (int i = 2; i < RequiredEndingLayerCount; i++)
         {
             CanvasGroup layer = endingLayers[i];
             Debug.Log($"[LoadingEnding] Ending layer {i + 1:00} started.", this);
@@ -201,6 +226,31 @@ public sealed class LoadingEndingController : MonoBehaviour
         Debug.Log("[LoadingEnding] Input enabled", this);
         Debug.Log($"[LoadingEnding] Auto return timer started: {autoReturnDelay:0.##}s", this);
         autoReturnCoroutine = StartCoroutine(AutoReturnAfterDelay());
+    }
+
+    private IEnumerator FadeInTogether(CanvasGroup firstLayer, CanvasGroup secondLayer)
+    {
+        if (endingFadeDuration <= 0f)
+        {
+            firstLayer.alpha = 1f;
+            secondLayer.alpha = 1f;
+            yield break;
+        }
+
+        float startedAt = Time.unscaledTime;
+        float elapsed = 0f;
+        while (elapsed < endingFadeDuration)
+        {
+            elapsed = Time.unscaledTime - startedAt;
+            float normalizedTime = Mathf.Clamp01(elapsed / endingFadeDuration);
+            float alpha = Mathf.SmoothStep(0f, 1f, normalizedTime);
+            firstLayer.alpha = alpha;
+            secondLayer.alpha = alpha;
+            yield return null;
+        }
+
+        firstLayer.alpha = 1f;
+        secondLayer.alpha = 1f;
     }
 
     private bool HasCompleteEndingSetup()
@@ -401,8 +451,6 @@ public sealed class LoadingEndingController : MonoBehaviour
 
     private void CreatePresentation()
     {
-        CreateCamera();
-
         GameObject canvasObject = new GameObject(
             "Canvas",
             typeof(RectTransform),
@@ -417,9 +465,6 @@ public sealed class LoadingEndingController : MonoBehaviour
         scaler.referenceResolution = new Vector2(1920f, 1080f);
         scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
         scaler.matchWidthOrHeight = 0.5f;
-
-        RawImage background = CreateFullscreenImage("Background", canvasObject.transform);
-        background.color = Color.black;
 
         int layerCount = endingTextures?.Length ?? 0;
         endingLayers = new CanvasGroup[layerCount];
@@ -437,39 +482,31 @@ public sealed class LoadingEndingController : MonoBehaviour
 
         SetEndingLayersHidden();
 
-        loadingVideoImage = CreateFullscreenImage("Loading Video", canvasObject.transform);
-        loadingVideoImage.color = Color.white;
-        loadingVideoImage.enabled = false;
-        AspectRatioFitter fitter = loadingVideoImage.gameObject.AddComponent<AspectRatioFitter>();
-        fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
-        fitter.aspectRatio = loadingVideo != null && loadingVideo.height > 0
-            ? (float)loadingVideo.width / loadingVideo.height
-            : 16f / 9f;
+        if (useInternalLoadingVideoPlayer)
+        {
+            loadingVideoImage = CreateFullscreenImage("Loading Video", canvasObject.transform);
+            loadingVideoImage.color = Color.white;
+            loadingVideoImage.enabled = false;
+            AspectRatioFitter fitter = loadingVideoImage.gameObject.AddComponent<AspectRatioFitter>();
+            fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            fitter.aspectRatio = loadingVideo != null && loadingVideo.height > 0
+                ? (float)loadingVideo.width / loadingVideo.height
+                : 16f / 9f;
 
-        loadingVideoPlayer = gameObject.AddComponent<VideoPlayer>();
-        loadingVideoPlayer.playOnAwake = false;
-        loadingVideoPlayer.waitForFirstFrame = true;
-        loadingVideoPlayer.isLooping = false;
-        loadingVideoPlayer.skipOnDrop = true;
-        loadingVideoPlayer.renderMode = VideoRenderMode.APIOnly;
-        loadingVideoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
-        loadingVideoPlayer.source = VideoSource.VideoClip;
-        loadingVideoPlayer.clip = loadingVideo;
-        loadingVideoPlayer.sendFrameReadyEvents = true;
+            loadingVideoPlayer = gameObject.AddComponent<VideoPlayer>();
+            loadingVideoPlayer.playOnAwake = false;
+            loadingVideoPlayer.waitForFirstFrame = true;
+            loadingVideoPlayer.isLooping = false;
+            loadingVideoPlayer.skipOnDrop = true;
+            loadingVideoPlayer.renderMode = VideoRenderMode.APIOnly;
+            loadingVideoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
+            loadingVideoPlayer.source = VideoSource.VideoClip;
+            loadingVideoPlayer.clip = loadingVideo;
+            loadingVideoPlayer.sendFrameReadyEvents = true;
 
-        loadingFadeOverlay = CreateFullscreenImage("Loading Fade From Black", canvasObject.transform);
-        loadingFadeOverlay.color = Color.black;
-    }
-
-    private static void CreateCamera()
-    {
-        GameObject cameraObject = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener));
-        cameraObject.tag = "MainCamera";
-        Camera camera = cameraObject.GetComponent<Camera>();
-        camera.clearFlags = CameraClearFlags.SolidColor;
-        camera.backgroundColor = Color.black;
-        camera.orthographic = true;
-        cameraObject.transform.position = new Vector3(0f, 0f, -10f);
+            loadingFadeOverlay = CreateFullscreenImage("Loading Fade From Black", canvasObject.transform);
+            loadingFadeOverlay.color = Color.black;
+        }
     }
 
     private static RawImage CreateFullscreenImage(string objectName, Transform parent)

@@ -22,6 +22,7 @@ public sealed class PlayerFortuneState : MonoBehaviour
 
     public int RopeId { get; private set; }
     public int CardId { get; private set; }
+    public int ID { get; private set; }
     public FortuneDataReader.FortuneData FortuneResult { get; private set; }
     public bool IsMuted { get; private set; }
     public int RopeIdCount => ropeIdCount;
@@ -96,6 +97,11 @@ public sealed class PlayerFortuneState : MonoBehaviour
         FortuneResult = fortuneResult;
     }
 
+    public void SetID(int id)
+    {
+        ID = id;
+    }
+
     public void SetMuted(bool isMuted)
     {
         IsMuted = isMuted;
@@ -105,6 +111,7 @@ public sealed class PlayerFortuneState : MonoBehaviour
     {
         RopeId = 0;
         CardId = 0;
+        ID = 0;
         FortuneResult = null;
         IsMuted = false;
     }
@@ -211,6 +218,7 @@ public sealed class PlayerFortuneStateEditor : UnityEditor.Editor
 
             using (new UnityEditor.EditorGUI.DisabledScope(true))
             {
+                UnityEditor.EditorGUILayout.IntField("ID", state.ID);
                 UnityEditor.EditorGUILayout.Toggle("Muted", state.IsMuted);
             }
         }
