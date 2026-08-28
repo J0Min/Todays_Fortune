@@ -505,6 +505,18 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: secondFadeDelay
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: firstFadeDuration
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: secondFadeDuration
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 9029670192589923569, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_TargetGraphic
       value: 
