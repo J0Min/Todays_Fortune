@@ -302,7 +302,20 @@ public sealed class SceneVideoController : MonoBehaviour
         if (skipsToPreloadedScene)
             pendingIncomingIntroStartSeconds = Mathf.Max(0f, nextIntroStartSeconds);
 
+        if (currentPhase == VideoPhase.Outro && objectToShowAfterOutroVideo != null)
+        {
+            objectToShowAfterOutroVideo.SetActive(false);
+        }
+
         FinishVideo();
+
+        // A skip must complete the scene transition even when the outgoing
+        // video's finish event is not wired to OpenScene in the Inspector.
+        if (skipsToPreloadedScene)
+        {
+            ActivatePreloadedScene();
+            CompleteHandoffIfReady();
+        }
     }
 
     public void VideoPause()
