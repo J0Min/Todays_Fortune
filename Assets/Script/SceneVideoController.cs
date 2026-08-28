@@ -12,6 +12,8 @@ using UnityEngine.Video;
 /// </summary>
 public sealed class SceneVideoController : MonoBehaviour
 {
+    public event System.Action IntroVideoFinished;
+
     private static SceneVideoController pendingOutgoingController;
     private static string pendingIncomingSceneName;
     private static float pendingIncomingIntroStartSeconds;
@@ -388,7 +390,7 @@ public sealed class SceneVideoController : MonoBehaviour
                 hasFinishedTransitionVideo = true;
                 StopScenePreActivation();
                 ActivatePreloadedScene();
-                onIntroVideoFinished?.Invoke();
+                InvokeIntroVideoFinished();
                 CompleteHandoffIfReady();
                 return;
             }
@@ -396,7 +398,7 @@ public sealed class SceneVideoController : MonoBehaviour
             HideVideoOutput();
             CompletePendingHandoff(gameObject.scene);
             SetUiVisible(true);
-            onIntroVideoFinished?.Invoke();
+            InvokeIntroVideoFinished();
         }
         else
         {
@@ -837,6 +839,12 @@ public sealed class SceneVideoController : MonoBehaviour
         }
 
         scenePreActivationRoutine = null;
+    }
+
+    private void InvokeIntroVideoFinished()
+    {
+        IntroVideoFinished?.Invoke();
+        onIntroVideoFinished?.Invoke();
     }
 
     private double GetRemainingVideoTime()

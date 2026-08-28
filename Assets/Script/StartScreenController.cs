@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using UnityEngine.UI;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
@@ -20,6 +21,7 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
     [SerializeField] private SceneVideoController sceneVideoController;
     [SerializeField] private CanvasGroup canvasToFade;
     [SerializeField, Min(0f)] private float canvasFadeDuration = 0.25f;
+    [SerializeField] private RawImage imageToShowWhenVideoFinishes;
 
     [Header("Events")]
     [SerializeField] private UnityEvent onTitleExitFinished;
@@ -29,6 +31,22 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
     private bool hasLoggedWaitingForRelease;
     private bool hasObservedReturnInputRelease;
     private Coroutine canvasFadeRoutine;
+
+    private void OnEnable()
+    {
+        if (sceneVideoController != null)
+        {
+            sceneVideoController.IntroVideoFinished += ShowVideoEndImage;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (sceneVideoController != null)
+        {
+            sceneVideoController.IntroVideoFinished -= ShowVideoEndImage;
+        }
+    }
 
     private void Awake()
     {
@@ -151,6 +169,20 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
             StartCoroutine(WaitForFirstVideoFrame());
         else
             StartCanvasFade();
+    }
+
+    private void ShowVideoEndImage()
+    {
+        if (imageToShowWhenVideoFinishes == null)
+        {
+            Debug.LogWarning(
+                "StartScreenController needs an image to show when the video finishes.",
+                this);
+            return;
+        }
+
+        imageToShowWhenVideoFinishes.gameObject.SetActive(true);
+        imageToShowWhenVideoFinishes.enabled = true;
     }
 
     private IEnumerator WaitForFirstVideoFrame()
