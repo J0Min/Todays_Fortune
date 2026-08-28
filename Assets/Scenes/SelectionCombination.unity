@@ -163,7 +163,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b23dc31ce8f4a0c9239d767b53da0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelectionCombinationController
-  backgroundSprite: {fileID: 6429504625928405481, guid: cbbeec6ded54ee242b7d8879c04e6c7c, type: 3}
+  firstBackgroundSprite: {fileID: 854038104297708352, guid: 92696ba754638574cb636286a8c580f7, type: 3}
+  secondBackgroundSprite: {fileID: 6429504625928405481, guid: cbbeec6ded54ee242b7d8879c04e6c7c, type: 3}
   titleSprite: {fileID: 2476729870842785084, guid: 96a3816663dca464480723b19da821ff, type: 3}
   canvasCamera: {fileID: 200002}
   ropeSprites:
@@ -196,6 +197,8 @@ MonoBehaviour:
   cardSize: {x: 600, y: 678}
   titlePosition: {x: 0, y: 380}
   titleSize: {x: 765, y: 185}
+  backgroundFadeDuration: 3
+  titleFadeDuration: 1.25
   introFadeDuration: 1.25
   secondImageFadeDuration: 1.25
   initialHoldDuration: 3.5

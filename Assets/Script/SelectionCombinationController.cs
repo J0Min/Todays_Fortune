@@ -8,10 +8,11 @@ using UnityEngine.UI;
 /// </summary>
 public sealed class SelectionCombinationController : MonoBehaviour
 {
-    private const float BackgroundOpacity = 0.5f;
-
     [Header("Presentation Assets")]
-    [SerializeField] private Sprite backgroundSprite;
+    [Tooltip("Displayed at the start, then faded out before the second background is shown.")]
+    [SerializeField] private Sprite firstBackgroundSprite;
+    [Tooltip("Displayed after the first background has faded out.")]
+    [SerializeField] private Sprite secondBackgroundSprite;
     [SerializeField] private Sprite titleSprite;
     [SerializeField] private Camera canvasCamera;
     [Tooltip("Element 0 maps to Rope ID 1.")]
@@ -38,6 +39,10 @@ public sealed class SelectionCombinationController : MonoBehaviour
     [SerializeField] private Vector2 titleSize = new Vector2(765f, 185f);
 
     [Header("Animation")]
+    [Min(0.01f)]
+    [SerializeField] private float backgroundFadeDuration = 1.25f;
+    [Min(0.01f)]
+    [SerializeField] private float titleFadeDuration = 1.25f;
     [Min(0.01f)]
     [SerializeField] private float introFadeDuration = 1.25f;
     [Min(0.01f)]
@@ -74,7 +79,8 @@ public sealed class SelectionCombinationController : MonoBehaviour
 
     private RectTransform ropeRectTransform;
     private RectTransform cardRectTransform;
-    private Image backgroundImage;
+    private Image firstBackgroundImage;
+    private Image secondBackgroundImage;
     private Image titleImage;
     private Image ropeImage;
     private Image cardImage;
@@ -111,7 +117,8 @@ public sealed class SelectionCombinationController : MonoBehaviour
 
     private void Start()
     {
-        float presentationDuration = introFadeDuration + secondImageFadeDuration +
+        float backgroundTransitionDuration = secondBackgroundSprite != null ? backgroundFadeDuration : 0f;
+        float presentationDuration = backgroundTransitionDuration + titleFadeDuration + introFadeDuration + secondImageFadeDuration +
             initialHoldDuration + animationDuration + postFadeHoldDuration;
         AmbientAudioManager.Instance?.FadeThroughSelection(presentationDuration);
 
@@ -182,7 +189,22 @@ public sealed class SelectionCombinationController : MonoBehaviour
         SetPresentationProgress(0f);
         SetImageAlpha(cardImage, 0f);
         SetImageAlpha(ropeImage, 0f);
+        SetImageAlpha(titleImage, 0f);
 
+        yield return PlayBackgroundTransition();
+
+        elapsed = 0f;
+        while (elapsed < titleFadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float titleAlpha = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / titleFadeDuration));
+            SetImageAlpha(titleImage, titleAlpha);
+            yield return null;
+        }
+
+        SetImageAlpha(titleImage, 1f);
+
+        elapsed = 0f;
         while (elapsed < introFadeDuration)
         {
             elapsed += Time.deltaTime;
@@ -293,6 +315,28 @@ public sealed class SelectionCombinationController : MonoBehaviour
         SetImageAlpha(cardImage, alpha);
     }
 
+    private IEnumerator PlayBackgroundTransition()
+    {
+        if (firstBackgroundImage == null || secondBackgroundImage == null || secondBackgroundSprite == null)
+        {
+            yield break;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < backgroundFadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = 1f - Mathf.SmoothStep(
+                0f,
+                1f,
+                Mathf.Clamp01(elapsed / backgroundFadeDuration));
+            SetImageAlpha(firstBackgroundImage, alpha);
+            yield return null;
+        }
+
+        SetImageAlpha(firstBackgroundImage, 0f);
+    }
+
     private void AttachTitleToAfterCombination()
     {
         if (titleImage == null || objectToShowAfterCombination == null)
@@ -347,13 +391,11 @@ public sealed class SelectionCombinationController : MonoBehaviour
         scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
         scaler.matchWidthOrHeight = 0.5f;
 
-        backgroundImage = CreateImage("Background", canvasObject.transform, backgroundSprite, false);
-        SetImageAlpha(backgroundImage, BackgroundOpacity);
-        RectTransform backgroundRect = backgroundImage.rectTransform;
-        backgroundRect.anchorMin = Vector2.zero;
-        backgroundRect.anchorMax = Vector2.one;
-        backgroundRect.offsetMin = Vector2.zero;
-        backgroundRect.offsetMax = Vector2.zero;
+        secondBackgroundImage = CreateImage("Second Background", canvasObject.transform, secondBackgroundSprite, false);
+        ConfigureBackgroundRect(secondBackgroundImage.rectTransform);
+
+        firstBackgroundImage = CreateImage("First Background", canvasObject.transform, firstBackgroundSprite, false);
+        ConfigureBackgroundRect(firstBackgroundImage.rectTransform);
 
         ropeImage = CreateImage("Selected Rope", canvasObject.transform, null, true);
         ropeRectTransform = ropeImage.rectTransform;
@@ -387,6 +429,14 @@ public sealed class SelectionCombinationController : MonoBehaviour
         rectTransform.pivot = new Vector2(0.5f, 0.5f);
         rectTransform.anchoredPosition = position;
         rectTransform.sizeDelta = size;
+    }
+
+    private static void ConfigureBackgroundRect(RectTransform rectTransform)
+    {
+        rectTransform.anchorMin = Vector2.zero;
+        rectTransform.anchorMax = Vector2.one;
+        rectTransform.offsetMin = Vector2.zero;
+        rectTransform.offsetMax = Vector2.zero;
     }
 
     private static void SetImageAlpha(Image image, float alpha)
