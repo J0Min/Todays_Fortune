@@ -56,6 +56,7 @@ public sealed class SceneVideoController : MonoBehaviour
 
     [Header("Scene Transition")]
     [SerializeField] private string sceneNameToOpen;
+    [Tooltip("Activate the preloaded next scene this many seconds before the current video ends. Set 0 to activate it when the current video finishes.")]
     [SerializeField, Min(0f)] private float incomingSceneActivationLeadTime = 2f;
 
     private InactivityTimer inactivityTimer;
@@ -69,6 +70,7 @@ public sealed class SceneVideoController : MonoBehaviour
     private Coroutine handoffCompletionRoutine;
     private Coroutine introEndingEventRoutine;
     private bool hasReceivedFirstFrame;
+    private long latestReceivedFrame = -1L;
     private bool isWaitingForFirstFrame;
     private bool isPreparing;
     private bool isFinishing;
@@ -385,6 +387,7 @@ public sealed class SceneVideoController : MonoBehaviour
             {
                 hasFinishedTransitionVideo = true;
                 StopScenePreActivation();
+                ActivatePreloadedScene();
                 onIntroVideoFinished?.Invoke();
                 CompleteHandoffIfReady();
                 return;
@@ -399,6 +402,10 @@ public sealed class SceneVideoController : MonoBehaviour
         {
             hasFinishedTransitionVideo = true;
             StopScenePreActivation();
+            if (preloadOperation != null)
+            {
+                ActivatePreloadedScene();
+            }
             // Keep the final outro frame visible until the preloaded scene is ready.
             onOutroVideoFinished?.Invoke();
             CompleteHandoffIfReady();
@@ -446,6 +453,7 @@ public sealed class SceneVideoController : MonoBehaviour
         isPreparing = true;
         isFinishing = false;
         hasReceivedFirstFrame = false;
+        latestReceivedFrame = -1L;
         hasInvokedIntroEndingSoon = false;
         isWaitingForFirstFrame = true;
         videoPlayer.targetCameraAlpha = 0f;
@@ -604,10 +612,11 @@ public sealed class SceneVideoController : MonoBehaviour
         SetDirectAudioMuted(ShouldHideIncomingVideoUntilHandoff());
         videoPlayer.Play();
 
-        if (currentPhase == VideoPhase.Outro ||
-            (currentPhase == VideoPhase.Intro && preloadSceneDuringIntro))
+        if (incomingSceneActivationLeadTime > 0f &&
+            (currentPhase == VideoPhase.Outro ||
+             (currentPhase == VideoPhase.Intro && preloadSceneDuringIntro)))
         {
-            scenePreActivationRoutine = StartCoroutine(ActivatePreloadedSceneBeforeOutroEnds());
+            scenePreActivationRoutine = StartCoroutine(ActivatePreloadedSceneBeforeTransitionEnds());
         }
 
         if (currentPhase == VideoPhase.Intro)
@@ -662,6 +671,8 @@ public sealed class SceneVideoController : MonoBehaviour
         {
             return;
         }
+
+        latestReceivedFrame = System.Math.Max(latestReceivedFrame, frameIndex);
 
         if (!hasReceivedFirstFrame)
         {
@@ -807,12 +818,16 @@ public sealed class SceneVideoController : MonoBehaviour
                (currentPhase == VideoPhase.Intro && preloadSceneDuringIntro);
     }
 
-    private IEnumerator ActivatePreloadedSceneBeforeOutroEnds()
+    private IEnumerator ActivatePreloadedSceneBeforeTransitionEnds()
     {
-        while (!isFinishing && IsTransitionVideoPlaying() &&
-               (videoPlayer.length <= 0d ||
-                videoPlayer.time < videoPlayer.length - incomingSceneActivationLeadTime))
+        while (!isFinishing && IsTransitionVideoPlaying())
         {
+            double remainingTime = GetRemainingVideoTime();
+            if (remainingTime <= incomingSceneActivationLeadTime)
+            {
+                break;
+            }
+
             yield return null;
         }
 
@@ -822,6 +837,52 @@ public sealed class SceneVideoController : MonoBehaviour
         }
 
         scenePreActivationRoutine = null;
+    }
+
+    private double GetRemainingVideoTime()
+    {
+        if (videoPlayer == null)
+        {
+            return double.PositiveInfinity;
+        }
+
+        double remainingTime = double.PositiveInfinity;
+        double duration = GetVideoDuration();
+        if (duration > 0d && videoPlayer.time >= 0d)
+        {
+            remainingTime = System.Math.Max(0d, duration - videoPlayer.time);
+        }
+
+        if (videoPlayer.frameRate > 0f && videoPlayer.frameCount > 0)
+        {
+            long currentFrame = System.Math.Max(latestReceivedFrame, videoPlayer.frame);
+            if (currentFrame >= 0)
+            {
+                double remainingFrames = System.Math.Max(
+                    0d,
+                    (double)videoPlayer.frameCount - currentFrame - 1d);
+                remainingTime = System.Math.Min(
+                    remainingTime,
+                    remainingFrames / videoPlayer.frameRate);
+            }
+        }
+
+        return remainingTime;
+    }
+
+    private double GetVideoDuration()
+    {
+        if (videoPlayer == null)
+        {
+            return 0d;
+        }
+
+        if (videoPlayer.clip != null && videoPlayer.clip.length > 0d)
+        {
+            return videoPlayer.clip.length;
+        }
+
+        return videoPlayer.length;
     }
 
     private void StopScenePreActivation()
@@ -982,9 +1043,10 @@ public sealed class SceneVideoController : MonoBehaviour
             return;
         }
 
-        if (introStartTimeAtHandoff > 0f)
+        double targetSeconds = Mathf.Max(0f, introStartTimeAtHandoff);
+        if (targetSeconds > 0d)
         {
-            videoPlayer.time = introStartTimeAtHandoff;
+            SeekVideoForwardTo(targetSeconds);
             videoPlayer.Play();
             introStartTimeAtHandoff = 0f;
         }
@@ -997,6 +1059,27 @@ public sealed class SceneVideoController : MonoBehaviour
         else
         {
             videoPlayer.targetCameraAlpha = 1f;
+        }
+    }
+
+    private void SeekVideoForwardTo(double targetSeconds)
+    {
+        if (videoPlayer.frameRate > 0f && videoPlayer.frameCount > 0)
+        {
+            long targetFrame = (long)(targetSeconds * videoPlayer.frameRate);
+            long lastFrame = (long)videoPlayer.frameCount - 1L;
+            targetFrame = System.Math.Min(targetFrame, lastFrame);
+            if (videoPlayer.frame < targetFrame)
+            {
+                videoPlayer.frame = targetFrame;
+            }
+
+            return;
+        }
+
+        if (videoPlayer.time < targetSeconds)
+        {
+            videoPlayer.time = targetSeconds;
         }
     }
 

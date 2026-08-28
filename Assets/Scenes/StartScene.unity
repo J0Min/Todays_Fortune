@@ -4489,7 +4489,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63ad6ccdb37dccf4095a2ec36e97f6dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InactivityTimer
-  inactivityTimeout: 30
+  inactivityTimeout: 120
   warningSeconds: 5
   inactiveSceneNames:
   - StartScene
@@ -4504,7 +4504,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 52a2e557aa144e13b4922508a272367c, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AmbientAudioManager
   loopCrossfadeDuration: 0.08
 --- !u!82 &907350455
@@ -4517,7 +4517,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 9dbc237bb9137f84bb0e5ad6f665fa52, type: 3}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 9dbc237bb9137f84bb0e5ad6f665fa52, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -7039,8 +7040,12 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
+      propertyPath: introEndingEventLeadTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: incomingSceneActivationLeadTime
-      value: 3
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7842681846921220052, guid: 8ff4f0c3b28c203408353e4a5210f63e, type: 3}
       propertyPath: onIntroVideoFinished.m_PersistentCalls.m_Calls.Array.size
