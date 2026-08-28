@@ -24,7 +24,7 @@ public class CardFan : MonoBehaviour
     [Header("Motion")]
     [SerializeField, Min(0f), Tooltip("Travel time per card position. The stack moves continuously through the whole fan.")]
     private float placementDuration = 0.12f;
-    [SerializeField] private bool unfoldOnStart = true;
+    [SerializeField] private bool unfoldOnStart = false;
     [SerializeField, Tooltip("Starts the stacked cards at the first card's fan position and angle instead of their current pose.")]
     private bool startAtFirstCardFanAngle = true;
     [SerializeField, Min(0f), Tooltip("Time to wait after the initial stacked-card pose is shown, before unfolding begins.")]
@@ -77,11 +77,10 @@ public class CardFan : MonoBehaviour
         }
 
         SpawnCards();
+        PlaceCardsAtFirstFanPosition();
 
         if (unfoldOnStart)
             Unfold();
-        else
-            SnapToFan();
     }
 
     private void Update()
@@ -208,6 +207,38 @@ public class CardFan : MonoBehaviour
 
         hoveredCard = card;
         StartHoverLayoutAnimation();
+    }
+
+    /// <summary>
+    /// Returns the world-space target position of the first card in the fan.
+    /// </summary>
+    public Vector3 GetFirstCardTargetPosition()
+    {
+        return GetCardTargetPosition(0);
+    }
+
+    /// <summary>
+    /// Returns the number of card target positions in the fan.
+    /// </summary>
+    public int GetCardTargetCount()
+    {
+        return Mathf.Max(1, cardCount);
+    }
+
+    /// <summary>
+    /// Returns the world-space target position for the specified card index.
+    /// </summary>
+    public Vector3 GetCardTargetPosition(int index)
+    {
+        int count = GetCardTargetCount();
+        if (index < 0 || index >= count)
+        {
+            Debug.LogError($"Card index {index} is outside the valid range (0-{count - 1}).", this);
+            return transform.position;
+        }
+
+        GetTarget(index, count, out Vector3 localPosition, out _);
+        return transform.TransformPoint(localPosition);
     }
 
     public void ClearHoverCard(Transform card)
@@ -447,6 +478,23 @@ public class CardFan : MonoBehaviour
         }
         result.Reverse();
         return result;
+    }
+
+    private void PlaceCardsAtFirstFanPosition()
+    {
+        List<Transform> activeCards = GetCards();
+        if (activeCards.Count == 0)
+        {
+            return;
+        }
+
+        GetTarget(0, activeCards.Count, out Vector3 position, out Quaternion rotation);
+        for (int i = 0; i < activeCards.Count; i++)
+        {
+            activeCards[i].localPosition = position;
+            activeCards[i].localRotation = rotation;
+            SetDrawOrder(activeCards[i], i);
+        }
     }
 
     private void ClearSpawnedCards()
