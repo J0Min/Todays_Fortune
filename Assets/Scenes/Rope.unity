@@ -679,11 +679,19 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 227832934471791979, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_Texture
+      value: 
+      objectReference: {fileID: 2800000, guid: 59867fa5ab4a6a0448beef717de83403, type: 3}
     - target: {fileID: 329210067544246540, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_Texture
       value: 
       objectReference: {fileID: 2800000, guid: 51778e68279c44b4687332c8f83ec703, type: 3}
     - target: {fileID: 1093632624771534572, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3520354019214359214, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}

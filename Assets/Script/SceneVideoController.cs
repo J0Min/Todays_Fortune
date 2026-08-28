@@ -302,11 +302,6 @@ public sealed class SceneVideoController : MonoBehaviour
         if (skipsToPreloadedScene)
             pendingIncomingIntroStartSeconds = Mathf.Max(0f, nextIntroStartSeconds);
 
-        if (currentPhase == VideoPhase.Outro && objectToShowAfterOutroVideo != null)
-        {
-            objectToShowAfterOutroVideo.SetActive(false);
-        }
-
         FinishVideo();
 
         // A skip must complete the scene transition even when the outgoing
@@ -377,6 +372,10 @@ public sealed class SceneVideoController : MonoBehaviour
         StopPrepareTimeout();
         StopFadeIn();
         StopShowObjectAfterVideo();
+        if (currentPhase == VideoPhase.Outro && objectToShowAfterOutroVideo != null)
+        {
+            objectToShowAfterOutroVideo.SetActive(false);
+        }
         StopIntroEndingEventRoutine();
         inactivityTimer?.Resume(this);
 
