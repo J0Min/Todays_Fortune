@@ -6283,6 +6283,7 @@ MonoBehaviour:
   sceneVideoController: {fileID: 1042478354}
   canvasToFade: {fileID: 2000000007}
   canvasFadeDuration: 0.25
+  imageToShowWhenVideoFinishes: {fileID: 0}
   onTitleExitFinished:
     m_PersistentCalls:
       m_Calls:
