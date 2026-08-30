@@ -202,11 +202,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RawImageGroupFadeIn
   firstGroup:
   - {fileID: 8157703934194712956}
-  firstFadeDuration: 1
+  firstFadeDelay: 0
+  firstFadeDuration: 5
+  firstFadeOutDelay: 0
+  firstFadeOutDuration: 1
   secondGroup:
   - {fileID: 1007854717857712857}
   - {fileID: 329210067544246540}
-  secondFadeDuration: 2
+  secondFadeDelay: 0.5
+  secondFadeDuration: 5
+  secondFadeOutDelay: 0
+  secondFadeOutDuration: 1
 --- !u!1 &1911230075554353863
 GameObject:
   m_ObjectHideFlags: 0

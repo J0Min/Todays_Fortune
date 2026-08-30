@@ -533,7 +533,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: secondFadeDelay
-      value: 2
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: firstFadeDuration
@@ -541,7 +541,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: secondFadeDuration
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: firstFadeOutDuration

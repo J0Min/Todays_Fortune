@@ -68,6 +68,8 @@ public sealed class SelectionCombinationController : MonoBehaviour
     [Tooltip("Shown after the rope and card have finished fading out. The title is attached to this object when it is shown.")]
     [SerializeField] private GameObject objectToShowAfterCombination;
     [Min(0f)]
+    [SerializeField] private float objectFadeInDuration = 1f;
+    [Min(0f)]
     [SerializeField] private float objectHoldDuration = 2f;
     [Min(0f)]
     [SerializeField] private float objectFadeOutDuration = 1f;
@@ -85,6 +87,7 @@ public sealed class SelectionCombinationController : MonoBehaviour
     private Image ropeImage;
     private Image cardImage;
     private CanvasGroup objectToShowCanvasGroup;
+    private CanvasGroup[] objectToShowContentCanvasGroups;
     private InactivityTimer inactivityTimer;
     private bool isTransitioning;
 
@@ -99,6 +102,7 @@ public sealed class SelectionCombinationController : MonoBehaviour
                 objectToShowCanvasGroup = objectToShowAfterCombination.AddComponent<CanvasGroup>();
             }
 
+            CacheAfterCombinationContentCanvasGroups();
             objectToShowCanvasGroup.alpha = 1f;
             objectToShowAfterCombination.SetActive(false);
         }
@@ -255,6 +259,8 @@ public sealed class SelectionCombinationController : MonoBehaviour
 
         if (objectToShowAfterCombination != null)
         {
+            objectToShowCanvasGroup.alpha = 1f;
+            SetAfterCombinationContentAlpha(objectFadeInDuration > 0f ? 0f : 1f);
             objectToShowAfterCombination.SetActive(true);
             AttachTitleToAfterCombination();
         }
@@ -265,6 +271,19 @@ public sealed class SelectionCombinationController : MonoBehaviour
         {
             yield break;
         }
+
+        elapsed = 0f;
+        while (elapsed < objectFadeInDuration)
+        {
+            elapsed += Time.deltaTime;
+            SetAfterCombinationContentAlpha(Mathf.SmoothStep(
+                0f,
+                1f,
+                Mathf.Clamp01(elapsed / Mathf.Max(0.01f, objectFadeInDuration))));
+            yield return null;
+        }
+
+        SetAfterCombinationContentAlpha(1f);
 
         if (objectHoldDuration > 0f)
         {
@@ -346,6 +365,40 @@ public sealed class SelectionCombinationController : MonoBehaviour
 
         titleImage.rectTransform.SetParent(objectToShowAfterCombination.transform, false);
         titleImage.rectTransform.SetAsLastSibling();
+    }
+
+    private void CacheAfterCombinationContentCanvasGroups()
+    {
+        Transform targetTransform = objectToShowAfterCombination.transform;
+        objectToShowContentCanvasGroups = new CanvasGroup[targetTransform.childCount];
+
+        for (int i = 0; i < targetTransform.childCount; i++)
+        {
+            GameObject child = targetTransform.GetChild(i).gameObject;
+            CanvasGroup group = child.GetComponent<CanvasGroup>();
+            if (group == null)
+            {
+                group = child.AddComponent<CanvasGroup>();
+            }
+
+            objectToShowContentCanvasGroups[i] = group;
+        }
+    }
+
+    private void SetAfterCombinationContentAlpha(float alpha)
+    {
+        if (objectToShowContentCanvasGroups == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < objectToShowContentCanvasGroups.Length; i++)
+        {
+            if (objectToShowContentCanvasGroups[i] != null)
+            {
+                objectToShowContentCanvasGroups[i].alpha = alpha;
+            }
+        }
     }
 
     /// <summary>
