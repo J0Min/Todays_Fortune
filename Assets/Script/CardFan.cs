@@ -24,7 +24,6 @@ public class CardFan : MonoBehaviour
     [Header("Motion")]
     [SerializeField, Min(0f), Tooltip("Travel time per card position. The stack moves continuously through the whole fan.")]
     private float placementDuration = 0.12f;
-    [SerializeField] private bool unfoldOnStart = true;
     [SerializeField, Tooltip("Starts the stacked cards at the first card's fan position and angle instead of their current pose.")]
     private bool startAtFirstCardFanAngle = true;
     [SerializeField, Min(0f), Tooltip("Time to wait after the initial stacked-card pose is shown, before unfolding begins.")]
@@ -60,6 +59,9 @@ public class CardFan : MonoBehaviour
     private bool cardSelected;
     private bool isCardPointerHeld;
     private bool pointerStartedOnPendingCard;
+    private bool isReadyForSelection;
+    private bool hasStarted;
+    private bool unfoldRequested;
     private Transform pendingSelectionCard;
     private Transform hoveredCard;
 
@@ -76,12 +78,14 @@ public class CardFan : MonoBehaviour
             cardCount = state.CardIdCount;
         }
 
-        SpawnCards();
+        SpawnFirstCard();
+        hasStarted = true;
 
-        if (unfoldOnStart)
+        if (unfoldRequested)
+        {
+            unfoldRequested = false;
             Unfold();
-        else
-            SnapToFan();
+        }
     }
 
     private void Update()
@@ -109,53 +113,36 @@ public class CardFan : MonoBehaviour
     [ContextMenu("Spawn Cards")]
     public void SpawnCards()
     {
-        ClearSpawnedCards();
-        cardSelected = false;
-        isCardPointerHeld = false;
-        pointerStartedOnPendingCard = false;
-        pendingSelectionCard = null;
-
-        if (cardBackSprite == null)
-        {
-            Debug.LogWarning("CardFan needs a Card Back Sprite before it can spawn cards.", this);
-            return;
-        }
-
-        int count = Mathf.Max(1, cardCount);
-        for (int i = 0; i < count; i++)
-        {
-            GameObject cardObject = new GameObject($"Card {i + 1:00}");
-            cardObject.transform.SetParent(transform, false);
-
-            SpriteRenderer spriteRenderer = cardObject.AddComponent<SpriteRenderer>();
-            spriteRenderer.sprite = cardBackSprite;
-
-            BoxCollider2D cardCollider = cardObject.AddComponent<BoxCollider2D>();
-            cardCollider.size = cardBackSprite.bounds.size;
-
-            Card2D card = cardObject.AddComponent<Card2D>();
-            card.Initialize(this);
-            spawnedCards.Add(cardObject.transform);
-        }
+        ResetSpawnState();
+        SpawnRemainingCards();
     }
 
     [ContextMenu("Unfold")]
     public void Unfold()
     {
-        if (unfoldRoutine != null)
-            StopCoroutine(unfoldRoutine);
+        if (!hasStarted)
+        {
+            unfoldRequested = true;
+            return;
+        }
 
+        if (unfoldRoutine != null || isReadyForSelection)
+            return;
+
+        SpawnRemainingCards();
         unfoldRoutine = StartCoroutine(UnfoldCards());
     }
 
     [ContextMenu("Snap To Fan")]
     public void SnapToFan()
     {
+        SpawnRemainingCards();
         List<Transform> activeCards = GetCards();
         for (int i = 0; i < activeCards.Count; i++)
         {
             ApplyTarget(activeCards[i], i, activeCards.Count);
         }
+        isReadyForSelection = activeCards.Count > 0;
     }
 
     public void FocusCard(Transform selectedCard)
@@ -170,7 +157,7 @@ public class CardFan : MonoBehaviour
 
     public void SelectCard(Transform selectedCard)
     {
-        if (isUnfolding || cardSelected || !spawnedCards.Contains(selectedCard)) return;
+        if (!isReadyForSelection || isUnfolding || cardSelected || !spawnedCards.Contains(selectedCard)) return;
 
         cardSelected = true;
         pendingSelectionCard = null;
@@ -191,7 +178,7 @@ public class CardFan : MonoBehaviour
 
     public void BeginCardPointerHold(Transform card)
     {
-        if (isUnfolding || cardSelected || !spawnedCards.Contains(card)) return;
+        if (!isReadyForSelection || isUnfolding || cardSelected || !spawnedCards.Contains(card)) return;
 
         isCardPointerHeld = true;
         pointerStartedOnPendingCard = card == pendingSelectionCard;
@@ -204,7 +191,7 @@ public class CardFan : MonoBehaviour
 
     public void HoverCard(Transform card)
     {
-        if (!enableHover || isUnfolding || cardSelected || (!isCardPointerHeld && pendingSelectionCard != null) || card == hoveredCard || !spawnedCards.Contains(card)) return;
+        if (!isReadyForSelection || !enableHover || isUnfolding || cardSelected || (!isCardPointerHeld && pendingSelectionCard != null) || card == hoveredCard || !spawnedCards.Contains(card)) return;
 
         hoveredCard = card;
         StartHoverLayoutAnimation();
@@ -399,6 +386,7 @@ public class CardFan : MonoBehaviour
             activeCards[i].localRotation = targetRotations[i];
         }
         isUnfolding = false;
+        isReadyForSelection = true;
         unfoldRoutine = null;
     }
 
@@ -457,6 +445,65 @@ public class CardFan : MonoBehaviour
                 Destroy(spawnedCards[i].gameObject);
         }
         spawnedCards.Clear();
+    }
+
+    private void SpawnFirstCard()
+    {
+        ResetSpawnState();
+        if (!CanSpawnCards())
+            return;
+
+        CreateCard(0);
+        int count = Mathf.Max(1, cardCount);
+        ApplyTarget(spawnedCards[0], 0, count);
+    }
+
+    private void SpawnRemainingCards()
+    {
+        if (!CanSpawnCards())
+            return;
+
+        int count = Mathf.Max(1, cardCount);
+        for (int i = spawnedCards.Count; i < count; i++)
+        {
+            CreateCard(i);
+        }
+    }
+
+    private void ResetSpawnState()
+    {
+        ClearSpawnedCards();
+        cardSelected = false;
+        isCardPointerHeld = false;
+        pointerStartedOnPendingCard = false;
+        isReadyForSelection = false;
+        pendingSelectionCard = null;
+        hoveredCard = null;
+    }
+
+    private bool CanSpawnCards()
+    {
+        if (cardBackSprite != null)
+            return true;
+
+        Debug.LogWarning("CardFan needs a Card Back Sprite before it can spawn cards.", this);
+        return false;
+    }
+
+    private void CreateCard(int index)
+    {
+        GameObject cardObject = new GameObject($"Card {index + 1:00}");
+        cardObject.transform.SetParent(transform, false);
+
+        SpriteRenderer spriteRenderer = cardObject.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = cardBackSprite;
+
+        BoxCollider2D cardCollider = cardObject.AddComponent<BoxCollider2D>();
+        cardCollider.size = cardBackSprite.bounds.size;
+
+        Card2D card = cardObject.AddComponent<Card2D>();
+        card.Initialize(this);
+        spawnedCards.Add(cardObject.transform);
     }
 
     private void ApplyTarget(Transform card, int index, int count)

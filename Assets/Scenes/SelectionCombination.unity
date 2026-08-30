@@ -435,6 +435,7 @@ GameObject:
   - component: {fileID: 330611434}
   - component: {fileID: 330611433}
   - component: {fileID: 330611435}
+  - component: {fileID: 330611436}
   m_Layer: 5
   m_Name: Image_Main_Changing
   m_TagString: Untagged
@@ -569,6 +570,19 @@ MonoBehaviour:
   - {fileID: 2800000, guid: cfcac69046bde7643b05559ab1a14571, type: 3}
   - {fileID: 2800000, guid: 28c120f166cf9614783702e0b7582531, type: 3}
   - {fileID: 2800000, guid: 87d4a29f7d71d64479dbd09bbe467134, type: 3}
+--- !u!114 &330611436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330611431}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f94d2a1cd0be554aa772b42059ae02e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RawImageAlphaRaycastFilter
+  alphaThreshold: 0.1
 --- !u!1 &520631581
 GameObject:
   m_ObjectHideFlags: 0
@@ -711,7 +725,7 @@ PrefabInstance:
     - {fileID: 1093632624771534572, guid: 547916af3529f09478904c1b25f77d21, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 6339290268488235687, guid: 547916af3529f09478904c1b25f77d21, type: 3}
-      insertIndex: -1
+      insertIndex: 0
       addedObject: {fileID: 1635362517}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 547916af3529f09478904c1b25f77d21, type: 3}
@@ -781,6 +795,7 @@ GameObject:
   - component: {fileID: 1852169738}
   - component: {fileID: 1852169740}
   - component: {fileID: 1852169739}
+  - component: {fileID: 1852169741}
   m_Layer: 5
   m_Name: Image_Sub
   m_TagString: Untagged
@@ -842,6 +857,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1852169737}
   m_CullTransparentMesh: 1
+--- !u!114 &1852169741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1852169737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f94d2a1cd0be554aa772b42059ae02e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RawImageAlphaRaycastFilter
+  alphaThreshold: 0.1
 --- !u!1 &1984665817
 GameObject:
   m_ObjectHideFlags: 0
