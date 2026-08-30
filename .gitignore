@@ -33,9 +33,13 @@
 /[Aa]ssets/Plugins/Editor/JetBrains*
 # Jetbrains Rider personal-layer settings
 *.DotSettings.user
+# JetBrains Rider project settings
+.idea/
 
 # Visual Studio cache directory
 .vs/
+# Unity-generated Visual Studio workload configuration
+.vsconfig
 
 # Gradle cache directory
 .gradle/
