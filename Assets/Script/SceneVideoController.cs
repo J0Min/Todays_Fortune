@@ -83,6 +83,17 @@ public sealed class SceneVideoController : MonoBehaviour
 
     public bool IsWaitingForFirstFrame => isWaitingForFirstFrame;
 
+    public static void ApplyMuteStateToLoadedVideos(bool muted)
+    {
+        SceneVideoController[] controllers =
+            FindObjectsByType<SceneVideoController>(FindObjectsInactive.Include);
+
+        for (int i = 0; i < controllers.Length; i++)
+        {
+            controllers[i].ApplyMuteState(muted);
+        }
+    }
+
     private void Awake()
     {
         if (videoPlayer == null)
@@ -611,7 +622,7 @@ public sealed class SceneVideoController : MonoBehaviour
 
         // Preparation does not guarantee that a decoded frame has reached the
         // camera output yet. Keep the video hidden until frameReady confirms it.
-        SetDirectAudioMuted(ShouldHideIncomingVideoUntilHandoff());
+        ApplyMuteState(IsGameAudioMuted());
         videoPlayer.Play();
 
         if (incomingSceneActivationLeadTime > 0f &&
@@ -1045,7 +1056,7 @@ public sealed class SceneVideoController : MonoBehaviour
 
     private void RevealVideoAfterHandoff()
     {
-        SetDirectAudioMuted(false);
+        ApplyMuteState(IsGameAudioMuted());
         if (currentPhase != VideoPhase.Intro || !hasReceivedFirstFrame || videoPlayer == null)
         {
             return;
@@ -1102,6 +1113,16 @@ public sealed class SceneVideoController : MonoBehaviour
         {
             videoPlayer.SetDirectAudioMute(trackIndex, muted);
         }
+    }
+
+    private void ApplyMuteState(bool muted)
+    {
+        SetDirectAudioMuted(muted || ShouldHideIncomingVideoUntilHandoff());
+    }
+
+    private static bool IsGameAudioMuted()
+    {
+        return PlayerFortuneState.Instance != null && PlayerFortuneState.Instance.IsMuted;
     }
 
     private static void SetSceneCamerasEnabled(Scene scene, bool enabled)

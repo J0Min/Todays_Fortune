@@ -113,11 +113,26 @@ public sealed class LoadingEndingController : MonoBehaviour
         }
 
         player.time = 0d;
+        ApplyDirectAudioMute(player);
         float playbackDuration = player.clip != null && player.playbackSpeed > 0f
             ? (float)(player.clip.length / player.playbackSpeed)
             : 0f;
         AmbientAudioManager.Instance?.FadeToBaseVolume(playbackDuration);
         player.Play();
+    }
+
+    private static void ApplyDirectAudioMute(VideoPlayer player)
+    {
+        if (player == null || player.audioOutputMode != VideoAudioOutputMode.Direct)
+        {
+            return;
+        }
+
+        bool muted = PlayerFortuneState.Instance != null && PlayerFortuneState.Instance.IsMuted;
+        for (ushort trackIndex = 0; trackIndex < player.audioTrackCount; trackIndex++)
+        {
+            player.SetDirectAudioMute(trackIndex, muted);
+        }
     }
 
     private void HandleVideoFrameReady(VideoPlayer player, long frameIndex)

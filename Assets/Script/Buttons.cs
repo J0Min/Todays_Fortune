@@ -68,6 +68,7 @@ public sealed class Buttons : MonoBehaviour
         }
 
         AudioListener.volume = state.IsMuted ? 0f : 1f;
+        SceneVideoController.ApplyMuteStateToLoadedVideos(state.IsMuted);
 
         if (soundButtonImage != null)
         {
