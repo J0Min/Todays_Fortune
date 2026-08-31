@@ -428,8 +428,8 @@ MonoBehaviour:
   firstTarget: {fileID: 2017129075}
   firstMoveDuration: 2
   secondTarget: {fileID: 971587977}
-  delayTime: 2
-  secondMoveDuration: 1
+  delayTime: 1
+  secondMoveDuration: 2
   moveEase:
     serializedVersion: 2
     m_Curve:
@@ -456,7 +456,19 @@ MonoBehaviour:
     m_RotationOrder: 4
   onDelayCompleted:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 103688805}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
   onFirstMoveCompleted:
     m_PersistentCalls:
       m_Calls: []
@@ -476,8 +488,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   disappearOnEnable: 1
-  disappearDelayTime: 4
-  disappearDuration: 3
+  disappearDelayTime: 3.5
+  disappearDuration: 1.5
   disappearEase:
     serializedVersion: 2
     m_Curve:
@@ -574,9 +586,7 @@ Transform:
   m_LocalPosition: {x: -10.68, y: 8.23, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2017129075}
-  - {fileID: 971587977}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &392529525 stripped
@@ -727,12 +737,20 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: firstFadeDelay
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: secondFadeDelay
-      value: 0.5
+      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: firstFadeDuration
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: firstFadeOutDelay
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6752613693707543951, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: secondFadeDuration
@@ -800,6 +818,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4925510246268224448, guid: 4d1848e095b97c94e9e1c33d5c1bc891, type: 3}
+      propertyPath: inactivityTimeout
+      value: 2000
+      objectReference: {fileID: 0}
     - target: {fileID: 5653611263484756912, guid: 4d1848e095b97c94e9e1c33d5c1bc891, type: 3}
       propertyPath: m_LocalPosition.x
       value: -7.24847
@@ -873,12 +895,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 971587976}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.19, y: 0.72, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -11.870001, y: 8.95, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 303397481}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!223 &1076468792 stripped
 Canvas:
@@ -1709,12 +1731,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2017129074}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.36, y: -8.35, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -6.49, y: 1.44, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 303397481}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2118569155 stripped
 MonoBehaviour:
@@ -1842,4 +1864,6 @@ SceneRoots:
   - {fileID: 1763643455}
   - {fileID: 209927368}
   - {fileID: 303397481}
+  - {fileID: 2017129075}
+  - {fileID: 971587977}
   - {fileID: 605455164}
