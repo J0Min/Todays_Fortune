@@ -54,6 +54,7 @@ public class CardFan : MonoBehaviour
     private Coroutine unfoldRoutine;
     private Coroutine selectionRoutine;
     private Coroutine hoverRoutine;
+    private Coroutine disableRoutine;
     private readonly List<Transform> spawnedCards = new List<Transform>();
     private bool isUnfolding;
     private bool cardSelected;
@@ -131,6 +132,20 @@ public class CardFan : MonoBehaviour
 
         SpawnRemainingCards();
         unfoldRoutine = StartCoroutine(UnfoldCards());
+    }
+
+    public void DisableAfterDelay(float delay)
+    {
+        if (disableRoutine != null)
+            StopCoroutine(disableRoutine);
+
+        if (delay <= 0f)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
+        disableRoutine = StartCoroutine(DisableAfterDelayRoutine(delay));
     }
 
     [ContextMenu("Snap To Fan")]
@@ -250,6 +265,13 @@ public class CardFan : MonoBehaviour
         selectedCard.localScale = selectedCardScale;
         selectionRoutine = null;
         onCardSelectionFinished?.Invoke();
+    }
+
+    private IEnumerator DisableAfterDelayRoutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        disableRoutine = null;
+        gameObject.SetActive(false);
     }
 
     private void StartHoverLayoutAnimation()

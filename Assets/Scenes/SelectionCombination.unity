@@ -213,6 +213,7 @@ MonoBehaviour:
   objectFadeInDuration: 1
   objectHoldDuration: 2
   objectFadeOutDuration: 1
+  secondBackgroundFinalAlpha: 0.8
   onCombinationFinished:
     m_PersistentCalls:
       m_Calls: []
@@ -422,7 +423,7 @@ MonoBehaviour:
   showObjectAfterOutroVideoSeconds: -1
   videoClips: []
   sceneNameToOpen: LoadingEnding
-  incomingSceneActivationLeadTime: 2
+  incomingSceneActivationLeadTime: 0
 --- !u!1 &330611431
 GameObject:
   m_ObjectHideFlags: 0
@@ -639,6 +640,22 @@ PrefabInstance:
     - target: {fileID: 4808071967332943310, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_Name
       value: Canvas_Overlay
+      objectReference: {fileID: 0}
+    - target: {fileID: 6020125275592991661, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6020125275592991661, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 300002}
+    - target: {fileID: 6020125275592991661, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SkipVideo
+      objectReference: {fileID: 0}
+    - target: {fileID: 6020125275592991661, guid: 547916af3529f09478904c1b25f77d21, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_FloatArgument
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 6339290268488235687, guid: 547916af3529f09478904c1b25f77d21, type: 3}
       propertyPath: m_Pivot.x

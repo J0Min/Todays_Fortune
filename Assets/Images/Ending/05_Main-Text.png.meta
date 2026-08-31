@@ -103,10 +103,10 @@ TextureImporter:
       name: 05_Main-Text_0
       rect:
         serializedVersion: 2
-        x: 618
-        y: 511
-        width: 683
-        height: 205
+        x: 634
+        y: 538
+        width: 647
+        height: 150
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

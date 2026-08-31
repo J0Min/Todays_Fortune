@@ -1,29 +1,44 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
-/// Moves this object to a target position whenever it becomes active.
+/// Moves this object through two target positions whenever it becomes active.
 /// </summary>
 public sealed class MoveToTargetOnEnable : MonoBehaviour
 {
-    [Header("Target")]
-    [SerializeField] private Transform target;
+    [Header("First Movement")]
+    [Tooltip("The first position to move to immediately after this object is enabled.")]
+    [FormerlySerializedAs("target")]
+    [SerializeField] private Transform firstTarget;
+    [Tooltip("Movement duration to the first target.")]
+    [FormerlySerializedAs("moveDuration")]
+    [SerializeField, Min(0f)] private float firstMoveDuration = 1f;
 
-    [Header("Timing")]
+    [Header("Second Movement")]
+    [Tooltip("The second position to move to after waiting at the first target.")]
+    [SerializeField] private Transform secondTarget;
+    [Tooltip("How long to wait at the first target before moving to the second target.")]
     [SerializeField, Min(0f)] private float delayTime;
-    [SerializeField, Min(0f)] private float moveDuration = 1f;
+    [Tooltip("Movement duration to the second target.")]
+    [SerializeField, Min(0f)] private float secondMoveDuration = 1f;
 
     [Header("Easing")]
     [SerializeField] private AnimationCurve moveEase =
         AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
     [Header("Delayed Event")]
-    [Tooltip("Invoked once when Delay Time has elapsed, immediately before movement begins.")]
+    [Tooltip("Invoked once when Delay Time has elapsed, immediately before moving to the second target.")]
     [SerializeField] private UnityEvent onDelayCompleted;
-    [Tooltip("Invoked once after this object reaches the cached target position.")]
-    [SerializeField] private UnityEvent onMoveCompleted;
+
+    [Header("Movement Events")]
+    [Tooltip("Invoked once after this object reaches the first target.")]
+    [SerializeField] private UnityEvent onFirstMoveCompleted;
+    [Tooltip("Invoked once after this object reaches the second target.")]
+    [FormerlySerializedAs("onMoveCompleted")]
+    [SerializeField] private UnityEvent onSecondMoveCompleted;
 
     [Header("Disappear (Optional)")]
     [SerializeField] private bool disappearOnEnable;
@@ -34,8 +49,10 @@ public sealed class MoveToTargetOnEnable : MonoBehaviour
 
     private Coroutine moveRoutine;
     private Coroutine disappearRoutine;
-    private Vector3 destinationPosition;
-    private bool hasDestination;
+    private Vector3 firstDestinationPosition;
+    private Vector3 secondDestinationPosition;
+    private bool hasFirstDestination;
+    private bool hasSecondDestination;
     private CanvasGroup canvasGroup;
     private Graphic[] graphics;
     private SpriteRenderer[] spriteRenderers;
@@ -50,15 +67,26 @@ public sealed class MoveToTargetOnEnable : MonoBehaviour
 
     private void OnEnable()
     {
-        hasDestination = target != null;
-        if (!hasDestination)
+        hasFirstDestination = firstTarget != null;
+        hasSecondDestination = secondTarget != null;
+
+        if (!hasFirstDestination)
         {
-            Debug.LogWarning("[MoveToTargetOnEnable] Target is not assigned.", this);
+            Debug.LogWarning("[MoveToTargetOnEnable] First Target is not assigned.", this);
         }
         else
         {
             // Cache once because a child target moves together with this object.
-            destinationPosition = target.position;
+            firstDestinationPosition = firstTarget.position;
+        }
+
+        if (!hasSecondDestination)
+        {
+            Debug.LogWarning("[MoveToTargetOnEnable] Second Target is not assigned.", this);
+        }
+        else
+        {
+            secondDestinationPosition = secondTarget.position;
         }
 
         moveRoutine = StartCoroutine(MoveToTarget());
@@ -87,6 +115,12 @@ public sealed class MoveToTargetOnEnable : MonoBehaviour
 
     private IEnumerator MoveToTarget()
     {
+        if (hasFirstDestination)
+        {
+            yield return MoveToPosition(firstDestinationPosition, firstMoveDuration);
+            onFirstMoveCompleted?.Invoke();
+        }
+
         if (delayTime > 0f)
         {
             yield return new WaitForSeconds(delayTime);
@@ -94,42 +128,46 @@ public sealed class MoveToTargetOnEnable : MonoBehaviour
 
         onDelayCompleted?.Invoke();
 
-        if (!hasDestination)
+        if (!hasSecondDestination)
         {
             moveRoutine = null;
             yield break;
         }
 
+        yield return MoveToPosition(secondDestinationPosition, secondMoveDuration);
+
+        onSecondMoveCompleted?.Invoke();
+        moveRoutine = null;
+    }
+
+    private IEnumerator MoveToPosition(Vector3 destination, float duration)
+    {
         Vector3 startPosition = transform.position;
 
-        if (moveDuration <= 0f)
+        if (duration <= 0f)
         {
-            transform.position = destinationPosition;
-            onMoveCompleted?.Invoke();
-            moveRoutine = null;
+            transform.position = destination;
             yield break;
         }
 
         float elapsed = 0f;
-        while (elapsed < moveDuration)
+        while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float normalizedTime = Mathf.Clamp01(elapsed / moveDuration);
+            float normalizedTime = Mathf.Clamp01(elapsed / duration);
             float easedTime = moveEase != null
                 ? moveEase.Evaluate(normalizedTime)
                 : normalizedTime;
 
             transform.position = Vector3.LerpUnclamped(
                 startPosition,
-                destinationPosition,
+                destination,
                 easedTime);
 
             yield return null;
         }
 
-        transform.position = destinationPosition;
-        onMoveCompleted?.Invoke();
-        moveRoutine = null;
+        transform.position = destination;
     }
 
     private IEnumerator Disappear()

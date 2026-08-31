@@ -73,6 +73,9 @@ public sealed class SelectionCombinationController : MonoBehaviour
     [SerializeField] private float objectHoldDuration = 2f;
     [Min(0f)]
     [SerializeField] private float objectFadeOutDuration = 1f;
+    [Range(0f, 1f)]
+    [Tooltip("Final alpha of the second background after the After Combination fade-out.")]
+    [SerializeField] private float secondBackgroundFinalAlpha = 0.5f;
     [SerializeField] private UnityEvent onCombinationFinished;
 
     [Header("Scene Transition")]
@@ -295,17 +298,33 @@ public sealed class SelectionCombinationController : MonoBehaviour
         sceneVideoController?.PreActivateNextSceneWithoutVideo();
 
         elapsed = 0f;
+        float secondBackgroundStartAlpha = secondBackgroundImage != null
+            ? secondBackgroundImage.color.a
+            : 1f;
         while (elapsed < objectFadeOutDuration)
         {
             elapsed += Time.deltaTime;
-            objectToShowCanvasGroup.alpha = 1f - Mathf.SmoothStep(
+            float fadeProgress = Mathf.SmoothStep(
                 0f,
                 1f,
                 Mathf.Clamp01(elapsed / Mathf.Max(0.01f, objectFadeOutDuration)));
+            objectToShowCanvasGroup.alpha = 1f - fadeProgress;
+
+            if (secondBackgroundImage != null)
+            {
+                SetImageAlpha(
+                    secondBackgroundImage,
+                    Mathf.Lerp(secondBackgroundStartAlpha, secondBackgroundFinalAlpha, fadeProgress));
+            }
+
             yield return null;
         }
 
         objectToShowCanvasGroup.alpha = 0f;
+        if (secondBackgroundImage != null)
+        {
+            SetImageAlpha(secondBackgroundImage, secondBackgroundFinalAlpha);
+        }
         ContinueToNextScene();
     }
 
