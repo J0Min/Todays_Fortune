@@ -36,12 +36,17 @@ public sealed class InactivityTimerWarningPopup : MonoBehaviour
     {
         int imageIndex = inactivityTimer.WarningSeconds - remainingSeconds;
         bool shouldShowPopup = imageIndex >= 0 && imageIndex < countdownTextures.Length;
+        bool wasPopupVisible = warningPopup.activeSelf;
 
         warningPopup.SetActive(shouldShowPopup);
 
         if (shouldShowPopup)
         {
             countdownImage.texture = countdownTextures[imageIndex];
+            if (!wasPopupVisible)
+            {
+                SfxAudioManager.Instance?.PlayPopup();
+            }
         }
     }
 
