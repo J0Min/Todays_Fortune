@@ -4,8 +4,8 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public sealed class AmbientAudioManager : MonoBehaviour
 {
-    private const float ContentVolumeRatio = 0.5f;
-    private const float SelectionFadeTargetRatio = 0.75f;
+    private const float ContentVolumeRatio = 0.4f;
+    private const float SelectionFadeTargetRatio = 1f;
 
     [SerializeField, Min(0.01f)] private float loopCrossfadeDuration = 0.08f;
 
@@ -62,7 +62,8 @@ public sealed class AmbientAudioManager : MonoBehaviour
         UpdateLoopCrossfade();
     }
 
-    public void SetContentVolumeImmediately() => SetVolumeRatioImmediately(ContentVolumeRatio);
+    public void FadeToContentVolume(float duration) =>
+        FadeToVolumeRatio(ContentVolumeRatio, duration);
 
     public void RestoreBaseVolumeImmediately() => SetVolumeRatioImmediately(1f);
 

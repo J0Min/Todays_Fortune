@@ -27,6 +27,9 @@ public sealed class TitleExitAnimation : MonoBehaviour
     private bool isPlaying;
     private bool isLogoDissolveComplete;
     public bool IsPlaying => isPlaying;
+    public float TitleFullyHiddenDuration => logoDissolve != null
+        ? logoDissolve.FullyDissolvedDuration
+        : exitDuration;
 
     public void Play(Action onCompleted)
     {

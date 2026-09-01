@@ -110,10 +110,6 @@ public sealed class LoadingEndingController : MonoBehaviour
         }
 
         player.time = 0d;
-        float playbackDuration = player.clip != null && player.playbackSpeed > 0f
-            ? (float)(player.clip.length / player.playbackSpeed)
-            : 0f;
-        AmbientAudioManager.Instance?.FadeToBaseVolume(playbackDuration);
         player.Play();
     }
 
@@ -169,7 +165,6 @@ public sealed class LoadingEndingController : MonoBehaviour
         }
 
         hasStartedEnding = true;
-        AmbientAudioManager.Instance?.RestoreBaseVolumeImmediately();
         hasFinishedLoadingVideo = true;
         if (loadingVideoImage != null)
         {

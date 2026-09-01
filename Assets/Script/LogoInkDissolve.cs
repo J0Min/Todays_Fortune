@@ -30,6 +30,33 @@ public sealed class LogoInkDissolve : MonoBehaviour
     private bool isPlaying;
 
     public bool IsPlaying => isPlaying;
+    public float FullyDissolvedDuration
+    {
+        get
+        {
+            float fullyDissolvedThreshold = MaximumNoiseValue + edgeFeather;
+            float thresholdDistance = thresholdRange.y - thresholdRange.x;
+            if (dissolveDuration <= 0f || Mathf.Approximately(thresholdDistance, 0f))
+            {
+                return 0f;
+            }
+
+            float targetProgress = Mathf.Clamp01(
+                (fullyDissolvedThreshold - thresholdRange.x) / thresholdDistance);
+            float lower = 0f;
+            float upper = 1f;
+            for (int i = 0; i < 20; i++)
+            {
+                float middle = (lower + upper) * 0.5f;
+                if (dissolveProgress.Evaluate(middle) < targetProgress)
+                    lower = middle;
+                else
+                    upper = middle;
+            }
+
+            return upper * dissolveDuration;
+        }
+    }
 
     private void Awake()
     {
