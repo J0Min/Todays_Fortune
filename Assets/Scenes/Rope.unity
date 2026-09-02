@@ -1036,8 +1036,8 @@ MonoBehaviour:
   initialInstructionUi: {fileID: 2890919350}
   initialInstructionBlankUi: {fileID: 6014762868}
   selectionZoneCollider: {fileID: 1585384102}
-  pullGaugeBackgroundSprite: {fileID: 2922060322078339858, guid: 7c3ae1896eb52be45bb2f5c44d1d75dc, type: 3}
-  pullGaugeFillSprite: {fileID: 7931230623825102730, guid: dfb4c7e49203d174796aceb341106ec5, type: 3}
+  pullGaugeBackgroundSprite: {fileID: -7568402507323798090, guid: 134b748779c253d418dd15c82a88325a, type: 3}
+  pullGaugeFillSprite: {fileID: 21300000, guid: e8b2ae68f26c48849b79fd7c8f003998, type: 3}
   pullGaugeSize: {x: 1299, y: 82}
   pullGaugeAnchoredPosition: {x: 0, y: 110}
   failedReturnDuration: 2.2

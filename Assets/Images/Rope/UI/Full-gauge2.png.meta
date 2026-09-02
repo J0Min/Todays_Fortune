@@ -1,0 +1,1495 @@
+fileFormatVersion: 2
+guid: e8b2ae68f26c48849b79fd7c8f003998
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 562930634851695842
+    second: Full-gauge2_0
+  - first:
+      213: -8042201426820216168
+    second: Full-gauge2_1
+  - first:
+      213: -5700272781212508634
+    second: Full-gauge2_2
+  - first:
+      213: -4629574132248930917
+    second: Full-gauge2_3
+  - first:
+      213: 8321775921170750242
+    second: Full-gauge2_4
+  - first:
+      213: 6242289734014216681
+    second: Full-gauge2_5
+  - first:
+      213: -1216546376713946039
+    second: Full-gauge2_6
+  - first:
+      213: 3354631230363608287
+    second: Full-gauge2_7
+  - first:
+      213: -3183619843317312928
+    second: Full-gauge2_8
+  - first:
+      213: -1014511739422664594
+    second: Full-gauge2_9
+  - first:
+      213: -2602417055796737203
+    second: Full-gauge2_10
+  - first:
+      213: -4796539303390728658
+    second: Full-gauge2_11
+  - first:
+      213: -6161401895831107349
+    second: Full-gauge2_12
+  - first:
+      213: 6431418587475392991
+    second: Full-gauge2_13
+  - first:
+      213: -464328049502342724
+    second: Full-gauge2_14
+  - first:
+      213: 3406822492384708071
+    second: Full-gauge2_15
+  - first:
+      213: -4123736748407072209
+    second: Full-gauge2_16
+  - first:
+      213: 7197523850879546885
+    second: Full-gauge2_17
+  - first:
+      213: -513629426699209868
+    second: Full-gauge2_18
+  - first:
+      213: -2281522020751068476
+    second: Full-gauge2_19
+  - first:
+      213: 3237523583105558439
+    second: Full-gauge2_20
+  - first:
+      213: 189784494339589565
+    second: Full-gauge2_21
+  - first:
+      213: 4794048412560227131
+    second: Full-gauge2_22
+  - first:
+      213: -2128552553404393934
+    second: Full-gauge2_23
+  - first:
+      213: 3258804902611850171
+    second: Full-gauge2_24
+  - first:
+      213: 6852065991888543083
+    second: Full-gauge2_25
+  - first:
+      213: -3707717372728346768
+    second: Full-gauge2_26
+  - first:
+      213: -1953561936829429017
+    second: Full-gauge2_27
+  - first:
+      213: 1051795460694884682
+    second: Full-gauge2_28
+  - first:
+      213: -2013275608127443057
+    second: Full-gauge2_29
+  - first:
+      213: -1050018639754697668
+    second: Full-gauge2_30
+  - first:
+      213: -6175116820509651927
+    second: Full-gauge2_31
+  - first:
+      213: 8860661809489576736
+    second: Full-gauge2_32
+  - first:
+      213: -656547038416395307
+    second: Full-gauge2_33
+  - first:
+      213: -4076035337170436987
+    second: Full-gauge2_34
+  - first:
+      213: -6348950924223287293
+    second: Full-gauge2_35
+  - first:
+      213: 8758147758220750317
+    second: Full-gauge2_36
+  - first:
+      213: -30225055924353493
+    second: Full-gauge2_37
+  - first:
+      213: 8731637669143737836
+    second: Full-gauge2_38
+  - first:
+      213: -2042986080746268472
+    second: Full-gauge2_39
+  - first:
+      213: 4665991832575091497
+    second: Full-gauge2_40
+  - first:
+      213: -3577009867297930708
+    second: Full-gauge2_41
+  - first:
+      213: 4559103558866918015
+    second: Full-gauge2_42
+  - first:
+      213: 3948626149471438287
+    second: Full-gauge2_43
+  - first:
+      213: 8241677420745794630
+    second: Full-gauge2_44
+  - first:
+      213: 5622831149145390047
+    second: Full-gauge2_45
+  - first:
+      213: -1534477286982529029
+    second: Full-gauge2_46
+  - first:
+      213: -3159014453521976654
+    second: Full-gauge2_47
+  - first:
+      213: 1271552076879103346
+    second: Full-gauge2_48
+  - first:
+      213: -4012217115523171068
+    second: Full-gauge2_49
+  - first:
+      213: -7174506433822930743
+    second: Full-gauge2_50
+  - first:
+      213: 295427939247651179
+    second: Full-gauge2_51
+  - first:
+      213: 2206595520947648947
+    second: Full-gauge2_52
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Full-gauge2_0
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 56
+        width: 67
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ec358b0e6eefc700800000000000000
+      internalID: 562930634851695842
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_1
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89acd36696c546090800000000000000
+      internalID: -8042201426820216168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_2
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62e10095b1094e0b0800000000000000
+      internalID: -5700272781212508634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_3
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 56
+        width: 35
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b9517f1fad270cfb0800000000000000
+      internalID: -4629574132248930917
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_4
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 56
+        width: 35
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22b18c11c13ec7370800000000000000
+      internalID: 8321775921170750242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_5
+      rect:
+        serializedVersion: 2
+        x: 190
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e92cf4a07111a650800000000000000
+      internalID: 6242289734014216681
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_6
+      rect:
+        serializedVersion: 2
+        x: 211
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 94c3d231485fd1fe0800000000000000
+      internalID: -1216546376713946039
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_7
+      rect:
+        serializedVersion: 2
+        x: 232
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd42146945b0e8e20800000000000000
+      internalID: 3354631230363608287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_8
+      rect:
+        serializedVersion: 2
+        x: 253
+        y: 56
+        width: 35
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 062df2bbe9281d3d0800000000000000
+      internalID: -3183619843317312928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_9
+      rect:
+        serializedVersion: 2
+        x: 273
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e689f37b2fabbe1f0800000000000000
+      internalID: -1014511739422664594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_10
+      rect:
+        serializedVersion: 2
+        x: 294
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4b41d7d97b52ebd0800000000000000
+      internalID: -2602417055796737203
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_11
+      rect:
+        serializedVersion: 2
+        x: 315
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e2e223eaae44f6db0800000000000000
+      internalID: -4796539303390728658
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_12
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be88198ce9d4e7aa0800000000000000
+      internalID: -6161401895831107349
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_13
+      rect:
+        serializedVersion: 2
+        x: 357
+        y: 56
+        width: 35
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd9b054512df04950800000000000000
+      internalID: 6431418587475392991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_14
+      rect:
+        serializedVersion: 2
+        x: 377
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb1b92e59106e89f0800000000000000
+      internalID: -464328049502342724
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_15
+      rect:
+        serializedVersion: 2
+        x: 398
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e5c667b107774f20800000000000000
+      internalID: 3406822492384708071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_16
+      rect:
+        serializedVersion: 2
+        x: 419
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2ad8fb964b85c6c0800000000000000
+      internalID: -4123736748407072209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_17
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 506b31aeecdb2e360800000000000000
+      internalID: 7197523850879546885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_18
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 56
+        width: 35
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 473f76bf1c83fd8f0800000000000000
+      internalID: -513629426699209868
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_19
+      rect:
+        serializedVersion: 2
+        x: 481
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c2b6e56fc76650e0800000000000000
+      internalID: -2281522020751068476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_20
+      rect:
+        serializedVersion: 2
+        x: 502
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a7e4f2bb8efdec20800000000000000
+      internalID: 3237523583105558439
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_21
+      rect:
+        serializedVersion: 2
+        x: 523
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db50df8fdff32a200800000000000000
+      internalID: 189784494339589565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_22
+      rect:
+        serializedVersion: 2
+        x: 544
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3b7daa91a1e78240800000000000000
+      internalID: 4794048412560227131
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_23
+      rect:
+        serializedVersion: 2
+        x: 565
+        y: 56
+        width: 35
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2369490fabcd572e0800000000000000
+      internalID: -2128552553404393934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_24
+      rect:
+        serializedVersion: 2
+        x: 585
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb31b740bc9993d20800000000000000
+      internalID: 3258804902611850171
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_25
+      rect:
+        serializedVersion: 2
+        x: 606
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6d1d0047bd671f50800000000000000
+      internalID: 6852065991888543083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_26
+      rect:
+        serializedVersion: 2
+        x: 627
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0777bfe91ba8b8cc0800000000000000
+      internalID: -3707717372728346768
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_27
+      rect:
+        serializedVersion: 2
+        x: 648
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7eace84d4cd83e4e0800000000000000
+      internalID: -1953561936829429017
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_28
+      rect:
+        serializedVersion: 2
+        x: 669
+        y: 56
+        width: 35
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a41461b166ab89e00800000000000000
+      internalID: 1051795460694884682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_29
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8fea9e40886f04e0800000000000000
+      internalID: -2013275608127443057
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_30
+      rect:
+        serializedVersion: 2
+        x: 710
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c34e1e14c959d61f0800000000000000
+      internalID: -1050018639754697668
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_31
+      rect:
+        serializedVersion: 2
+        x: 731
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92c8bfa08f39d4aa0800000000000000
+      internalID: -6175116820509651927
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_32
+      rect:
+        serializedVersion: 2
+        x: 752
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0230f7d48f467fa70800000000000000
+      internalID: 8860661809489576736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_33
+      rect:
+        serializedVersion: 2
+        x: 773
+        y: 56
+        width: 35
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d32bd472f973e6f0800000000000000
+      internalID: -656547038416395307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_34
+      rect:
+        serializedVersion: 2
+        x: 793
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58c3404e4730f67c0800000000000000
+      internalID: -4076035337170436987
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_35
+      rect:
+        serializedVersion: 2
+        x: 814
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3007849c5cef3e7a0800000000000000
+      internalID: -6348950924223287293
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_36
+      rect:
+        serializedVersion: 2
+        x: 835
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: deda123cbf03b8970800000000000000
+      internalID: 8758147758220750317
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_37
+      rect:
+        serializedVersion: 2
+        x: 856
+        y: 56
+        width: 35
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b260056c87e949ff0800000000000000
+      internalID: -30225055924353493
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_38
+      rect:
+        serializedVersion: 2
+        x: 877
+        y: 56
+        width: 35
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce57bb8a2320d2970800000000000000
+      internalID: 8731637669143737836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_39
+      rect:
+        serializedVersion: 2
+        x: 897
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c81d08dbfad5a3e0800000000000000
+      internalID: -2042986080746268472
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_40
+      rect:
+        serializedVersion: 2
+        x: 918
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9232389a9dee0c040800000000000000
+      internalID: 4665991832575091497
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_41
+      rect:
+        serializedVersion: 2
+        x: 939
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c22c3ad3a78eb5ec0800000000000000
+      internalID: -3577009867297930708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_42
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 56
+        width: 35
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7a5b781880354f30800000000000000
+      internalID: 4559103558866918015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_43
+      rect:
+        serializedVersion: 2
+        x: 981
+        y: 56
+        width: 35
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc5401eef865cc630800000000000000
+      internalID: 3948626149471438287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_44
+      rect:
+        serializedVersion: 2
+        x: 1001
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64429e8a2f1506270800000000000000
+      internalID: 8241677420745794630
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_45
+      rect:
+        serializedVersion: 2
+        x: 1022
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fdbffcc932f480e40800000000000000
+      internalID: 5622831149145390047
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_46
+      rect:
+        serializedVersion: 2
+        x: 1043
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bff4089990174bae0800000000000000
+      internalID: -1534477286982529029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_47
+      rect:
+        serializedVersion: 2
+        x: 1064
+        y: 56
+        width: 35
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b27f79771de824d0800000000000000
+      internalID: -3159014453521976654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_48
+      rect:
+        serializedVersion: 2
+        x: 1085
+        y: 56
+        width: 35
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2750acf70e575a110800000000000000
+      internalID: 1271552076879103346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_49
+      rect:
+        serializedVersion: 2
+        x: 1105
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40dbf738acdb158c0800000000000000
+      internalID: -4012217115523171068
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_50
+      rect:
+        serializedVersion: 2
+        x: 1126
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c8ca3d19680f6c90800000000000000
+      internalID: -7174506433822930743
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_51
+      rect:
+        serializedVersion: 2
+        x: 1147
+        y: 56
+        width: 36
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b69f49f3522991400800000000000000
+      internalID: 295427939247651179
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Full-gauge2_52
+      rect:
+        serializedVersion: 2
+        x: 1168
+        y: 56
+        width: 76
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3b97d0d6fe66f9e10800000000000000
+      internalID: 2206595520947648947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Full-gauge2_0: 562930634851695842
+      Full-gauge2_1: -8042201426820216168
+      Full-gauge2_10: -2602417055796737203
+      Full-gauge2_11: -4796539303390728658
+      Full-gauge2_12: -6161401895831107349
+      Full-gauge2_13: 6431418587475392991
+      Full-gauge2_14: -464328049502342724
+      Full-gauge2_15: 3406822492384708071
+      Full-gauge2_16: -4123736748407072209
+      Full-gauge2_17: 7197523850879546885
+      Full-gauge2_18: -513629426699209868
+      Full-gauge2_19: -2281522020751068476
+      Full-gauge2_2: -5700272781212508634
+      Full-gauge2_20: 3237523583105558439
+      Full-gauge2_21: 189784494339589565
+      Full-gauge2_22: 4794048412560227131
+      Full-gauge2_23: -2128552553404393934
+      Full-gauge2_24: 3258804902611850171
+      Full-gauge2_25: 6852065991888543083
+      Full-gauge2_26: -3707717372728346768
+      Full-gauge2_27: -1953561936829429017
+      Full-gauge2_28: 1051795460694884682
+      Full-gauge2_29: -2013275608127443057
+      Full-gauge2_3: -4629574132248930917
+      Full-gauge2_30: -1050018639754697668
+      Full-gauge2_31: -6175116820509651927
+      Full-gauge2_32: 8860661809489576736
+      Full-gauge2_33: -656547038416395307
+      Full-gauge2_34: -4076035337170436987
+      Full-gauge2_35: -6348950924223287293
+      Full-gauge2_36: 8758147758220750317
+      Full-gauge2_37: -30225055924353493
+      Full-gauge2_38: 8731637669143737836
+      Full-gauge2_39: -2042986080746268472
+      Full-gauge2_4: 8321775921170750242
+      Full-gauge2_40: 4665991832575091497
+      Full-gauge2_41: -3577009867297930708
+      Full-gauge2_42: 4559103558866918015
+      Full-gauge2_43: 3948626149471438287
+      Full-gauge2_44: 8241677420745794630
+      Full-gauge2_45: 5622831149145390047
+      Full-gauge2_46: -1534477286982529029
+      Full-gauge2_47: -3159014453521976654
+      Full-gauge2_48: 1271552076879103346
+      Full-gauge2_49: -4012217115523171068
+      Full-gauge2_5: 6242289734014216681
+      Full-gauge2_50: -7174506433822930743
+      Full-gauge2_51: 295427939247651179
+      Full-gauge2_52: 2206595520947648947
+      Full-gauge2_6: -1216546376713946039
+      Full-gauge2_7: 3354631230363608287
+      Full-gauge2_8: -3183619843317312928
+      Full-gauge2_9: -1014511739422664594
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
