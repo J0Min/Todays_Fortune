@@ -1,11 +1,15 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
 
 [DisallowMultipleComponent]
+[DefaultExecutionOrder(-10000)]
 public sealed class SfxAudioManager : MonoBehaviour
 {
     [Header("Clips")]
@@ -22,6 +26,16 @@ public sealed class SfxAudioManager : MonoBehaviour
 
     private AudioSource audioSource;
     private AudioSource popupAudioSource;
+    private readonly Dictionary<Button, ButtonSoundBinding> buttonBindings = new();
+    private readonly List<Button> removedButtons = new();
+    private Selectable[] selectables = new Selectable[32];
+    private bool countdownPressHandled;
+
+    private sealed class ButtonSoundBinding
+    {
+        public Button.ButtonClickedEvent ClickEvent;
+        public UnityAction Listener;
+    }
 
     private void Awake()
     {
@@ -43,15 +57,129 @@ public sealed class SfxAudioManager : MonoBehaviour
         popupAudioSource.playOnAwake = false;
         popupAudioSource.loop = false;
         popupAudioSource.spatialBlend = 0f;
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.sceneUnloaded += OnSceneUnloaded;
+        foreach (Button button in FindObjectsByType<Button>(FindObjectsInactive.Include))
+        {
+            RegisterButton(button);
+        }
     }
 
     private void Update()
     {
+        // Selectable keeps an allocation-free list of enabled UI, including runtime creations.
+        if (selectables.Length < Selectable.allSelectableCount)
+        {
+            Array.Resize(ref selectables, Mathf.NextPowerOfTwo(Selectable.allSelectableCount));
+        }
+        int count = Selectable.AllSelectablesNoAlloc(selectables);
+        for (int i = 0; i < count; i++)
+        {
+            if (selectables[i] is Button button)
+            {
+                RegisterButton(button);
+            }
+            selectables[i] = null;
+        }
+        if (Time.frameCount % 60 == 0)
+        {
+            RemoveDestroyedButtonBindings();
+        }
+
         if (IsTouchFeedbackEnabledForActiveScene() && TryGetPrimaryPressPosition(out Vector2 screenPosition))
         {
-            PlayOneShot(buttonPressClip);
             PrimaryPressed?.Invoke(screenPosition);
         }
+    }
+
+    private void LateUpdate()
+    {
+        // Keep suppression through EventSystem's release/click processing. A countdown
+        // touch can hide the overlay before that same input reaches an underlying button.
+        if (!IsPrimaryPressHeld())
+        {
+            countdownPressHandled = false;
+        }
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        foreach (GameObject root in scene.GetRootGameObjects())
+        {
+            foreach (Button button in root.GetComponentsInChildren<Button>(true))
+            {
+                RegisterButton(button);
+            }
+        }
+    }
+
+    private void OnSceneUnloaded(Scene scene)
+    {
+        RemoveDestroyedButtonBindings();
+    }
+
+    private void RemoveDestroyedButtonBindings()
+    {
+        removedButtons.Clear();
+        foreach (var pair in buttonBindings)
+        {
+            if (pair.Key == null)
+            {
+                pair.Value.ClickEvent.RemoveListener(pair.Value.Listener);
+                removedButtons.Add(pair.Key);
+            }
+        }
+        foreach (Button button in removedButtons)
+        {
+            buttonBindings.Remove(button);
+        }
+        removedButtons.Clear();
+    }
+
+    public void RegisterButton(Button button)
+    {
+        if (button == null)
+        {
+            return;
+        }
+        if (buttonBindings.TryGetValue(button, out ButtonSoundBinding previous))
+        {
+            if (ReferenceEquals(previous.ClickEvent, button.onClick))
+            {
+                return;
+            }
+            previous.ClickEvent.RemoveListener(previous.Listener);
+        }
+
+        Button.ButtonClickedEvent clickEvent = button.onClick;
+        UnityAction listener = () =>
+        {
+            // ToggleMute owns its sound order. Check the original Inspector callbacks,
+            // so the generic listener never plays a second sound after unmuting.
+            for (int i = 0; i < clickEvent.GetPersistentEventCount(); i++)
+            {
+                if (clickEvent.GetPersistentTarget(i) is Buttons &&
+                    clickEvent.GetPersistentMethodName(i) == nameof(Buttons.ToggleMute) &&
+                    clickEvent.GetPersistentListenerState(i) != UnityEventCallState.Off)
+                {
+                    return;
+                }
+            }
+            PlayButtonPress();
+        };
+        clickEvent.AddListener(listener);
+        buttonBindings[button] = new ButtonSoundBinding { ClickEvent = clickEvent, Listener = listener };
+    }
+
+    public void PlayCountdownPopupPress()
+    {
+        if (countdownPressHandled)
+        {
+            return;
+        }
+        PlayButtonPress();
+        countdownPressHandled = true;
     }
 
     public void PlayPopup()
@@ -67,12 +195,18 @@ public sealed class SfxAudioManager : MonoBehaviour
         popupAudioSource.Play();
     }
 
-    private void PlayOneShot(AudioClip clip)
+    public void PlayButtonPress(bool finishWhenMuted = false)
     {
-        if (audioSource != null && clip != null)
+        if (countdownPressHandled || audioSource == null || buttonPressClip == null ||
+            (PlayerFortuneState.Instance != null && PlayerFortuneState.Instance.IsMuted))
         {
-            audioSource.PlayOneShot(clip);
+            return;
         }
+
+        // Only the click that enables mute may finish after listener volume becomes zero.
+        // New clicks while muted are rejected above; popup/ambient sources remain unchanged.
+        audioSource.ignoreListenerVolume = finishWhenMuted;
+        audioSource.PlayOneShot(buttonPressClip);
     }
 
     private bool IsTouchFeedbackEnabledForActiveScene()
@@ -122,10 +256,27 @@ public sealed class SfxAudioManager : MonoBehaviour
         return false;
     }
 
+    private static bool IsPrimaryPressHeld()
+    {
+#if ENABLE_INPUT_SYSTEM
+        return (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed) ||
+               (Mouse.current != null && Mouse.current.leftButton.isPressed);
+#else
+        return Input.touchCount > 0 || Input.GetMouseButton(0);
+#endif
+    }
+
     private void OnDestroy()
     {
         if (Instance == this)
         {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
+            foreach (ButtonSoundBinding binding in buttonBindings.Values)
+            {
+                binding.ClickEvent.RemoveListener(binding.Listener);
+            }
+            buttonBindings.Clear();
             Instance = null;
         }
     }

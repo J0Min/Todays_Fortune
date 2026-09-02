@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public sealed class InactivityTimerWarningPopup : MonoBehaviour
@@ -8,9 +10,11 @@ public sealed class InactivityTimerWarningPopup : MonoBehaviour
     [SerializeField] private Texture[] countdownTextures;
 
     private InactivityTimer inactivityTimer;
+    private readonly List<RaycastResult> touchHits = new();
 
     private void OnEnable()
     {
+        SfxAudioManager.PrimaryPressed += OnPrimaryPressed;
         inactivityTimer = FindAnyObjectByType<InactivityTimer>();
 
         if (inactivityTimer == null)
@@ -25,11 +29,35 @@ public sealed class InactivityTimerWarningPopup : MonoBehaviour
 
     private void OnDisable()
     {
+        SfxAudioManager.PrimaryPressed -= OnPrimaryPressed;
         if (inactivityTimer != null)
         {
             inactivityTimer.WarningSecondChanged -= RefreshPopup;
             inactivityTimer.TimerReset -= HidePopup;
         }
+    }
+
+    private void OnPrimaryPressed(Vector2 screenPosition)
+    {
+        if (warningPopup == null || !warningPopup.activeInHierarchy || EventSystem.current == null)
+        {
+            return;
+        }
+
+        var pointer = new PointerEventData(EventSystem.current) { position = screenPosition };
+        touchHits.Clear();
+        EventSystem.current.RaycastAll(pointer, touchHits);
+        if (touchHits.Count == 0)
+        {
+            return;
+        }
+
+        Transform hit = touchHits[0].gameObject.transform;
+        if (hit.IsChildOf(warningPopup.transform) && hit.GetComponentInParent<Button>() == null)
+        {
+            SfxAudioManager.Instance?.PlayCountdownPopupPress();
+        }
+        touchHits.Clear();
     }
 
     private void RefreshPopup(int remainingSeconds)

@@ -50,8 +50,18 @@ public sealed class Buttons : MonoBehaviour
             return;
         }
 
-        state.SetMuted(!state.IsMuted);
-        ApplyMuteState();
+        if (state.IsMuted)
+        {
+            state.SetMuted(false);
+            ApplyMuteState();
+            SfxAudioManager.Instance?.PlayButtonPress();
+        }
+        else
+        {
+            SfxAudioManager.Instance?.PlayButtonPress(finishWhenMuted: true);
+            state.SetMuted(true);
+            ApplyMuteState();
+        }
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)

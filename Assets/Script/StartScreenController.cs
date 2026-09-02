@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
@@ -31,6 +32,7 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
     private bool hasLoggedWaitingForRelease;
     private bool hasObservedReturnInputRelease;
     private Coroutine canvasFadeRoutine;
+    private readonly List<RaycastResult> startTouchHits = new();
 
     private void OnEnable()
     {
@@ -156,10 +158,39 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
         }
 
         hasStartedTransition = true;
+        // Update and OnPointerClick can both reach here for the same touch.
+        // The transition guard keeps the start sound to one play; UI buttons own theirs.
+        if (!IsStartTouchOverButton())
+        {
+            SfxAudioManager.Instance?.PlayButtonPress();
+        }
         AmbientAudioManager.Instance?.FadeToContentVolume(
             titleExitAnimation.TitleFullyHiddenDuration);
         Debug.Log(TouchMessage);
         titleExitAnimation.Play(HandleTitleExitFinished);
+    }
+
+    private bool IsStartTouchOverButton()
+    {
+        if (EventSystem.current == null)
+        {
+            return false;
+        }
+
+#if ENABLE_INPUT_SYSTEM
+        Vector2 position = Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed
+            ? Touchscreen.current.primaryTouch.position.ReadValue()
+            : Pointer.current != null ? Pointer.current.position.ReadValue() : Vector2.zero;
+#else
+        Vector2 position = Input.touchCount > 0 ? Input.GetTouch(0).position : (Vector2)Input.mousePosition;
+#endif
+        var pointer = new PointerEventData(EventSystem.current) { position = position };
+        startTouchHits.Clear();
+        EventSystem.current.RaycastAll(pointer, startTouchHits);
+        bool isButton = startTouchHits.Count > 0 &&
+            startTouchHits[0].gameObject.GetComponentInParent<Button>() != null;
+        startTouchHits.Clear();
+        return isButton;
     }
 
     private void HandleTitleExitFinished()
