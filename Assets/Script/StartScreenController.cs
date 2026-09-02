@@ -156,7 +156,8 @@ public sealed class StartScreenController : MonoBehaviour, IPointerClickHandler
         }
 
         hasStartedTransition = true;
-        AmbientAudioManager.Instance?.SetContentVolumeImmediately();
+        AmbientAudioManager.Instance?.FadeToContentVolume(
+            titleExitAnimation.TitleFullyHiddenDuration);
         Debug.Log(TouchMessage);
         titleExitAnimation.Play(HandleTitleExitFinished);
     }
