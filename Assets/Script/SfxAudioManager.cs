@@ -18,6 +18,7 @@ public sealed class SfxAudioManager : MonoBehaviour
     [SerializeField] private string[] touchExcludedSceneNames = Array.Empty<string>();
 
     public static SfxAudioManager Instance { get; private set; }
+    public static event Action<Vector2> PrimaryPressed;
 
     private AudioSource audioSource;
     private AudioSource popupAudioSource;
@@ -46,9 +47,10 @@ public sealed class SfxAudioManager : MonoBehaviour
 
     private void Update()
     {
-        if (IsTouchFeedbackEnabledForActiveScene() && WasPrimaryPressStartedThisFrame())
+        if (IsTouchFeedbackEnabledForActiveScene() && TryGetPrimaryPressPosition(out Vector2 screenPosition))
         {
             PlayOneShot(buttonPressClip);
+            PrimaryPressed?.Invoke(screenPosition);
         }
     }
 
@@ -87,17 +89,37 @@ public sealed class SfxAudioManager : MonoBehaviour
         return true;
     }
 
-    private static bool WasPrimaryPressStartedThisFrame()
+    private static bool TryGetPrimaryPressPosition(out Vector2 screenPosition)
     {
 #if ENABLE_INPUT_SYSTEM
-        bool mousePressed = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
-        bool touchPressed = Touchscreen.current != null &&
-            Touchscreen.current.primaryTouch.press.wasPressedThisFrame;
-        return mousePressed || touchPressed;
+        if (Touchscreen.current != null &&
+            Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
+        {
+            screenPosition = Touchscreen.current.primaryTouch.position.ReadValue();
+            return true;
+        }
+
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            screenPosition = Mouse.current.position.ReadValue();
+            return true;
+        }
 #else
-        return Input.GetMouseButtonDown(0) ||
-            (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began);
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        {
+            screenPosition = Input.GetTouch(0).position;
+            return true;
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            screenPosition = Input.mousePosition;
+            return true;
+        }
 #endif
+
+        screenPosition = default;
+        return false;
     }
 
     private void OnDestroy()
