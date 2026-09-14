@@ -2,9 +2,21 @@ using System;
 using System.IO;
 using UnityEngine;
 
+public enum BixolonPrintImageSource
+{
+    AssignedImage = 0,
+    FortuneRenderer = 1
+}
+
 public sealed class BixolonUsbPrinter : MonoBehaviour
 {
     [Header("Source")]
+    [SerializeField, Tooltip("Assigned Image는 Inspector에 지정한 이미지를, Fortune Renderer는 기존 PrintLayout을 출력합니다.")]
+    private BixolonPrintImageSource imageSource = BixolonPrintImageSource.AssignedImage;
+    [SerializeField, Tooltip("출력할 PNG/JPG Texture 에셋을 지정합니다. Read/Write 옵션을 켤 필요는 없습니다.")]
+    private Texture2D assignedImage;
+    [SerializeField, Min(1), Tooltip("지정 이미지의 출력 폭(dot)입니다. BK3-31 최대 인쇄 폭은 576dot입니다.")]
+    private int assignedImageOutputWidth = 576;
     [SerializeField] private FortunePrintRenderer printRenderer;
 
     [Header("Connection")]
@@ -15,7 +27,10 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
     [SerializeField, Range(-96, 96), Tooltip("양수는 인쇄 내용을 오른쪽으로 이동합니다. 단위는 203dpi 프린터의 dot입니다.")]
     private int horizontalOffsetDots;
     [SerializeField, Range(0, 100)] private int brightness = 50;
-    [SerializeField] private bool dithering = true;
+    [SerializeField, Tooltip("SDK는 프린터 드라이버에 맡기고, 나머지는 Unity에서 BMP 생성 전에 흑백 처리합니다.")]
+    private BixolonDitheringMode ditheringMode = BixolonDitheringMode.Sdk;
+    [SerializeField, Range(0, 255), Tooltip("Unity 디더링 방식에서 사용합니다. 높을수록 검정 영역이 늘어납니다.")]
+    private int blackWhiteThreshold = 128;
     [SerializeField, Range(0, 20)] private int lineFeedsAfterImage = 3;
     [SerializeField] private bool cutAfterPrint = true;
     [SerializeField, Min(100)] private int completionTimeoutMilliseconds = 5000;
@@ -104,7 +119,7 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
         }
     }
 
-    public void PrintFortune()
+    public void PrintImage()
     {
         if (IsPrinting)
         {
@@ -112,13 +127,7 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
             return;
         }
 
-        if (printRenderer == null)
-        {
-            Debug.LogError("[BixolonUsbPrinter] FortunePrintRenderer가 지정되지 않았습니다.", this);
-            return;
-        }
-
-        Texture2D texture = printRenderer.RenderToTexture();
+        Texture2D texture = CreatePrintTexture();
         if (texture == null)
         {
             return;
@@ -126,11 +135,17 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
 
         string bitmapPath = Path.Combine(
             Application.temporaryCachePath,
-            $"bixolon_fortune_{DateTime.Now:yyyyMMdd_HHmmss_fff}.bmp");
+            $"bixolon_print_{DateTime.Now:yyyyMMdd_HHmmss_fff}.bmp");
 
         try
         {
-            File.WriteAllBytes(bitmapPath, Bmp24Encoder.Encode(texture, horizontalOffsetDots));
+            File.WriteAllBytes(
+                bitmapPath,
+                Bmp24Encoder.Encode(
+                    texture,
+                    horizontalOffsetDots,
+                    ditheringMode,
+                    blackWhiteThreshold));
         }
         catch (Exception exception) when (
             exception is IOException ||
@@ -163,6 +178,30 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
             IsPrinting = false;
             TryDelete(bitmapPath);
         }
+    }
+
+    public void SetAssignedImage(Texture2D image)
+    {
+        assignedImage = image;
+        imageSource = BixolonPrintImageSource.AssignedImage;
+    }
+
+    public void PrintTexture(Texture2D image)
+    {
+        if (image == null)
+        {
+            Debug.LogError("[BixolonUsbPrinter] 출력할 이미지가 null입니다.", this);
+            return;
+        }
+
+        SetAssignedImage(image);
+        PrintImage();
+    }
+
+    // 기존 버튼이나 스크립트 연결을 깨지 않기 위한 호환용 메서드입니다.
+    public void PrintFortune()
+    {
+        PrintImage();
     }
 
     public int GetPrinterStatus()
@@ -206,7 +245,7 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
                 BixolonPosNative.WidthFull,
                 BixolonPosNative.AlignmentCenter,
                 brightness,
-                dithering);
+                ditheringMode == BixolonDitheringMode.Sdk);
 
             if (result == BixolonPosNative.Success && lineFeedsAfterImage > 0)
             {
@@ -223,6 +262,77 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
                 completionTimeoutMilliseconds);
 
             return result != BixolonPosNative.Success ? result : endResult;
+        }
+    }
+
+    private Texture2D CreatePrintTexture()
+    {
+        if (imageSource == BixolonPrintImageSource.FortuneRenderer)
+        {
+            if (printRenderer == null)
+            {
+                Debug.LogError("[BixolonUsbPrinter] Fortune Renderer가 지정되지 않았습니다.", this);
+                return null;
+            }
+
+            return printRenderer.RenderToTexture();
+        }
+
+        if (assignedImage == null)
+        {
+            Debug.LogError("[BixolonUsbPrinter] Assigned Image에 출력할 이미지가 지정되지 않았습니다.", this);
+            return null;
+        }
+
+        int outputWidth = Mathf.Clamp(assignedImageOutputWidth, 1, SystemInfo.maxTextureSize);
+        int outputHeight = Mathf.Max(
+            1,
+            Mathf.RoundToInt(assignedImage.height * (outputWidth / (float)assignedImage.width)));
+
+        if (outputHeight > SystemInfo.maxTextureSize)
+        {
+            float scale = SystemInfo.maxTextureSize / (float)outputHeight;
+            outputWidth = Mathf.Max(1, Mathf.RoundToInt(outputWidth * scale));
+            outputHeight = SystemInfo.maxTextureSize;
+        }
+
+        RenderTexture temporary = RenderTexture.GetTemporary(
+            outputWidth,
+            outputHeight,
+            0,
+            RenderTextureFormat.ARGB32,
+            RenderTextureReadWrite.Default);
+        RenderTexture previous = RenderTexture.active;
+        Texture2D readableCopy = null;
+
+        try
+        {
+            Graphics.Blit(assignedImage, temporary);
+            RenderTexture.active = temporary;
+
+            readableCopy = new Texture2D(
+                outputWidth,
+                outputHeight,
+                TextureFormat.RGBA32,
+                false);
+            readableCopy.ReadPixels(new Rect(0, 0, outputWidth, outputHeight), 0, 0);
+            readableCopy.Apply(false, false);
+            return readableCopy;
+        }
+        catch (Exception exception)
+        {
+            if (readableCopy != null)
+            {
+                Destroy(readableCopy);
+            }
+
+            Debug.LogError($"[BixolonUsbPrinter] 지정 이미지 변환 실패: {exception.Message}", this);
+            return null;
+        }
+        finally
+        {
+            RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(temporary);
         }
     }
 
