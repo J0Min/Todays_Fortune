@@ -30,6 +30,7 @@ public sealed class SceneVideoController : MonoBehaviour
     [SerializeField, Min(0f)] private float fadeInDuration;
 
     [Header("Events")]
+    [SerializeField] private UnityEvent onFirstVideoFramePresented;
     [SerializeField] private UnityEvent onIntroVideoEndingSoon;
     [SerializeField] private UnityEvent onIntroVideoFinished;
     [FormerlySerializedAs("onVideoFinished")]
@@ -691,6 +692,7 @@ public sealed class SceneVideoController : MonoBehaviour
         {
             hasReceivedFirstFrame = true;
             isWaitingForFirstFrame = false;
+            onFirstVideoFramePresented?.Invoke();
             HideUi();
             StartShowObjectAfterOutroVideo();
             if (ShouldHideIncomingVideoUntilHandoff())

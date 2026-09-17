@@ -46,6 +46,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SceneVideoController
   videoPlayer: {fileID: 0}
   restartFromBeginning: 1
+  onFirstVideoFramePresented:
+    m_PersistentCalls:
+      m_Calls: []
   onVideoFinished:
     m_PersistentCalls:
       m_Calls:

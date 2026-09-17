@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public enum BixolonPrintImageSource
@@ -24,6 +26,8 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
     [SerializeField] private bool initializeAfterConnect = true;
 
     [Header("Print")]
+    [SerializeField, Min(0f), Tooltip("영상의 첫 프레임이 표시된 후 인쇄까지 기다리는 시간(초)입니다.")]
+    private float printDelayAfterVideoStartSeconds = 3f;
     [SerializeField, Range(-96, 96), Tooltip("양수는 인쇄 내용을 오른쪽으로 이동합니다. 단위는 203dpi 프린터의 dot입니다.")]
     private int horizontalOffsetDots;
     [SerializeField, Range(0, 100)] private int brightness = 50;
@@ -40,9 +44,15 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
     public int LastResult { get; private set; }
 
     private readonly object printerLock = new object();
+    private Coroutine scheduledPrintRoutine;
+    private bool hasScheduledPrint;
+    private bool disconnectWhenPrintCompletes;
 
     private void OnEnable()
     {
+        hasScheduledPrint = false;
+        disconnectWhenPrintCompletes = false;
+
         if (connectOnEnable)
         {
             ConnectUsb();
@@ -51,7 +61,42 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
 
     private void OnDisable()
     {
-        Disconnect();
+        if (scheduledPrintRoutine != null)
+        {
+            StopCoroutine(scheduledPrintRoutine);
+            scheduledPrintRoutine = null;
+        }
+
+        if (IsPrinting)
+        {
+            disconnectWhenPrintCompletes = true;
+        }
+        else
+        {
+            Disconnect();
+        }
+    }
+
+    public void SchedulePrintAfterVideoStart()
+    {
+        if (hasScheduledPrint)
+        {
+            return;
+        }
+
+        hasScheduledPrint = true;
+        scheduledPrintRoutine = StartCoroutine(PrintAfterVideoStartDelay());
+    }
+
+    private IEnumerator PrintAfterVideoStartDelay()
+    {
+        if (printDelayAfterVideoStartSeconds > 0f)
+        {
+            yield return new WaitForSecondsRealtime(printDelayAfterVideoStartSeconds);
+        }
+
+        scheduledPrintRoutine = null;
+        PrintImage();
     }
 
     public bool ConnectUsb()
@@ -119,7 +164,7 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
         }
     }
 
-    public void PrintImage()
+    public async void PrintImage()
     {
         if (IsPrinting)
         {
@@ -133,26 +178,21 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
             return;
         }
 
-        string bitmapPath = Path.Combine(
-            Application.temporaryCachePath,
-            $"bixolon_print_{DateTime.Now:yyyyMMdd_HHmmss_fff}.bmp");
+        byte[] bitmapBytes;
 
         try
         {
-            File.WriteAllBytes(
-                bitmapPath,
-                Bmp24Encoder.Encode(
-                    texture,
-                    horizontalOffsetDots,
-                    ditheringMode,
-                    blackWhiteThreshold));
+            // Texture access must stay on Unity's main thread.
+            bitmapBytes = Bmp24Encoder.Encode(
+                texture,
+                horizontalOffsetDots,
+                ditheringMode,
+                blackWhiteThreshold);
         }
         catch (Exception exception) when (
-            exception is IOException ||
-            exception is UnauthorizedAccessException ||
             exception is ArgumentException)
         {
-            Debug.LogError($"[BixolonUsbPrinter] 임시 BMP 생성 실패: {exception.Message}", this);
+            Debug.LogError($"[BixolonUsbPrinter] BMP 변환 실패: {exception.Message}", this);
             return;
         }
         finally
@@ -160,10 +200,27 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
             Destroy(texture);
         }
 
+        string bitmapPath = Path.Combine(
+            Application.temporaryCachePath,
+            $"bixolon_print_{DateTime.Now:yyyyMMdd_HHmmss_fff}.bmp");
+
         IsPrinting = true;
         try
         {
-            LastResult = PrintBitmapFile(bitmapPath);
+            int result = await Task.Run(() =>
+            {
+                try
+                {
+                    File.WriteAllBytes(bitmapPath, bitmapBytes);
+                    return PrintBitmapFile(bitmapPath);
+                }
+                finally
+                {
+                    TryDelete(bitmapPath);
+                }
+            });
+
+            LastResult = result;
             if (LastResult == BixolonPosNative.Success)
             {
                 Debug.Log("[BixolonUsbPrinter] 인쇄 명령을 완료했습니다.", this);
@@ -173,10 +230,27 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
                 Debug.LogError($"[BixolonUsbPrinter] 인쇄 실패: {DescribeResult(LastResult)}", this);
             }
         }
+        catch (Exception exception) when (
+            exception is IOException ||
+            exception is UnauthorizedAccessException ||
+            exception is ArgumentException)
+        {
+            Debug.LogError($"[BixolonUsbPrinter] 임시 BMP 생성 실패: {exception.Message}", this);
+        }
+        catch (Exception exception)
+        {
+            LastResult = int.MinValue;
+            Debug.LogError($"[BixolonUsbPrinter] 인쇄 처리 중 예외가 발생했습니다: {exception.Message}", this);
+        }
         finally
         {
             IsPrinting = false;
-            TryDelete(bitmapPath);
+
+            if (disconnectWhenPrintCompletes)
+            {
+                disconnectWhenPrintCompletes = false;
+                await Task.Run(Disconnect);
+            }
         }
     }
 

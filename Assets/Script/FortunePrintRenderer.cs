@@ -11,6 +11,7 @@ public sealed class FortunePrintRenderer : MonoBehaviour
     [SerializeField] private Camera printCamera;
     [SerializeField] private Canvas printCanvas;
     [SerializeField] private RectTransform printLayout;
+    [SerializeField] private FortunePrintLayoutController printLayoutController;
 
     [Header("Output")]
     [SerializeField, Min(1)] private int outputWidth = 576;
@@ -21,6 +22,20 @@ public sealed class FortunePrintRenderer : MonoBehaviour
     [SerializeField] private bool autoSaveOnStart;
 
     public string LastSavedPath { get; private set; }
+    private RenderTexture printRenderTexture;
+
+    private void OnEnable()
+    {
+        if (ValidateReferences(false) && TryGetOutputSize(out int width, out int height))
+        {
+            EnsureRenderTarget(width, height);
+        }
+    }
+
+    private void OnDisable()
+    {
+        ReleaseRenderTarget();
+    }
 
     private IEnumerator Start()
     {
@@ -40,6 +55,48 @@ public sealed class FortunePrintRenderer : MonoBehaviour
             return null;
         }
 
+        if (printLayoutController != null)
+        {
+            printLayoutController.RefreshForPrint();
+        }
+
+        if (!TryGetOutputSize(out int renderWidth, out int renderHeight))
+        {
+            return null;
+        }
+
+        EnsureRenderTarget(renderWidth, renderHeight);
+
+        RenderTexture previousActive = RenderTexture.active;
+
+        try
+        {
+            Canvas.ForceUpdateCanvases();
+            printCanvas.GetComponent<RectTransform>().ForceUpdateRectTransforms();
+            printLayout.ForceUpdateRectTransforms();
+            printCamera.Render();
+
+            RenderTexture.active = printRenderTexture;
+            Texture2D texture = new Texture2D(
+                renderWidth,
+                renderHeight,
+                TextureFormat.RGBA32,
+                false);
+            texture.ReadPixels(new Rect(0, 0, renderWidth, renderHeight), 0, 0);
+            texture.Apply();
+            return texture;
+        }
+        finally
+        {
+            RenderTexture.active = previousActive;
+        }
+    }
+
+    private bool TryGetOutputSize(out int width, out int height)
+    {
+        width = 0;
+        height = 0;
+
         LayoutRebuilder.ForceRebuildLayoutImmediate(printLayout);
         Canvas.ForceUpdateCanvases();
 
@@ -53,54 +110,73 @@ public sealed class FortunePrintRenderer : MonoBehaviour
             Debug.LogError(
                 "[FortunePrintRenderer] Print layout width and height must be greater than zero.",
                 this);
-            return null;
+            return false;
         }
 
-        int outputHeight = Mathf.CeilToInt(layoutHeight * outputWidth / layoutWidth);
-        if (outputWidth > SystemInfo.maxTextureSize || outputHeight > SystemInfo.maxTextureSize)
+        width = outputWidth;
+        height = Mathf.CeilToInt(layoutHeight * outputWidth / layoutWidth);
+        if (width > SystemInfo.maxTextureSize || height > SystemInfo.maxTextureSize)
         {
             Debug.LogError(
-                $"[FortunePrintRenderer] Output size {outputWidth}x{outputHeight} exceeds " +
+                $"[FortunePrintRenderer] Output size {width}x{height} exceeds " +
                 $"the maximum texture size of {SystemInfo.maxTextureSize}.",
                 this);
-            return null;
+            return false;
         }
 
-        RenderTexture renderTexture = RenderTexture.GetTemporary(
-            outputWidth,
-            outputHeight,
+        return true;
+    }
+
+    private void EnsureRenderTarget(int width, int height)
+    {
+        if (printRenderTexture != null &&
+            printRenderTexture.width == width &&
+            printRenderTexture.height == height)
+        {
+            return;
+        }
+
+        ReleaseRenderTarget();
+        printRenderTexture = new RenderTexture(
+            width,
+            height,
             24,
-            RenderTextureFormat.ARGB32);
-
-        RenderTexture previousCameraTarget = printCamera.targetTexture;
-        RenderTexture previousActive = RenderTexture.active;
-        Camera previousCanvasCamera = printCanvas.worldCamera;
-
-        try
+            RenderTextureFormat.ARGB32)
         {
-            printCamera.targetTexture = renderTexture;
-            printCanvas.worldCamera = printCamera;
+            name = "Fortune Print Render Texture"
+        };
+        printRenderTexture.Create();
 
-            Canvas.ForceUpdateCanvases();
-            printCamera.Render();
+        printCamera.targetTexture = printRenderTexture;
+        printCanvas.worldCamera = printCamera;
+        printCanvas.enabled = false;
+        printCanvas.enabled = true;
+        Canvas.ForceUpdateCanvases();
+    }
 
-            RenderTexture.active = renderTexture;
-            Texture2D texture = new Texture2D(
-                outputWidth,
-                outputHeight,
-                TextureFormat.RGBA32,
-                false);
-            texture.ReadPixels(new Rect(0, 0, outputWidth, outputHeight), 0, 0);
-            texture.Apply();
-            return texture;
-        }
-        finally
+    private void ReleaseRenderTarget()
+    {
+        if (printRenderTexture == null)
         {
-            printCamera.targetTexture = previousCameraTarget;
-            printCanvas.worldCamera = previousCanvasCamera;
-            RenderTexture.active = previousActive;
-            RenderTexture.ReleaseTemporary(renderTexture);
+            return;
         }
+
+        if (printCamera != null && printCamera.targetTexture == printRenderTexture)
+        {
+            printCamera.targetTexture = null;
+        }
+
+        printRenderTexture.Release();
+        if (Application.isPlaying)
+        {
+            Destroy(printRenderTexture);
+        }
+        else
+        {
+            DestroyImmediate(printRenderTexture);
+        }
+
+        printRenderTexture = null;
     }
 
     public void SavePng()
@@ -165,31 +241,43 @@ public sealed class FortunePrintRenderer : MonoBehaviour
         }
     }
 
-    private bool ValidateReferences()
+    private bool ValidateReferences(bool logErrors = true)
     {
         if (printCamera == null)
         {
-            Debug.LogError("[FortunePrintRenderer] Print Camera is not assigned.", this);
+            if (logErrors)
+            {
+                Debug.LogError("[FortunePrintRenderer] Print Camera is not assigned.", this);
+            }
             return false;
         }
 
         if (printCanvas == null)
         {
-            Debug.LogError("[FortunePrintRenderer] Print Canvas is not assigned.", this);
+            if (logErrors)
+            {
+                Debug.LogError("[FortunePrintRenderer] Print Canvas is not assigned.", this);
+            }
             return false;
         }
 
         if (printCanvas.renderMode == RenderMode.ScreenSpaceOverlay)
         {
-            Debug.LogError(
-                "[FortunePrintRenderer] Print Canvas must use Screen Space - Camera or World Space.",
-                this);
+            if (logErrors)
+            {
+                Debug.LogError(
+                    "[FortunePrintRenderer] Print Canvas must use Screen Space - Camera or World Space.",
+                    this);
+            }
             return false;
         }
 
         if (printLayout == null)
         {
-            Debug.LogError("[FortunePrintRenderer] Print Layout is not assigned.", this);
+            if (logErrors)
+            {
+                Debug.LogError("[FortunePrintRenderer] Print Layout is not assigned.", this);
+            }
             return false;
         }
 

@@ -16,6 +16,7 @@ public sealed class SfxAudioManager : MonoBehaviour
     [SerializeField] private AudioClip popupClip;
     [SerializeField, Min(0f)] private float popupStartOffset = 0.47f;
     [SerializeField] private AudioClip buttonPressClip;
+    [SerializeField, Range(0f, 1f)] private float buttonPressVolume = 1f;
 
     [Header("Touch Feedback")]
     [Tooltip("Add scene names here when global touch feedback should be disabled for that scene.")]
@@ -206,7 +207,7 @@ public sealed class SfxAudioManager : MonoBehaviour
         // Only the click that enables mute may finish after listener volume becomes zero.
         // New clicks while muted are rejected above; popup/ambient sources remain unchanged.
         audioSource.ignoreListenerVolume = finishWhenMuted;
-        audioSource.PlayOneShot(buttonPressClip);
+        audioSource.PlayOneShot(buttonPressClip, buttonPressVolume);
     }
 
     private bool IsTouchFeedbackEnabledForActiveScene()
