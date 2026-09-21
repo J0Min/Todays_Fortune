@@ -44,6 +44,9 @@ public sealed class LoadingEndingController : MonoBehaviour
     private bool hasFinishedLoadingVideo;
     private bool isInputEnabled;
     private bool isReturning;
+    private bool isApplicationFocused = true;
+    private bool isApplicationPaused;
+    private bool resumeVideoWhenApplicationActive;
     private Coroutine autoReturnCoroutine;
     private Coroutine loadingFadeCoroutine;
 
@@ -54,6 +57,7 @@ public sealed class LoadingEndingController : MonoBehaviour
 
     private void OnEnable()
     {
+        isApplicationFocused = Application.isFocused;
         inactivityTimer = FindAnyObjectByType<InactivityTimer>();
         inactivityTimer?.Pause(this);
 
@@ -78,6 +82,7 @@ public sealed class LoadingEndingController : MonoBehaviour
 
     private void OnDisable()
     {
+        resumeVideoWhenApplicationActive = false;
         inactivityTimer?.Resume(this);
 
         if (loadingVideoPlayer == null)
@@ -114,7 +119,57 @@ public sealed class LoadingEndingController : MonoBehaviour
 
         player.time = 0d;
         ApplyDirectAudioMute(player);
-        player.Play();
+        PlayVideoWhenApplicationActive();
+    }
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        isApplicationFocused = hasFocus;
+        RefreshApplicationPlaybackState();
+    }
+
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        isApplicationPaused = pauseStatus;
+        RefreshApplicationPlaybackState();
+    }
+
+    private void RefreshApplicationPlaybackState()
+    {
+        if (loadingVideoPlayer == null)
+        {
+            return;
+        }
+
+        if (!isApplicationFocused || isApplicationPaused)
+        {
+            if (loadingVideoPlayer.isPlaying)
+            {
+                resumeVideoWhenApplicationActive = true;
+                loadingVideoPlayer.Pause();
+            }
+
+            return;
+        }
+
+        if (resumeVideoWhenApplicationActive && !hasFinishedLoadingVideo &&
+            loadingVideoPlayer.isPrepared)
+        {
+            resumeVideoWhenApplicationActive = false;
+            loadingVideoPlayer.Play();
+        }
+    }
+
+    private void PlayVideoWhenApplicationActive()
+    {
+        if (!isApplicationFocused || isApplicationPaused)
+        {
+            resumeVideoWhenApplicationActive = true;
+            return;
+        }
+
+        resumeVideoWhenApplicationActive = false;
+        loadingVideoPlayer.Play();
     }
 
     private static void ApplyDirectAudioMute(VideoPlayer player)
@@ -183,6 +238,7 @@ public sealed class LoadingEndingController : MonoBehaviour
         }
 
         hasStartedEnding = true;
+        resumeVideoWhenApplicationActive = false;
         hasFinishedLoadingVideo = true;
         if (loadingVideoImage != null)
         {

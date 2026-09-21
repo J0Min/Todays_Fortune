@@ -10,6 +10,7 @@ public sealed class FortuneDataReader_Save : MonoBehaviour
 
     private readonly Dictionary<(int ropeId, int cardId), int> finalIdBySelection = new();
     private bool isLoaded;
+    private int firstFinalId;
 
     private void Start()
     {
@@ -25,9 +26,20 @@ public sealed class FortuneDataReader_Save : MonoBehaviour
             return false;
         }
 
+        if (state.RopeId == 0 && state.CardId == 0)
+        {
+            if (!TryGetFirstFinalId(out int firstId))
+            {
+                return false;
+            }
+
+            state.SetID(firstId);
+            return true;
+        }
+
         if (!state.IsValidRopeId(state.RopeId) || !state.IsValidCardId(state.CardId))
         {
-            Debug.LogError(
+            Debug.LogWarning(
                 $"[FortuneDataReader_Save] Invalid selection: RopeId={state.RopeId}, CardId={state.CardId}.",
                 this);
             return false;
@@ -61,6 +73,18 @@ public sealed class FortuneDataReader_Save : MonoBehaviour
         return false;
     }
 
+    private bool TryGetFirstFinalId(out int finalId)
+    {
+        finalId = 0;
+        if (!LoadData())
+        {
+            return false;
+        }
+
+        finalId = firstFinalId;
+        return true;
+    }
+
     private bool LoadData()
     {
         if (isLoaded)
@@ -75,6 +99,7 @@ public sealed class FortuneDataReader_Save : MonoBehaviour
         }
 
         finalIdBySelection.Clear();
+        firstFinalId = 0;
         string[] lines = fortuneTsv.text.Split('\n');
         for (int lineIndex = 1; lineIndex < lines.Length; lineIndex++)
         {
@@ -102,6 +127,10 @@ public sealed class FortuneDataReader_Save : MonoBehaviour
                 Debug.LogError(
                     $"[FortuneDataReader_Save] Duplicate selection in TSV: RopeId={ropeId}, CardId={cardId}.",
                     this);
+            }
+            else if (finalIdBySelection.Count == 1)
+            {
+                firstFinalId = finalId;
             }
         }
 

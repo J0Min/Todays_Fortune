@@ -79,6 +79,9 @@ public sealed class SceneVideoController : MonoBehaviour
     private bool isFinishing;
     private bool hasFinishedTransitionVideo;
     private bool hasInvokedIntroEndingSoon;
+    private bool isApplicationFocused = true;
+    private bool isApplicationPaused;
+    private bool resumeVideoWhenApplicationActive;
     private VideoPhase currentPhase;
     private float introStartTimeAtHandoff;
 
@@ -116,6 +119,7 @@ public sealed class SceneVideoController : MonoBehaviour
 
     private void OnEnable()
     {
+        isApplicationFocused = Application.isFocused;
         inactivityTimer = FindAnyObjectByType<InactivityTimer>();
 
         if (videoPlayer != null)
@@ -130,6 +134,8 @@ public sealed class SceneVideoController : MonoBehaviour
 
     private void OnDisable()
     {
+        resumeVideoWhenApplicationActive = false;
+
         if (videoPlayer != null)
         {
             videoPlayer.prepareCompleted -= HandleVideoPrepared;
@@ -337,6 +343,7 @@ public sealed class SceneVideoController : MonoBehaviour
             return;
         }
 
+        resumeVideoWhenApplicationActive = false;
         videoPlayer.Pause();
     }
 
@@ -348,6 +355,56 @@ public sealed class SceneVideoController : MonoBehaviour
             return;
         }
 
+        PlayVideoWhenApplicationActive();
+    }
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        isApplicationFocused = hasFocus;
+        RefreshApplicationPlaybackState();
+    }
+
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        isApplicationPaused = pauseStatus;
+        RefreshApplicationPlaybackState();
+    }
+
+    private void RefreshApplicationPlaybackState()
+    {
+        if (videoPlayer == null)
+        {
+            return;
+        }
+
+        if (!isApplicationFocused || isApplicationPaused)
+        {
+            if (videoPlayer.isPlaying)
+            {
+                resumeVideoWhenApplicationActive = true;
+                videoPlayer.Pause();
+            }
+
+            return;
+        }
+
+        if (resumeVideoWhenApplicationActive && !isPreparing && !isFinishing &&
+            videoPlayer.isPrepared)
+        {
+            resumeVideoWhenApplicationActive = false;
+            videoPlayer.Play();
+        }
+    }
+
+    private void PlayVideoWhenApplicationActive()
+    {
+        if (!isApplicationFocused || isApplicationPaused)
+        {
+            resumeVideoWhenApplicationActive = true;
+            return;
+        }
+
+        resumeVideoWhenApplicationActive = false;
         videoPlayer.Play();
     }
 
@@ -378,6 +435,7 @@ public sealed class SceneVideoController : MonoBehaviour
         }
 
         isFinishing = true;
+        resumeVideoWhenApplicationActive = false;
         if (currentPhase == VideoPhase.Intro)
         {
             InvokeIntroEndingSoonOnce();
@@ -624,7 +682,7 @@ public sealed class SceneVideoController : MonoBehaviour
         // Preparation does not guarantee that a decoded frame has reached the
         // camera output yet. Keep the video hidden until frameReady confirms it.
         ApplyMuteState(IsGameAudioMuted());
-        videoPlayer.Play();
+        PlayVideoWhenApplicationActive();
 
         if (incomingSceneActivationLeadTime > 0f &&
             (currentPhase == VideoPhase.Outro ||
@@ -1068,7 +1126,7 @@ public sealed class SceneVideoController : MonoBehaviour
         if (targetSeconds > 0d)
         {
             SeekVideoForwardTo(targetSeconds);
-            videoPlayer.Play();
+            PlayVideoWhenApplicationActive();
             introStartTimeAtHandoff = 0f;
         }
 

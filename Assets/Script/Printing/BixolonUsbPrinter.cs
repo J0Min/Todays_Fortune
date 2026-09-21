@@ -133,7 +133,7 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
 
             if (!IsConnected)
             {
-                Debug.LogError($"[BixolonUsbPrinter] USB 연결 실패: {DescribeResult(LastResult)}", this);
+                Debug.LogWarning($"[BixolonUsbPrinter] USB 연결 안 됨: {DescribeResult(LastResult)}", this);
             }
 
             return IsConnected;
@@ -227,7 +227,15 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"[BixolonUsbPrinter] 인쇄 실패: {DescribeResult(LastResult)}", this);
+                string message = $"[BixolonUsbPrinter] 인쇄 실패: {DescribeResult(LastResult)}";
+                if (IsPrinterUnavailableResult(LastResult))
+                {
+                    Debug.LogWarning(message, this);
+                }
+                else
+                {
+                    Debug.LogError(message, this);
+                }
             }
         }
         catch (Exception exception) when (
@@ -436,6 +444,11 @@ public sealed class BixolonUsbPrinter : MonoBehaviour
         return exception is DllNotFoundException ||
                exception is EntryPointNotFoundException ||
                exception is BadImageFormatException;
+    }
+
+    private static bool IsPrinterUnavailableResult(int result)
+    {
+        return result == -100 || result == -101 || result == BixolonPosNative.StatusNotOpen;
     }
 
     private static void TryDelete(string path)
